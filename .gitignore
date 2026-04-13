@@ -1,0 +1,35 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# AI / ML
+*.bin
+*.pkl
+
+# Node
+node_modules/
+**/node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# Java / Spring Boot
+target/
+build/
+.gradle/
+*.class
+
+# Logs
+*.log
+
+# Vite build
+dist/
+
+# Env file (frontend/backend)
+.env
+.env.*
+
+# Spring Boot secret
+src/main/resources/application-secret.properties
