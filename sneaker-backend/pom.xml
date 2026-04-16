@@ -83,7 +83,7 @@
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
-<!--add thuư viện jjwt để làm user-->
+<!--add thư viện jjwt để làm user-->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
@@ -103,6 +103,7 @@
             <version>0.11.5</version>
             <scope>runtime</scope>
         </dependency>
+
     </dependencies>
 
     <build>
