@@ -24,7 +24,6 @@ public class SecurityConfig {
 
                         // Cho phép login/register
                         .requestMatchers("/api/auth/**").permitAll()
-
                         // Các API khác cần token
                         .anyRequest().authenticated()
                 )

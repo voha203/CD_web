@@ -6,19 +6,19 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "product_sizes")
+@Table(name = "product_sizes",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"product_id", "size"})) //chống trùng DB
 public class ProductSize {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer size;     // 38, 39, 40...
-
-    private Integer quantity; // tồn kho theo size
+    private Integer size;
+    private Integer quantity;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    @JsonIgnore // tránh vòng lặp JSON
+    @JsonIgnore
     private Product product;
 }

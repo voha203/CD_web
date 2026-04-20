@@ -1,5 +1,7 @@
 package com.sneaker.backend.controller;
 
+import com.sneaker.backend.dto.productsize.ProductSizeDTO;
+import com.sneaker.backend.dto.productsize.ProductSizeRequest;
 import com.sneaker.backend.entity.Product;
 import com.sneaker.backend.entity.ProductSize;
 import com.sneaker.backend.repository.ProductRepository;
@@ -23,20 +25,30 @@ public class ProductSizeController {
 
     // GET size theo product
     @GetMapping("/product/{productId}")
-    public List<ProductSize> getByProduct(@PathVariable Long productId) {
+    public List<ProductSizeDTO> getByProduct(@PathVariable Long productId) {
         return productSizeService.getByProduct(productId);
     }
 
     // CREATE size cho product
     @PostMapping
-    public ProductSize create(@RequestBody ProductSize productSize) {
+    public ProductSizeDTO create(@RequestBody ProductSizeRequest request) {
 
-        // đảm bảo product tồn tại
-        Product product = productRepository.findById(productSize.getProduct().getId())
+        Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        productSize.setProduct(product);
+        ProductSize ps = new ProductSize();
+        ps.setProduct(product);
+        ps.setSize(request.getSize());
+        ps.setQuantity(request.getQuantity());
 
-        return productSizeService.create(productSize);
+        ProductSize saved = productSizeService.create(ps);
+
+        ProductSizeDTO dto = new ProductSizeDTO();
+        dto.setId(saved.getId());
+        dto.setSize(saved.getSize());
+        dto.setQuantity(saved.getQuantity());
+        dto.setProductId(product.getId());
+
+        return dto;
     }
 }
