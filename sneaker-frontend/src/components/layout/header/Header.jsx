@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import './Header.css';
+import logo_flag_vn from '../../../assets/images/flag/vn.svg'
+import logo_flag_en from '../../../assets/images/flag/en.svg'
 
 function Header() {
     const [selectedCategory, setSelectedCategory] = useState("All");
+    const [language, setLanguage] = useState("VN");
 
     return (
         <header className="header">
@@ -56,6 +59,61 @@ function Header() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </button>
+                </div>
+
+                {/* Chọn ngôn ngữ (Language Switcher) */}
+                <div className="nav-item language-select-wrapper">
+                    <div className="language-trigger">
+                        <img src={language === 'VN' ? logo_flag_vn : logo_flag_en} alt="flag" className="header-flag" />
+                        <span className="header-lang-text">{language}</span>
+                        <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24" style={{ marginLeft: '4px', marginTop: '4px', color: '#ccc' }}>
+                            <path d="M7 10l5 5 5-5z"></path>
+                        </svg>
+                    </div>
+
+                    <div className="language-dropdown-menu">
+                        <div className="dropdown-arrow-up"></div>
+
+                        <div className="dropdown-inner">
+                            <div className="dropdown-title">Change language</div>
+
+                            <label className="dropdown-radio-label">
+                                <input
+                                    type="radio"
+                                    name="lang-select"
+                                    className="custom-radio"
+                                    checked={language === 'EN'}
+                                    onChange={() => setLanguage('EN')}
+                                />
+                                <span>English - EN</span>
+                            </label>
+
+                            <label className="dropdown-radio-label">
+                                <input
+                                    type="radio"
+                                    name="lang-select"
+                                    className="custom-radio"
+                                    checked={language === 'VN'}
+                                    onChange={() => setLanguage('VN')}
+                                />
+                                <span>Tiếng Việt - VN</span>
+                            </label>
+
+                            <div className="dropdown-divider"></div>
+
+                            <div className="dropdown-title">Change currency</div>
+
+                            <label className="dropdown-radio-label">
+                                <input type="radio" name="currency-select" className="custom-radio" defaultChecked />
+                                <span>$ - USD - US Dollar</span>
+                            </label>
+
+                            <label className="dropdown-radio-label">
+                                <input type="radio" name="currency-select" className="custom-radio" />
+                                <span>₫ - VND - Vietnamese Dong</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Account và Orders */}
