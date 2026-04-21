@@ -12,4 +12,5 @@ public class ProductDTO {
     private String image;
     private Integer stock;
     private Long categoryId;
+    private Double finalPrice;
 }

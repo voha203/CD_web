@@ -6,6 +6,7 @@ import com.sneaker.backend.entity.Product;
 import com.sneaker.backend.entity.Category;
 import com.sneaker.backend.repository.ProductRepository;
 import com.sneaker.backend.repository.CategoryRepository;
+import com.sneaker.backend.service.DiscountService;
 import com.sneaker.backend.service.ProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +24,38 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    //  convert Entity → DTO
+    @Autowired
+    private DiscountService discountService;
+
+    // =========================
+    // 🔥 CONVERT ENTITY → DTO
+    // =========================
     private ProductDTO toDTO(Product p) {
+
         ProductDTO dto = new ProductDTO();
+
         dto.setId(p.getId());
         dto.setName(p.getName());
         dto.setPrice(p.getPrice());
         dto.setDescription(p.getDescription());
         dto.setImage(p.getImage());
         dto.setStock(p.getStock());
-        dto.setCategoryId(p.getCategory().getId());
+
+        if (p.getCategory() != null) {
+            dto.setCategoryId(p.getCategory().getId());
+        }
+
+        // 🔥 FINAL PRICE (có check null)
+        if (p.getPrice() != null) {
+            dto.setFinalPrice(discountService.getFinalPrice(p));
+        }
+
         return dto;
     }
 
-    //  get all
+    // =========================
+    // GET ALL
+    // =========================
     @Override
     public List<ProductDTO> getAll() {
         return productRepository.findAll()
@@ -45,17 +64,39 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-    //  get by id
+    // =========================
+    // GET BY ID
+    // =========================
     @Override
     public ProductDTO getById(Long id) {
         Product p = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
+
         return toDTO(p);
     }
 
-    //  create
+    // =========================
+    // CREATE
+    // =========================
     @Override
     public ProductDTO create(ProductRequest request) {
+
+        //  VALIDATE
+        if (request.getName() == null || request.getName().trim().isEmpty()) {
+            throw new RuntimeException("Name is required");
+        }
+
+        if (request.getPrice() == null || request.getPrice() < 0) {
+            throw new RuntimeException("Price must be >= 0");
+        }
+
+        if (request.getStock() == null || request.getStock() < 0) {
+            throw new RuntimeException("Stock must be >= 0");
+        }
+
+        if (request.getCategoryId() == null) {
+            throw new RuntimeException("CategoryId is required");
+        }
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -71,12 +112,30 @@ public class ProductServiceImpl implements ProductService {
         return toDTO(productRepository.save(p));
     }
 
-    //  update
+    // =========================
+    // UPDATE
+    // =========================
     @Override
     public ProductDTO update(Long id, ProductRequest request) {
 
         Product p = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        if (request.getName() == null || request.getName().trim().isEmpty()) {
+            throw new RuntimeException("Name is required");
+        }
+
+        if (request.getPrice() == null || request.getPrice() < 0) {
+            throw new RuntimeException("Price must be >= 0");
+        }
+
+        if (request.getStock() == null || request.getStock() < 0) {
+            throw new RuntimeException("Stock must be >= 0");
+        }
+
+        if (request.getCategoryId() == null) {
+            throw new RuntimeException("CategoryId is required");
+        }
 
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
@@ -91,9 +150,15 @@ public class ProductServiceImpl implements ProductService {
         return toDTO(productRepository.save(p));
     }
 
-    //  delete
+    // =========================
+    // DELETE
+    // =========================
     @Override
     public void delete(Long id) {
-        productRepository.deleteById(id);
+
+        Product p = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        productRepository.delete(p);
     }
 }

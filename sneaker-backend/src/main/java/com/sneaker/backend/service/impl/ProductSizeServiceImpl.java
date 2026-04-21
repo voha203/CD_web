@@ -41,16 +41,37 @@ public class ProductSizeServiceImpl implements ProductSizeService {
     @Override
     public ProductSize create(ProductSize productSize) {
 
+        // 🔥 CHECK NULL PRODUCT
+        if (productSize.getProduct() == null || productSize.getProduct().getId() == null) {
+            throw new RuntimeException("ProductId is required");
+        }
+
         Long productId = productSize.getProduct().getId();
         Integer size = productSize.getSize();
 
-        // CHECK TRÙNG
+        //  CHECK SIZE
+        if (size == null || size < 30 || size > 50) {
+            throw new RuntimeException("Invalid size (30-50)");
+        }
+
+        //  CHECK QUANTITY
+        if (productSize.getQuantity() == null || productSize.getQuantity() < 0) {
+            throw new RuntimeException("Quantity must be >= 0");
+        }
+
+        //  CHECK PRODUCT TỒN TẠI
+        var product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        //  CHECK TRÙNG
         boolean exists = productSizeRepository
                 .existsByProductIdAndSize(productId, size);
 
         if (exists) {
             throw new RuntimeException("Size already exists for this product");
         }
+
+        productSize.setProduct(product);
 
         return productSizeRepository.save(productSize);
     }
