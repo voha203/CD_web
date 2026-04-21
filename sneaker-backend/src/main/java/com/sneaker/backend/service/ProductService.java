@@ -1,18 +1,19 @@
 package com.sneaker.backend.service;
 
-import com.sneaker.backend.entity.Product;
+import com.sneaker.backend.dto.product.ProductDTO;
+import com.sneaker.backend.dto.product.ProductRequest;
 
 import java.util.List;
 
 public interface ProductService {
 
-    List<Product> getAll();
+    List<ProductDTO> getAll();
 
-    Product getById(Long id);
+    ProductDTO getById(Long id);
 
-    Product create(Product product);
+    ProductDTO create(ProductRequest request);
 
-    Product update(Long id, Product product);
+    ProductDTO update(Long id, ProductRequest request);
 
     void delete(Long id);
 }

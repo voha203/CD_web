@@ -1,13 +1,13 @@
 package com.sneaker.backend.controller;
 
+import com.sneaker.backend.dto.auth.*;
+import com.sneaker.backend.dto.user.UserDTO;
 import com.sneaker.backend.entity.User;
 import com.sneaker.backend.security.JwtUtil;
 import com.sneaker.backend.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -22,22 +22,45 @@ public class AuthController {
 
     // REGISTER
     @PostMapping("/register")
-    public User register(@RequestBody User user) {
-        return userService.register(user);
+    public UserDTO register(@RequestBody RegisterRequest request) {
+
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setPassword(request.getPassword());
+        user.setEmail(request.getEmail());
+        user.setFullName(request.getFullName());
+        user.setPhone(request.getPhone());
+        user.setAddress(request.getAddress());
+
+        User savedUser = userService.register(user);
+
+        return toDTO(savedUser);
     }
 
     // LOGIN
     @PostMapping("/login")
-    public Map<String, Object> login(@RequestBody User user) {
+    public AuthResponse login(@RequestBody LoginRequest request) {
 
-        User u = userService.login(user.getUsername(), user.getPassword());
+        User user = userService.login(
+                request.getUsername(),
+                request.getPassword()
+        );
 
-        String token = jwtUtil.generateToken(u.getUsername());
-        u.setPassword(null); // chú ý dòng này để ẩn pass
-        Map<String, Object> response = new HashMap<>();
-        response.put("user", u);
-        response.put("token", token);
+        String token = jwtUtil.generateToken(user.getUsername());
 
-        return response;
+        return new AuthResponse(toDTO(user), token);
+    }
+
+    // convert User → DTO (RẤT QUAN TRỌNG)
+    private UserDTO toDTO(User u) {
+        UserDTO dto = new UserDTO();
+        dto.setId(u.getId());
+        dto.setUsername(u.getUsername());
+        dto.setEmail(u.getEmail());
+        dto.setFullName(u.getFullName());
+        dto.setPhone(u.getPhone());
+        dto.setAddress(u.getAddress());
+        dto.setRole(u.getRole());
+        return dto;
     }
 }

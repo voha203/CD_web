@@ -8,4 +8,5 @@ import java.util.List;
 public interface ProductSizeRepository extends JpaRepository<ProductSize, Long> {
 
     List<ProductSize> findByProductId(Long productId);
+    boolean existsByProductIdAndSize(Long productId, Integer size);
 }

@@ -24,8 +24,10 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
         String path = request.getRequestURI();
-// 🔥 BỎ QUA AUTH API
+
+        // bỏ qua auth API
         if (path.startsWith("/api/auth")) {
             filterChain.doFilter(request, response);
             return;
@@ -33,9 +35,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        // Nếu không có token → chặn
+        // 🔥 FIX: KHÔNG chặn, cho đi tiếp
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            filterChain.doFilter(request, response);
             return;
         }
 
@@ -48,7 +50,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     new UsernamePasswordAuthenticationToken(
                             username,
                             null,
-                            Collections.singletonList(new SimpleGrantedAuthority("USER"))
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
                     );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
