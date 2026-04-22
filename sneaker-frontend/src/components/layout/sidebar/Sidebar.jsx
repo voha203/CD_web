@@ -6,7 +6,7 @@ function Sidebar() {
         <aside className="sidebar-wrapper">
 
             {/* KHỐI 1: DANH MỤC */}
-            <div className="filter-section">
+            {/* <div className="filter-section">
                 <h3 className="filter-heading">Danh mục</h3>
                 <ul className="category-list">
                     <li><a href="#" className="category-link">Giày Nam</a></li>
@@ -18,7 +18,7 @@ function Sidebar() {
                     <li><a href="#" className="category-link mt-1">Giày Nữ</a></li>
                     <li><a href="#" className="category-link mt-1">Giày Trẻ Em</a></li>
                 </ul>
-            </div>
+            </div> */}
 
             {/* KHỐI 2: THƯƠNG HIỆU */}
             <div className="filter-section">
