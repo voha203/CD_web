@@ -1,0 +1,149 @@
+.footer-container {
+    background-color: #232f3e;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+}
+
+/* THANH "BACK TO TOP" */
+.back-to-top {
+    background-color: #37475a;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.back-to-top:hover {
+    background-color: #475a6f;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 40px;
+    margin-bottom: 50px;
+}
+
+/* Cột 1: Logo và Giới thiệu */
+.footer-brand .footer-logo {
+    font-size: 24px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 33px;
+    display: block;
+}
+
+.footer-brand p {
+    color: #dddddd;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+/* Tiêu đề các cột phụ */
+.footer-heading {
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+/* Danh sách link */
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: #dddddd;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+    color: #ffffff;
+}
+
+/* Cột Newsletter (Đăng ký nhận tin) */
+.footer-newsletter p {
+    font-size: 14px;
+    color: #dddddd;
+    margin-bottom: 20px;
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 10px;
+}
+
+.newsletter-form input {
+    flex: 1;
+    background-color: #222;
+    border: 1px solid #333;
+    padding: 10px 15px;
+    color: white;
+    border-radius: 4px;
+    outline: none;
+}
+
+.newsletter-form button {
+    background-color: white;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.newsletter-form button:hover {
+    background-color: #ff4500;
+    color: white;
+}
+
+/* Phần bản quyền dưới đáy */
+.footer-bottom {
+    background-color: #131921;
+    max-width: 100%;
+    padding: 0 30px;
+    border-top: 1px solid #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #dddddd;
+    font-size: 13px;
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .newsletter-form {
+        flex-direction: column;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
