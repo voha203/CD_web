@@ -1,0 +1,91 @@
+.product-list-container {
+    background-color: #ffffff;
+    min-height: 100vh;
+}
+
+.product-list-container main {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+    display: flex;
+    gap: 30px;
+}
+
+/* ================ Thanh đếm số lượng tìm kiếm và sắp xếp danh sách theo yêu cầu ================== */
+.product-list-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 0.0625em 0.0625em, rgba(0, 0, 0, 0.25) 0px 0.125em 0.5em, rgba(255, 255, 255, 0.1) 0px 0px 0px 1px inset;;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.product-list-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.product-list-title h2 {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.product-list-title p {
+    margin-left: 30px;
+    font-size: 14px;
+    color: #555;
+}
+
+.product-list-arrange {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.product-list-arrange label {
+    color: #555;
+}
+
+.product-list-arrange select {
+    padding: 5px;
+    border-radius: 8px;
+    border: 1px solid #d5d9d9;
+    background-color: #f0f2f2;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(15, 17, 17, .15);
+}
+
+.product-list-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.text-result {
+    margin-bottom: 20px;
+}
+
+.text-result h2 {
+    margin-bottom: 5px;
+}
+
+@media (max-width: 1024px) {
+    .product-list-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .product-list-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

@@ -1,0 +1,234 @@
+.sidebar-wrapper {
+    width: 256px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 96px;
+}
+
+.sidebar-wrapper {
+    font-family: 'Inter', sans-serif;
+}
+
+.sidebar-wrapper h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.product-name,
+.hero-title {
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* ============= Các nhóm bộ lọc (Danh mục, Thương hiệu, v.v.) ================ */
+.filter-section {
+    margin-bottom: 24px;
+}
+
+.filter-heading {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #111827;
+}
+
+/* ===================== Danh mục =================== */
+.category-list {
+    font-size: 14px;
+    color: #374151;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.category-link {
+    text-decoration: none;
+    color: inherit;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.category-link:hover {
+    color: #000000;
+}
+
+/* Link đang được chọn (Active) */
+.category-link.active {
+    color: #000000;
+    font-weight: 600;
+    border-left: 2px solid #000000;
+    padding-left: 8px;
+}
+
+.sub-item {
+    padding-left: 12px;
+}
+
+.mt-1 {
+    margin-top: 4px;
+    display: inline-block;
+}
+
+/* ============= Checkbox Thương hiệu =============== */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.checkbox-label {
+    font-size: 14px;
+    color: black;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.checkbox-label:hover {
+    color: #000000;
+}
+
+/* ================= Khoảng giá ================= */
+.price-ranges {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.radio-input {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: #0078d4;
+}
+
+.radio-text {
+    margin-top: 4px;
+    font-size: 14px;
+    color: black;
+    transition: color 0.2s;
+}
+
+.radio-label:hover .radio-text {
+    color: #000000;
+    font-weight: 500;
+}
+
+.custom-price-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px dashed #e5e7eb;
+}
+
+.price-inputs-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-wrapper {
+    position: relative;
+    flex: 1;
+}
+
+.price-input-new {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 8px 24px 8px 8px;
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.price-input-new:focus {
+    border-color: #000000;
+}
+
+.price-input-new::-webkit-outer-spin-button,
+.price-input-new::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.currency-badge {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.price-separator {
+    color: #9ca3af;
+    font-weight: bold;
+}
+
+.price-submit-btn {
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    color: #000000;
+    border-radius: 6px;
+    padding: 8px 0;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.price-submit-btn:hover {
+    background-color: #475a6f;
+    color: #ffffff;
+     border: 1px solid #475a6f;
+}
+
+/* ==================== Lưới Kích cỡ ================= */
+.size-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    font-size: 14px;
+}
+
+.size-btn {
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 6px 4px;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.size-btn:hover {
+    border-color: #000000;
+    background-color: #f9fafb;
+}
+
+.size-btn:focus {
+    background-color: #475a6f;
+    color: #ffffff;
+    border-color: #000000;
+}
