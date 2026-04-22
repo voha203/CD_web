@@ -1,0 +1,118 @@
+.product-card {
+    position: relative;
+    background-color: white;
+    border: 1px solid #eeeeee;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+    width: 280px;
+}
+
+.product-card:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px);
+}
+
+.card-image-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1/1;
+    background-color: #f6f6f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image {
+    width: 250px;
+    object-fit: contain;
+    transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+/* ----- BADGES (Nhãn New, Sale...) ----- */
+.badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+    z-index: 2;
+}
+
+.badge-new {
+    background-color: #27ae60;
+}
+
+.badge-sale {
+    background-color: #e74c3c;
+}
+
+.card-details {
+    padding: 16px;
+    display: grid;
+    gap: 4px;
+}
+
+.product-brand {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #888888;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+.product-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #111111;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.price-row {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.current-price {
+    font-size: 18px;
+    font-weight: 800;
+    color: black;
+}
+
+.old-price {
+    font-size: 14px;
+    color: #aaaaaa;
+    text-decoration: line-through;
+}
+
+.cart-btn {
+    background-color: #ffd814;
+    border: 1px solid #fcd200;
+    border-radius: 100px;
+    padding: 8px 15px;
+    font-size: 14px;
+    color: #0f1111;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: max-content;
+    margin-top: auto;
+}
+
+.cart-btn:hover {
+    background-color: #f7ca00;
+}
