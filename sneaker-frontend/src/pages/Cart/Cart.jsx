@@ -71,7 +71,7 @@ function Cart() {
     }
 
     // Xử lí trạng thái giỏ hàng trống
-    if (cartItems.length >= 0) {
+    if (cartItems.length === 0) {
         return (
             <div className="cart-page-container">
                 <Header />
