@@ -1,0 +1,640 @@
+.auth {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: white;
+}
+
+input[type="password"]::-ms-reveal {
+    display: none;
+}
+
+/* ============ Container ============ */
+.auth {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+}
+
+/* ============ Logo ============ */
+.logo-container {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.logo-text {
+    color: #232f3e;
+    font-size: 30px;
+    font-weight: bold;
+    letter-spacing: -1px;
+}
+
+/* ===================================== Enter Box ================================== */
+.enter-box {
+    width: 300px;
+    border: 1px solid #d5d9d9;
+    border-radius: 8px;
+    padding-top: 8px;
+    padding-bottom: 20px;
+    padding-left: 26px;
+    padding-right: 26px;
+    margin-bottom: 243px;
+}
+
+.enter-box .enter-box-header h1 {
+    font-size: 22px;
+    font-weight: 400;
+    margin-bottom: 15px;
+}
+
+.enter-box .enter-box-input {
+    position: relative;
+    width: 100%;
+}
+
+/* ============ Label ============ */
+.enter-box .enter-box-input label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* ============ Input ============ */
+.enter-box .enter-box-input input {
+    width: 284px;
+    height: 31px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #a6a6a6;
+    border-radius: 3px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 11px;
+    padding-right: 7px;
+    outline: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.enter-box input:focus {
+    border-color: #007185;
+    box-shadow: 0 0 3px 2px rgba(0, 118, 255, 0.2);
+}
+
+.enter-box .enter-box-input .clear-btn {
+    position: absolute;
+    right: 1px;
+    top: 60%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #555;
+    cursor: pointer;
+    user-select: none;
+}
+
+.enter-box .enter-box-input .clear-btn:hover {
+    color: black;
+}
+
+/* ============ Button ============ */
+.enter-box button {
+    width: 100%;
+    height: 31px;
+    background: #ffd814;
+    border: 1px solid #fcd200;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.enter-box button:hover {
+    background: #f7ca00;
+}
+
+/* ============ Terms ============ */
+.terms {
+    font-size: 13px;
+    margin-top: 15px;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.terms span {
+    color: #0066c0;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.terms span:hover {
+    text-decoration: underline;
+    color: #131921;
+}
+
+/* ============ Help ============ */
+.help {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #0066c0;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.help span:hover {
+    text-decoration: underline;
+    color: #131921;
+}
+
+/* ============ Divider ============ */
+.divider {
+    margin: 20px 0;
+    border-top: 2px solid #e7e7e7;
+}
+
+/* ============ Business ============ */
+.business-title {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.business-link {
+    font-size: 14px;
+    color: #0066c0;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.business-link:hover {
+    text-decoration: underline;
+    color: #131921;
+}
+
+
+
+/* ====================================== Confirm New Box ===================================== */
+.confirm-new-box {
+    width: 300px;
+    border: 1px solid #d5d9d9;
+    border-radius: 8px;
+    padding-top: 8px;
+    padding-bottom: 20px;
+    padding-left: 26px;
+    padding-right: 26px;
+    margin-bottom: 291px;
+    margin-top: 10px;
+}
+
+.confirm-new-box .confirm-new-box-header h2 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 25px;
+}
+
+.confirm-new-box .information {
+    font-size: 14px;
+}
+
+/* ============ Nút "Change" ============ */
+.change-btn span {
+    margin-top: 10px;
+    font-size: 15px;
+    color: #0066c0;
+    cursor: pointer;
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.change-btn span:hover {
+    text-decoration: underline;
+    color: #131921;
+}
+
+.confirm-new-box .text {
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+/* ============ Button ============ */
+.confirm-new-box button {
+    width: 100%;
+    height: 31px;
+    background: #ffd814;
+    border: 1px solid #fcd200;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.confirm-new-box button:hover {
+    background: #f7ca00;
+}
+
+.confirm-new-box .confirm-new-box-footer p {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* ============ Another sign button ============ */
+.confirm-new-box .confirm-new-box-footer span {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #0066c0;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.confirm-new-box .confirm-new-box-footer span:hover {
+    text-decoration: underline;
+    color: #131921;
+}
+
+
+
+/* ===================================== Register ================================== */
+.register-box {
+    width: 300px;
+    border: 1px solid #d5d9d9;
+    border-radius: 8px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 40px;
+}
+
+.register-box .register-box-header h1 {
+    font-size: 27px;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.register-box .register-box-input {
+    position: relative;
+    width: 100%;
+}
+
+/* ============ Label ============ */
+.register-box .register-box-input label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* ============ Input ============ */
+.register-box .register-box-input input {
+    width: 284px;
+    height: 31px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #a6a6a6;
+    border-radius: 8px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 11px;
+    padding-right: 7px;
+    outline: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.register-box .register-box-input input:focus {
+    border-color: #007185;
+    box-shadow: 0 0 3px 2px rgba(0, 118, 255, 0.2);
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-wrapper input {
+    width: 100%;
+    padding-right: 35px;
+}
+
+.eye-btn {
+    position: absolute;
+    right: 0;
+    top: 60%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.register-box .warning-text {
+    display: flex;
+    align-items: center;
+    margin-top: -5px;
+    margin-bottom: 15px;
+}
+
+.register-box .warning-text svg {
+    color: #246fb6;
+    margin-right: 5px;
+}
+
+.register-box .warning-text span {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.register-box .register-box-btn button {
+    width: 100%;
+    height: 31px;
+    background: #ffd814;
+    border: 1px solid #fcd200;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.register-box .register-box-btn button:hover {
+    background: #f7ca00;
+}
+
+.register-box .register-box-footer {
+    padding-bottom: 10px;
+}
+
+.register-box .register-box-footer p {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.register-box .register-box-footer span {
+    font-size: 14px;
+    color: #0066c0;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.register-box .register-box-footer span:hover {
+    text-decoration: underline;
+    color: #131921;
+}
+
+
+
+/* ===================================== Verify ================================== */
+.verify-box {
+    width: 300px;
+    border: 1px solid #d5d9d9;
+    border-radius: 8px;
+    padding-top: 8px;
+    padding-bottom: 20px;
+    padding-left: 26px;
+    padding-right: 26px;
+    margin-bottom: 220px;
+    margin-top: 10px;
+}
+
+.verify-box .verify-box-header h2 {
+    font-size: 24px;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.verify-box .text {
+    font-size: 14px;
+}
+
+.verify-box .text p {
+    margin-top: 0;
+    margin-bottom: 2px;
+    line-height: 1.5;
+}
+
+.verify-box .request {
+    font-size: 10px;
+    padding-top: 2px;
+    margin-bottom: -8px;
+}
+
+.verify-box .otp-container {
+    width: 100%;
+    height: 31px;
+    display: flex;
+    justify-content: space-between;
+    margin: 15px 0;
+    padding-bottom: 18px;
+}
+
+.verify-box .otp-container input {
+    width: 40px;
+    height: 45px;
+    text-align: center;
+    font-size: 20px;
+    border: 1px solid #a6a6a6;
+    border-radius: 6px;
+    outline: none;
+}
+
+.verify-box .otp-container input:focus {
+    border-color: #007185;
+    box-shadow: 0 0 3px 2px rgba(0, 118, 255, 0.2);
+}
+
+.verify-box .verify-btn {
+    width: 100%;
+    height: 31px;
+    background: #ffd814;
+    border: 1px solid #fcd200;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.verify-box .verify-btn:hover {
+    background: #f7ca00;
+}
+
+.verify-box .resend {
+    font-size: 14px;
+    color: #0066c0;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.verify-box .resend:hover {
+    text-decoration: underline;
+    color: #131921;
+}
+
+
+
+/* ===================================== Login ================================== */
+.login-box {
+    width: 300px;
+    border: 1px solid #d5d9d9;
+    border-radius: 8px;
+    padding-top: 8px;
+    padding-bottom: 12px;
+    padding-left: 26px;
+    padding-right: 26px;
+    margin-bottom: 220px;
+    margin-top: 10px;
+}
+
+.login-box .login-box-header h1 {
+    font-size: 27px;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+/* ============ Nút "Change" ============ */
+.change-btn span {
+    margin-top: 10px;
+    font-size: 15px;
+    color: #0066c0;
+    cursor: pointer;
+    text-decoration: none;
+    margin-left: 10px;
+}
+
+.change-btn span:hover {
+    text-decoration: underline;
+    color: #131921;
+}
+
+.login-box .login-box-input {
+    position: relative;
+    width: 100%;
+}
+
+/* ============ Label ============ */
+.login-box .login-box-input label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* ============ Input ============ */
+.login-box .login-box-input input {
+    width: 284px;
+    height: 31px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #a6a6a6;
+    border-radius: 8px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 11px;
+    padding-right: 7px;
+    outline: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.login-box .login-box-input input:focus {
+    border-color: #007185;
+    box-shadow: 0 0 3px 2px rgba(0, 118, 255, 0.2);
+}
+
+.password-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.forgot-password {
+    font-size: 13px;
+    color: #0066c0;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+    color: #131921;
+}
+
+/* ============ Button ============ */
+.login-box .login-btn {
+    width: 100%;
+    height: 31px;
+    background: #ffd814;
+    border: 1px solid #fcd200;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.login-box .login-btn:hover {
+    background: #f7ca00;
+}
+
+.login-box .other-login-btn {
+    width: 100%;
+    height: 31px;
+    border: 1px solid rgba(151, 132, 132, 0.782);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    background-color: white;
+    margin-bottom: 18px;
+}
+
+.login-box .other-login-btn:hover {
+    background: #f1f1f1;
+}
+
+.or-divider {
+    position: relative;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.or-divider span {
+    background: white;
+    padding: 0 10px;
+    font-size: 12px;
+    color: #555;
+    position: relative;
+    z-index: 1;
+}
+
+.or-divider::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: #e7e7e7;
+    z-index: 0;
+}
+
+
+
+/* ============ Footer ============ */
+.footer {
+    height: 70px;
+    padding-top: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 13px;
+    color: #555;
+    border-top: 1px solid #d5d9d9;
+}
+
+.footer-links {
+    margin-bottom: 10px;
+}
+
+.footer-links span {
+    margin: 0 10px;
+    color: #0066c0;
+    cursor: pointer;
+}
+
+.footer-links span:hover {
+    text-decoration: underline;
+    color: #131921;
+}
