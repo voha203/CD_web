@@ -38,7 +38,7 @@ input[type="password"]::-ms-reveal {
     padding-bottom: 20px;
     padding-left: 26px;
     padding-right: 26px;
-    margin-bottom: 243px;
+    margin-bottom: 226px;
 }
 
 .enter-box .enter-box-header h1 {
@@ -180,7 +180,7 @@ input[type="password"]::-ms-reveal {
     padding-bottom: 20px;
     padding-left: 26px;
     padding-right: 26px;
-    margin-bottom: 291px;
+    margin-bottom: 302px;
     margin-top: 10px;
 }
 
@@ -210,7 +210,7 @@ input[type="password"]::-ms-reveal {
 }
 
 .confirm-new-box .text {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.5;
     font-weight: 500;
 }
@@ -390,7 +390,7 @@ input[type="password"]::-ms-reveal {
     padding-bottom: 20px;
     padding-left: 26px;
     padding-right: 26px;
-    margin-bottom: 220px;
+    margin-bottom: 250px;
     margin-top: 10px;
 }
 
@@ -478,7 +478,7 @@ input[type="password"]::-ms-reveal {
     padding-bottom: 12px;
     padding-left: 26px;
     padding-right: 26px;
-    margin-bottom: 220px;
+    margin-bottom: 204px;
     margin-top: 10px;
 }
 
