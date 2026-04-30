@@ -6,9 +6,8 @@ import lombok.Data;
 public class ProductRequest {
 
     private String name;
+    private String brand;
     private Double price;
     private String description;
-    private String image;
-    private Integer stock;
     private Long categoryId;
 }

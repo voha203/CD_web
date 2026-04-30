@@ -18,13 +18,11 @@ public class Product {
     private Long id;
 
     private String name;
+    private String brand;
     private Double price;
 
     @Column(columnDefinition = "TEXT")
     private String description;
-
-    private String image;
-    private Integer stock;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
@@ -37,4 +35,7 @@ public class Product {
             cascade = CascadeType.ALL,
             orphanRemoval = true)
     private List<ProductSize> productSizes;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<ProductVariant> variants;
 }
