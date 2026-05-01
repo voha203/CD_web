@@ -64,13 +64,7 @@ function ProductCard({ product }) {
                         </span>
                     )}
                 </div>
-
-                {/* Nút Add to Cart */}
-                <button className="cart-btn">
-                    Add to cart
-                </button>
             </div>
-
         </div>
     );
 }
