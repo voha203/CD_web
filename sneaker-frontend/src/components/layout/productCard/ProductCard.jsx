@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+import { Link } from 'react-router-dom';
 import './ProductCard.css';
 
 function ProductCard({ product }) {
@@ -22,50 +23,52 @@ function ProductCard({ product }) {
         "https://via.placeholder.com/300";
 
     return (
-        <div className="product-card">
+        <Link to={`/products/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div className="product-card">
 
-            {/* 1. KHỐI HÌNH ẢNH (Chứa Badges và Hiệu ứng Hover) */}
-            <div className="card-image-wrapper">
+                {/* 1. KHỐI HÌNH ẢNH (Chứa Badges và Hiệu ứng Hover) */}
+                <div className="card-image-wrapper">
 
-                {/* Render Badges nếu có dữ liệu */}
-                {product.isNew && <span className="badge badge-new">New</span>}
-                {product.salePercentage > 0 && (
-                    <span className="badge badge-sale">-${product.salePercentage}%</span>
-                )}
-
-                {/* Ảnh giày chính */}
-                <img
-                    src={mainImage}
-                    alt={product.name}
-                    className="product-image"
-                />
-            </div>
-
-            {/* 2. KHỐI THÔNG TIN SẢN PHẨM (Nằm dưới ảnh) */}
-            <div className="card-details">
-                {/* Hiển thị thương hiệu nếu có */}
-                {product.brand && <span className="product-brand">{product.brand}</span>}
-
-                {/* Tên giày */}
-                <h3 className="product-name" title={product.name}>
-                    {product.name}
-                </h3>
-
-                {/* Khối hiển thị giá */}
-                <div className="price-row">
-                    <span className="current-price">
-                        {formatPrice(product.price)}
-                    </span>
-
-                    {/* Hiện giá cũ (bị gạch) nếu đang sale */}
-                    {product.oldPrice && (
-                        <span className="old-price">
-                            {formatPrice(product.oldPrice)}
-                        </span>
+                    {/* Render Badges nếu có dữ liệu */}
+                    {product.isNew && <span className="badge badge-new">New</span>}
+                    {product.salePercentage > 0 && (
+                        <span className="badge badge-sale">-${product.salePercentage}%</span>
                     )}
+
+                    {/* Ảnh giày chính */}
+                    <img
+                        src={mainImage}
+                        alt={product.name}
+                        className="product-image"
+                    />
+                </div>
+
+                {/* 2. KHỐI THÔNG TIN SẢN PHẨM (Nằm dưới ảnh) */}
+                <div className="card-details">
+                    {/* Hiển thị thương hiệu nếu có */}
+                    {product.brand && <span className="product-brand">{product.brand}</span>}
+
+                    {/* Tên giày */}
+                    <h3 className="product-name" title={product.name}>
+                        {product.name}
+                    </h3>
+
+                    {/* Khối hiển thị giá */}
+                    <div className="price-row">
+                        <span className="current-price">
+                            {formatPrice(product.price)}
+                        </span>
+
+                        {/* Hiện giá cũ (bị gạch) nếu đang sale */}
+                        {product.oldPrice && (
+                            <span className="old-price">
+                                {formatPrice(product.oldPrice)}
+                            </span>
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+        </Link>
     );
 }
 
