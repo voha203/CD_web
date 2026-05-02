@@ -22,16 +22,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .product-image {
-    width: 250px;
-    object-fit: contain;
-    transition: transform 0.5s ease;
-}
+    width: 100%;
+    height: 100%;
 
-.product-card:hover .product-image {
-    transform: scale(1.1) rotate(-5deg);
+    object-fit: cover;
+    transition: transform 0.5s ease;
 }
 
 /* ----- BADGES (Nhãn New, Sale...) ----- */
@@ -73,12 +72,13 @@
 
 .product-name {
     font-size: 16px;
-    font-weight: bold;
+    font-weight: 600;
     color: #111111;
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-top: 6px;
 }
 
 .price-row {
@@ -90,7 +90,7 @@
 
 .current-price {
     font-size: 18px;
-    font-weight: 800;
+    font-weight: 600;
     color: black;
 }
 
@@ -98,21 +98,4 @@
     font-size: 14px;
     color: #aaaaaa;
     text-decoration: line-through;
-}
-
-.cart-btn {
-    background-color: #ffd814;
-    border: 1px solid #fcd200;
-    border-radius: 100px;
-    padding: 8px 15px;
-    font-size: 14px;
-    color: #0f1111;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    width: max-content;
-    margin-top: auto;
-}
-
-.cart-btn:hover {
-    background-color: #f7ca00;
 }
