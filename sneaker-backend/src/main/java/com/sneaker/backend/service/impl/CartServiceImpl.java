@@ -38,7 +38,19 @@ public class CartServiceImpl implements CartService {
     public CartDTO getMyCart() {
         Long userId = getCurrentUserId();
         Cart cart = getOrCreateCart(userId);
-        return cartMapper.toDTO(cart);
+
+        CartDTO dto = cartMapper.toDTO(cart);
+
+        // TÍNH TOTAL PRICE
+        Long total = cart.getItems().stream()
+                .mapToLong(item ->
+                        (long) (item.getVariantSize().getVariant().getProduct().getPrice() * item.getQuantity())
+                )
+                .sum();
+
+        dto.setTotalPrice(total);
+
+        return dto;
     }
 
     // =========================
@@ -173,7 +185,7 @@ public class CartServiceImpl implements CartService {
 //        }
 //
 //        return auth.getPrincipal().toString();
-        return "anhtu13579";
+        return "admin";
     }
 
     private Long getCurrentUserId() {
