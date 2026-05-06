@@ -11,10 +11,14 @@ public class CartItemDTO {
 
     private Long variantSizeId;
 
+    private String productName;
     private String color;
     private String sizeValue;
 
     private List<ProductImageDTO> images;
+
+    private String brand;
+    private Long price;
 
     private int quantity;
 }
