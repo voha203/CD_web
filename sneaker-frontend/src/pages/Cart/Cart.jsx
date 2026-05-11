@@ -3,40 +3,74 @@ import Header from "../../components/layout/header/Header";
 import Footer from "../../components/layout/footer/Footer";
 import './Cart.css';
 
+import {
+    getCart,
+    updateQuantity,
+    deleteItem
+} from "../../services/cartService"
+
+
 function Cart() {
-    // Dữ liệu ảo (Mock data) của giỏ hàng
-    const [cartItems, setCartItems] = useState([
-        { id: 1, brand: 'Nike', name: 'Air Max 270', price: 3500000, quantity: 1, imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400' },
-        { id: 2, brand: 'Adidas', name: 'Ultraboost 22', price: 4200000, quantity: 2, imageUrl: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400' }
-    ]);
 
-    // Tính tổng tiền
-    const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const [cartData, setCartData] = useState(null);
+    const [cartItems, setCartItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(true);
 
-    const handleIncrease = (id) => {
-        setCartItems(cartItems.map(item => item.id === id ? { ...item, quantity: item.quantity + 1 } : item));
+    // Lấy dữ liệu giỏ hàng từ cơ sở dữ liệu
+    const fetchCart = async () => {
+        try {
+            setIsLoading(true);
+            const res = await getCart();
+            setCartData(res.data);
+            setCartItems(res.data.items || []);
+        } catch (err) {
+            console.error("Fetch cart error:", err);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const handleDecrease = (id) => {
-        setCartItems(cartItems.map(item => item.id === id && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item));
+    useEffect(() => {
+        fetchCart();
+    }, []);
+
+    const handleIncrease = async (id, qty) => {
+        await updateQuantity(id, qty + 1);
+        fetchCart();
+    };
+
+    const handleDecrease = async (id, qty) => {
+        if (qty <= 1) return;
+        await updateQuantity(id, qty - 1);
+        fetchCart();
+    };
+
+    const handleDelete = async (id) => {
+        if (!window.confirm("Xóa sản phẩm?")) return;
+        await deleteItem(id);
+        fetchCart();
+    };
+
+    const handleInputBlur = async (id, value) => {
+        let qty = parseInt(value);
+        if (!qty || qty < 1) qty = 1;
+
+        await updateQuantity(id, qty);
+        fetchCart();
     };
 
     const handleInputChange = (id, value) => {
-        const newQuantity = parseInt(value);
-        if (!isNaN(newQuantity) && newQuantity >= 1) {
-            setCartItems(cartItems.map(item => item.id === id ? { ...item, quantity: newQuantity } : item));
-        } else if (value === '') {
-            setCartItems(cartItems.map(item => item.id === id ? { ...item, quantity: '' } : item));
-        }
+        setCartItems(prev =>
+            prev.map(item =>
+                item.cartItemId === id
+                    ? { ...item, quantity: value }
+                    : item
+            )
+        );
     };
 
-    const handleInputBlur = (id, currentQuantity) => {
-        if (currentQuantity === '' || currentQuantity < 1) {
-            setCartItems(cartItems.map(item => item.id === id ? { ...item, quantity: 1 } : item));
-        }
-    };
-
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const subtotal = cartData?.totalPrice || 0;
 
     if (!isLoggedIn) {
         return (
@@ -77,11 +111,11 @@ function Cart() {
                 <Header />
                 <main className="cart-empty-error-state">
                     <img src="https://cdn-icons-png.flaticon.com/512/11329/11329060.png" alt="Empty Cart" className="state-image" />
-                    <div class="row-header">
+                    <div className="row-header">
                         <span>Chưa có sản phẩm nào trong giỏ hàng</span>
                     </div>
-                    <div class="cart-actions">
-                        <button class="return-btn">
+                    <div className="cart-actions">
+                        <button className="return-btn">
                             <span>QUAY TRỞ LẠI CỬA HÀNG</span>
                         </button>
                     </div>
@@ -107,11 +141,11 @@ function Cart() {
                         {cartItems.map(item => (
                             <div key={item.id} className="cart-item">
                                 <div className="cart-item-image">
-                                    <img src={item.imageUrl} alt={item.name} />
+                                    <img src={item.images[0]?.imageUrl} alt={item.productName} />
                                 </div>
 
                                 <div className="cart-item-details">
-                                    <h3 className="item-name">{item.name}</h3>
+                                    <h3 className="item-name">{item.productName}</h3>
                                     <p className="item-brand">{item.brand}</p>
                                     <p className="item-stock">In Stock</p>
 
@@ -119,7 +153,7 @@ function Cart() {
                                         <div className="quantity-control-group">
                                             <button
                                                 className="qty-btn"
-                                                onClick={() => handleDecrease(item.id)}
+                                                onClick={() => handleDecrease(item.id, item.quantity)}
                                                 disabled={item.quantity <= 1}
                                             >
                                                 -
@@ -129,12 +163,12 @@ function Cart() {
                                                 className="qty-input"
                                                 value={item.quantity}
                                                 onChange={(e) => handleInputChange(item.id, e.target.value)}
-                                                onBlur={() => handleInputBlur(item.id, item.quantity)}
+                                                onBlur={(e) => handleInputBlur(item.id, e.target.value)}
                                                 min="1"
                                             />
                                             <button
                                                 className="qty-btn"
-                                                onClick={() => handleIncrease(item.id)}
+                                                onClick={() => handleIncrease(item.id, item.quantity)}
                                             >
                                                 +
                                             </button>
@@ -160,7 +194,7 @@ function Cart() {
                                 </div>
 
                                 <div className="cart-item-price">
-                                    <strong>{item.price.toLocaleString('vi-VN')}₫</strong>
+                                    <strong>{(item.price * item.quantity).toLocaleString('vi-VN')}₫</strong>
                                 </div>
                             </div>
                         ))}

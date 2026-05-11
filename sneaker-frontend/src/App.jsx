@@ -5,6 +5,7 @@ import Footer from './components/layout/header/Header'
 import Home from "./pages/Home/Home";
 import ProductList from "./pages/ProductList/ProductList";
 import ProductDetail from "./pages/productDetail/ProductDetail";
+import Cart from "./pages/Cart/Cart"
 
 function App() {
   return (
@@ -18,6 +19,9 @@ function App() {
 
           {/* Trang chi tiết sản phẩm */}
           <Route path="/products/:id" element={<ProductDetail />} />
+
+          {/* Trang giỏ hàng */}
+          <Route path="/cart" element={<Cart />} />
 
           {/* Trang 404: Không tải được giao diện */}
           <Route path="*" element={<h1>404 - Not Found</h1>} />

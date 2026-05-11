@@ -36,7 +36,7 @@ public class CartController {
     }
 
     // Thêm một món vào giỏ
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<?> addToCart(@RequestBody CartRequest request) {
         try {
             cartService.addToCart(request);
