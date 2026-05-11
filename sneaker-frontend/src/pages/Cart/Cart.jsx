@@ -3,6 +3,8 @@ import Header from "../../components/layout/header/Header";
 import Footer from "../../components/layout/footer/Footer";
 import './Cart.css';
 
+import { useCart } from "../../context/CartContext";
+
 import {
     getCart,
     updateQuantity,
@@ -16,6 +18,8 @@ function Cart() {
     const [cartItems, setCartItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+    const { fetchCartCount } = useCart();
 
     // Lấy dữ liệu giỏ hàng từ cơ sở dữ liệu
     const fetchCart = async () => {
@@ -37,19 +41,22 @@ function Cart() {
 
     const handleIncrease = async (id, qty) => {
         await updateQuantity(id, qty + 1);
-        fetchCart();
+        await fetchCart();
+        fetchCartCount();
     };
 
     const handleDecrease = async (id, qty) => {
         if (qty <= 1) return;
         await updateQuantity(id, qty - 1);
-        fetchCart();
+        await fetchCart();
+        fetchCartCount();
     };
 
     const handleDelete = async (id) => {
         if (!window.confirm("Xóa sản phẩm?")) return;
         await deleteItem(id);
-        fetchCart();
+        await fetchCart();
+        fetchCartCount();
     };
 
     const handleInputBlur = async (id, value) => {
@@ -57,7 +64,8 @@ function Cart() {
         if (!qty || qty < 1) qty = 1;
 
         await updateQuantity(id, qty);
-        fetchCart();
+        await fetchCart();
+        fetchCartCount();
     };
 
     const handleInputChange = (id, value) => {
@@ -70,7 +78,14 @@ function Cart() {
         );
     };
 
+    // Đếm tổng tiền hiện tại
     const subtotal = cartData?.totalPrice || 0;
+
+    // Đếm tổng số lượng sản phẩm
+    const totalItems = cartItems.reduce(
+        (sum, item) => sum + item.quantity,
+        0
+    );
 
     if (!isLoggedIn) {
         return (
@@ -176,7 +191,7 @@ function Cart() {
 
                                         {/* Nút bấm được làm lại rõ ràng hơn, có icon */}
                                         <div className="action-buttons-group">
-                                            <button className="action-btn delete-btn">
+                                            <button className="action-btn delete-btn" onClick={() => handleDelete(item.id)}>
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                     <polyline points="3 6 5 6 21 6"></polyline>
                                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -201,7 +216,7 @@ function Cart() {
                     </div>
 
                     <div className="cart-subtotal-bottom">
-                        Subtotal ({cartItems.length} items): <strong>{subtotal.toLocaleString('vi-VN')}₫</strong>
+                        Subtotal ({totalItems} items): <strong>{subtotal.toLocaleString('vi-VN')}₫</strong>
                     </div>
                 </div>
 

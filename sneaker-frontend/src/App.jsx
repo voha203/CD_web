@@ -7,10 +7,13 @@ import ProductList from "./pages/ProductList/ProductList";
 import ProductDetail from "./pages/productDetail/ProductDetail";
 import Cart from "./pages/Cart/Cart"
 
+import { CartProvider } from './context/CartContext';
+
 function App() {
   return (
-    <Router>
-      <Routes>
+    <CartProvider>
+      <Router>
+        <Routes>
           {/* Trang chủ: Mặc định chuyển hướng về danh sách sản phẩm */}
           <Route path="/" element={<Home />} />
 
@@ -26,8 +29,9 @@ function App() {
           {/* Trang 404: Không tải được giao diện */}
           <Route path="*" element={<h1>404 - Not Found</h1>} />
 
-      </Routes>
-    </Router>
+        </Routes>
+      </Router>
+    </CartProvider>
   );
 }
 
