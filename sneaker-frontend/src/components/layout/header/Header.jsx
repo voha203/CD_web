@@ -5,14 +5,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo_flag_vn from '../../../assets/images/flag/vn.svg'
 import logo_flag_en from '../../../assets/images/flag/en.svg'
 
-import { getCart } from "../../../services/cartService";
 import { isAuthenticated } from "../../utils/auth";
+import { useCart } from "../../../context/CartContext"
 
 function Header() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [language, setLanguage] = useState("VN");
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    
+    const { cartCount, fetchCartCount } = useCart();
 
     const navigate = useNavigate();
 
@@ -20,6 +22,7 @@ function Header() {
 
         if (isAuthenticated()) {
             setIsLoggedIn(true);
+            fetchCartCount();
         }
 
     }, []);
@@ -164,7 +167,7 @@ function Header() {
                         <svg width="36" height="36" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                         </svg>
-                        <span className="cart-count">0</span>
+                        <span className="cart-count">{cartCount}</span>
                     </div>
                     <span className="cart-text">Cart</span>
                 </div>
