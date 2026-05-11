@@ -1,12 +1,7 @@
 import axios from "axios";
+import { getToken } from "../components/utils/auth";
 
 const API_URL = "http://localhost:8080/api/cart";
-
-const getToken = () => {
-    // return localStorage.getItem("token");
-    // Sử dụng token được tạo sẵn
-    return "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3ODA2OTk0MCwiZXhwIjoxNzc4MTU2MzQwfQ.BqxTZ9xPYOJbIKQ1MhDASXjZ0iJMUSZESTcEhvZTj3w";
-};
 
 const getAuthHeader = () => {
     const token = getToken();
