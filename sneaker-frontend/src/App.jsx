@@ -6,6 +6,7 @@ import Home from "./pages/Home/Home";
 import ProductList from "./pages/ProductList/ProductList";
 import ProductDetail from "./pages/productDetail/ProductDetail";
 import Cart from "./pages/Cart/Cart"
+import Checkout from "./pages/Checkout/Checkout"
 
 import { CartProvider } from './context/CartContext';
 
@@ -25,6 +26,8 @@ function App() {
 
           {/* Trang giỏ hàng */}
           <Route path="/cart" element={<Cart />} />
+
+          <Route path="/checkout" element={<Checkout />} />
 
           {/* Trang 404: Không tải được giao diện */}
           <Route path="*" element={<h1>404 - Not Found</h1>} />
