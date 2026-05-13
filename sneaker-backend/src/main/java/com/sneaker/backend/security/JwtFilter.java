@@ -27,8 +27,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // bỏ qua auth API
-        if (path.startsWith("/api/auth")) {
+        // Chỉ bỏ qua Login và Register, các cái khác của /api/auth vẫn phải giải mã Token
+        if (path.equals("/api/auth/login") || path.equals("/api/auth/register")) {
             filterChain.doFilter(request, response);
             return;
         }

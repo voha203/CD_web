@@ -7,7 +7,12 @@ import com.sneaker.backend.security.JwtUtil;
 import com.sneaker.backend.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -49,6 +54,19 @@ public class AuthController {
         String token = jwtUtil.generateToken(user.getUsername());
 
         return new AuthResponse(toDTO(user), token);
+    }
+
+    // PROFILE
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserProfile(Principal principal) {
+        User user = userService.findByUsername(principal.getName());
+
+        Map<String, String> profile = new HashMap<>();
+        profile.put("fullName", user.getFullName());
+        profile.put("phone", user.getPhone());
+        profile.put("address", user.getAddress());
+
+        return ResponseEntity.ok(profile);
     }
 
     // convert User → DTO (RẤT QUAN TRỌNG)

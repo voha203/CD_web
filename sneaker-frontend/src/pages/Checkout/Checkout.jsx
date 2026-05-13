@@ -1,9 +1,94 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Checkout.css';
+
+import { getCart } from "../../services/cartService";
+import { placeOrder } from "../../services/orderService";
+import { useCart } from "../../context/CartContext";
+import { getProfile } from "../../services/authService";
 
 function Checkout() {
     const [activeStep, setActiveStep] = useState(1);
     const [isSecurePopupOpen, setIsSecurePopupOpen] = useState(false);
+
+    const navigate = useNavigate();
+    const { fetchCartCount } = useCart();
+
+    const [cartData, setCartData] = useState(null);
+    const [formData, setFormData] = useState({
+        receiverName: '',
+        receiverPhone: '',
+        shippingAddress: '',
+        paymentMethod: 'COD',
+        note: '',
+    });
+
+    useEffect(() => {
+        // Lấy dữ liệu giỏ hàng
+        const fetchCartSummary = async () => {
+            const res = await getCart();
+            setCartData(res.data);
+        };
+
+        // Lấy dữ liệu người dùng để điền sẵn
+        const fetchUserProfile = async () => {
+            try {
+                const res = await getProfile();
+                const { fullName, phone, address } = res.data;
+
+                // Cập nhật formData với thông tin từ Database
+                setFormData(prev => ({
+                    ...prev,
+                    receiverName: fullName || '',
+                    receiverPhone: phone || '',
+                    shippingAddress: address || ''
+                }));
+            } catch (err) {
+                console.log("User chưa cập nhật profile hoặc lỗi server");
+            }
+        };
+
+        fetchCartSummary();
+        fetchUserProfile();
+    }, []);
+
+    // Cập nhật hàm thay đổi input chung
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    // Hàm xử lý chọn phương thức thanh toán
+    const handlePaymentChange = (value) => {
+        setFormData(prev => ({
+            ...prev,
+            paymentMethod: value
+        }));
+    };
+
+    // Hàm xử lý Đặt hàng cuối cùng
+    const handlePlaceOrder = async () => {
+        try {
+            if (!formData.receiverName || !formData.receiverPhone || !formData.shippingAddress) {
+                alert("Vui lòng nhập đầy đủ thông tin giao hàng!");
+                setActiveStep(1);
+                return;
+            }
+
+            const res = await placeOrder(formData);
+            alert("Đặt hàng thành công! Mã đơn hàng: " + res.data.orderId);
+            fetchCartCount();
+            navigate('/thank-you');
+        } catch (err) {
+            alert("Lỗi: " + (err.response?.data || "Không thể đặt hàng"));
+        }
+    };
+
+    // Kiểm tra người dùng có đồng ý các điều khoản trước khi đặt hàng
+    const [isAgreed, setIsAgreed] = useState(false);
 
     return (
         <div className="checkout-page-container">
@@ -18,8 +103,8 @@ function Checkout() {
                     </a>
 
                     <div className="secure-checkout-container">
-                        <div 
-                            className="checkout-text" 
+                        <div
+                            className="checkout-text"
                             onClick={() => setIsSecurePopupOpen(!isSecurePopupOpen)}
                         >
                             <h2 className="checkout-title">Secure checkout</h2>
@@ -30,8 +115,8 @@ function Checkout() {
 
                         {isSecurePopupOpen && (
                             <div className="secure-popup-box">
-                                <button 
-                                    className="close-popup-btn" 
+                                <button
+                                    className="close-popup-btn"
                                     onClick={() => setIsSecurePopupOpen(false)}
                                 >
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -75,15 +160,34 @@ function Checkout() {
                                 <form className="address-form">
                                     <div className="form-group">
                                         <label>Họ và tên</label>
-                                        <input type="text" placeholder="Nhập họ và tên..." />
+                                        <input
+                                            name="receiverName"
+                                            value={formData.receiverName}
+                                            onChange={handleChange}
+                                            type="text"
+                                            placeholder="Nhập họ và tên..."
+                                        />
                                     </div>
                                     <div className="form-group">
                                         <label>Số điện thoại</label>
-                                        <input type="tel" placeholder="Nhập số điện thoại..." />
+                                        <input
+                                            name="receiverPhone"
+                                            value={formData.receiverPhone}
+                                            onChange={handleChange}
+                                            type="tel"
+                                            placeholder="Nhập số điện thoại..."
+                                        />
                                     </div>
                                     <div className="form-group">
                                         <label>Địa chỉ cụ thể</label>
-                                        <textarea placeholder="Số nhà, tên đường, phường/xã..."></textarea>
+                                        <textarea
+                                            name="shippingAddress"
+                                            value={formData.shippingAddress}
+                                            onChange={handleChange}
+                                            type="text"
+                                            placeholder="Số nhà, tên đường, tòa nhà, phường/xã..."
+                                            rows="3"
+                                        ></textarea>
                                     </div>
                                     <button
                                         type="button"
@@ -107,15 +211,31 @@ function Checkout() {
                             <div className="step-body">
                                 <div className="payment-options">
                                     <label className="radio-label">
-                                        <input type="radio" name="payment" defaultChecked />
+                                        <input
+                                            type="radio"
+                                            name="payment"
+                                            defaultChecked
+                                            checked={formData.paymentMethod === 'COD'}
+                                            onChange={() => handlePaymentChange('COD')}
+                                        />
                                         Thanh toán khi nhận hàng (COD)
                                     </label>
                                     <label className="radio-label">
-                                        <input type="radio" name="payment" />
+                                        <input
+                                            type="radio"
+                                            name="payment"
+                                            checked={formData.paymentMethod === 'CARD'}
+                                            onChange={() => handlePaymentChange('CARD')}
+                                        />
                                         Thẻ tín dụng / Ghi nợ (Credit / Debit Card)
                                     </label>
                                     <label className="radio-label">
-                                        <input type="radio" name="payment" />
+                                        <input
+                                            type="radio"
+                                            name="payment"
+                                            checked={formData.paymentMethod === 'E-WALLET'}
+                                            onChange={() => handlePaymentChange('E-WALLET')}
+                                        />
                                         Ví điện tử Momo / ZaloPay
                                     </label>
                                 </div>
@@ -138,15 +258,19 @@ function Checkout() {
                         {activeStep === 3 && (
                             <div className="step-body">
                                 <div className="review-items-list">
-                                    <div className="review-item">
-                                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100" alt="Nike" />
-                                        <div className="review-item-info">
-                                            <h4>Nike Air Max 270</h4>
-                                            <p>Số lượng: 1</p>
-                                            <strong className="text-red">3.500.000₫</strong>
+                                    {cartData?.items.map((item, index) => (
+                                        <div className="review-item" key={index}>
+                                            <img src={item.images[0]?.imageUrl} alt={item.productName} />
+                                            <div className="review-item-info">
+                                                <h4>{item.productName}</h4>
+                                                <p>Size: {item.sizeValue} | Màu: {item.color}</p>
+                                                <p>Số lượng: {item.quantity}</p>
+                                                <strong className="text-red">
+                                                    {(item.price * item.quantity).toLocaleString('vi-VN')}₫
+                                                </strong>
+                                            </div>
                                         </div>
-                                    </div>
-                                    {/* Thêm các sản phẩm khác ở đây */}
+                                    ))}
                                 </div>
                             </div>
                         )}
@@ -156,15 +280,36 @@ function Checkout() {
                 {/* CỘT PHẢI: TỔNG KẾT ĐƠN HÀNG (ORDER SUMMARY) */}
                 <div className="checkout-summary-column">
                     <div className="summary-box">
-                        <button className="place-order-btn">Đặt hàng (Place your order)</button>
-                        <p className="agreement-text">Bằng việc đặt hàng, bạn đồng ý với các Điều khoản sử dụng và Chính sách bảo mật của chúng tôi.</p>
+
+                        {/* Nút đặt hàng */}
+                        <button
+                            className={`place-order-btn ${!isAgreed ? 'btn-disabled' : ''}`}
+                            onClick={handlePlaceOrder}
+                            disabled={!isAgreed} // Chỉ cho phép ấn khi isAgreed === true
+                        >
+                            Đặt hàng (Place your order)
+                        </button>
+
+                        {/* Ô tích xác nhận */}
+                        <div className="agreement-checkbox-container" style={{ marginBottom: '15px', display: 'flex', alignItems: 'flex-start' }}>
+                            <input
+                                type="checkbox"
+                                id="agree-terms"
+                                checked={isAgreed}
+                                onChange={(e) => setIsAgreed(e.target.checked)}
+                                style={{ marginTop: '4px', marginRight: '10px', cursor: 'pointer' }}
+                            />
+                            <label htmlFor="agree-terms" style={{ fontSize: '14px', cursor: 'pointer', lineHeight: '1.4' }}>
+                                Bằng việc đặt hàng, bạn đồng ý với các Điều khoản sử dụng và Chính sách bảo mật của chúng tôi.
+                            </label>
+                        </div>
 
                         <div className="summary-divider"></div>
 
                         <h3>Order Summary</h3>
                         <div className="summary-row">
-                            <span>Tạm tính (Items):</span>
-                            <span>3.500.000₫</span>
+                            <span>Tạm tính ({cartData?.items.length} món):</span>
+                            <span>{cartData?.totalPrice.toLocaleString('vi-VN')}₫</span>
                         </div>
                         <div className="summary-row">
                             <span>Phí vận chuyển (Shipping):</span>
@@ -179,7 +324,9 @@ function Checkout() {
 
                         <div className="summary-row total-row">
                             <span>Tổng cộng (Order total):</span>
-                            <span>3.500.000₫</span>
+                            <span>
+                                {(cartData?.totalPrice || 0).toLocaleString('vi-VN')}₫
+                            </span>
                         </div>
                     </div>
                 </div>
