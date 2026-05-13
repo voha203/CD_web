@@ -139,16 +139,6 @@
     align-items: flex-end;
 }
 
-.cart-count {
-    position: absolute;
-    top: -5px;
-    left: 14px;
-    color: #f08804;
-    font-weight: bold;
-    font-size: 16px;
-    background-color: #131921;
-}
-
 /* ============= Bố cục 2 cột chính ============= */
 .checkout-main-content {
     width: 100%;
@@ -320,6 +310,18 @@
     background-color: white;
 }
 
+/* Nút tích "Đồng ý xác nhận" khi bị vô hiệu hóa */
+.place-order-btn:disabled {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    cursor: not-allowed;
+    border-color: #999999;
+}
+
+.place-order-btn {
+    transition: all 0.3s ease;
+}
+
 .place-order-btn {
     width: 100%;
     background-color: #ffd814;
@@ -335,14 +337,6 @@
 
 .place-order-btn:hover {
     background-color: #f7ca00;
-}
-
-.agreement-text {
-    font-size: 12px;
-    color: #565959;
-    text-align: center;
-    margin-bottom: 15px;
-    line-height: 1.4;
 }
 
 .summary-divider {
