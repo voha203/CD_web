@@ -12,7 +12,7 @@ function ProductList() {
     const [sortOption, setSortOption] = useState("Featured");
 
     // Lưu thuộc tính bộ lọc sản phẩm
-    const [filters, setFilters] = useState({ brands: [], priceOption: "", customPrice: { min: "", max: "" } });
+    const [filters, setFilters] = useState({ categoryId: null, categoryName: null, brands: [], priceOption: "", customPrice: { min: "", max: "" } });
 
     // Lấy dữ liệu từ cơ sở dữ liệu
     useEffect(() => {
@@ -38,6 +38,10 @@ function ProductList() {
                 params.append("sortBy", "id");
                 params.append("sortDir", "asc"); // Sắp xếp mặc định
                 break;
+        }
+
+        if (filters.categoryId) {
+            params.append("categoryId", filters.categoryId);
         }
 
         // Xử lý Lọc theo Hãng (Nối chuỗi ?brands=Nike&brands=Adidas...)
@@ -76,7 +80,9 @@ function ProductList() {
             <div className="product-list-top">
                 {/* Tiêu đề và kết quả tìm kiếm */}
                 <div className="product-list-title">
-                    <h2>Kết quả tìm kiếm cho "Sneakers"</h2>
+                    <h2>
+                        {filters.categoryName ? `Kết quả tìm kiếm cho ${filters.categoryName}` : "Tất cả sản phẩm"}
+                    </h2>
                     <p>Hiển thị {products.length} kết quả</p>
                 </div>
 

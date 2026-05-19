@@ -8,6 +8,24 @@ function Sidebar({ onFilterChange }) {
     const [maxPrice, setMaxPrice] = useState("");
     const [selectedSizes, setSelectedSizes] = useState([]);
 
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+
+    // Lấy danh mục từ Backend khi load trang
+    useEffect(() => {
+        fetch("http://localhost:8080/api/categories")
+            .then(res => res.json())
+            .then(data => setCategories(data))
+            .catch(err => console.error("Lỗi khi lấy danh mục:", err));
+    }, []);
+
+    // Xử lý khi người dùng click vào một danh mục
+    const handleCategoryClick = (e, id) => {
+        e.preventDefault(); // Ngăn trình duyệt load lại trang do thẻ <a>
+        // Nếu bấm lại vào cái đang chọn thì bỏ chọn (set null), nếu bấm cái khác thì gán id mới
+        setSelectedCategory(prevId => prevId === id ? null : id);
+    };
+
     // Xử lý khi chọn/bỏ chọn Thương hiệu
     const handleBrandChange = (e) => {
         const value = e.target.value;
@@ -35,11 +53,11 @@ function Sidebar({ onFilterChange }) {
         if (min === "" && max === "") {
             // NẾU ĐỂ TRỐNG CẢ 2 Ô -> CHUYỂN VỀ TRẠNG THÁI 'ALL' (RESET)
             setPriceRange("all");
-            triggerFilterChange("all"); 
+            triggerFilterChange("all");
         } else {
             // NẾU CÓ NHẬP ÍT NHẤT 1 Ô -> ÁP DỤNG LỌC CUSTOM
             setPriceRange("custom");
-            triggerFilterChange("custom"); 
+            triggerFilterChange("custom");
         }
     };
 
@@ -55,11 +73,15 @@ function Sidebar({ onFilterChange }) {
     // Sử dụng useEffect để theo dõi, mỗi khi các State thay đổi thì gửi lên ProductList
     useEffect(() => {
         triggerFilterChange(priceRange);
-    }, [selectedBrands, selectedSizes, priceRange]); // Chạy lại khi mảng này thay đổi
+    }, [selectedBrands, selectedSizes, priceRange, selectedCategory, categories]); // Chạy lại khi mảng này thay đổi
 
     const triggerFilterChange = (currentPriceRange) => {
         if (onFilterChange) {
+            const activeCategoryObj = categories.find(c => c.id === selectedCategory);
+
             onFilterChange({
+                categoryId: selectedCategory,
+                categoryName: activeCategoryObj ? activeCategoryObj.name : null,
                 brands: selectedBrands,
                 priceOption: currentPriceRange,
                 customPrice: { min: minPrice, max: maxPrice },
@@ -72,19 +94,23 @@ function Sidebar({ onFilterChange }) {
         <aside className="sidebar-wrapper">
 
             {/* KHỐI 1: DANH MỤC */}
-            {/* <div className="filter-section">
+            <div className="filter-section">
                 <h3 className="filter-heading">Danh mục</h3>
                 <ul className="category-list">
-                    <li><a href="#" className="category-link">Giày Nam</a></li>
-                    <li className="sub-item">
-                        <a href="#" className="category-link active">Sneakers</a>
-                    </li>
-                    <li className="sub-item"><a href="#" className="category-link">Giày Chạy Bộ</a></li>
-                    <li className="sub-item"><a href="#" className="category-link">Giày Bóng Rổ</a></li>
-                    <li><a href="#" className="category-link mt-1">Giày Nữ</a></li>
-                    <li><a href="#" className="category-link mt-1">Giày Trẻ Em</a></li>
+                    {categories.map((category) => (
+                        <li key={category.id}>
+                            <a 
+                                href="#" 
+                                // Nếu ID đang chọn trùng với ID của category này thì thêm class 'active' (để bạn tự CSS tô đậm lên)
+                                className={`category-link ${selectedCategory === category.id ? 'active-category' : ''}`} 
+                                onClick={(e) => handleCategoryClick(e, category.id)}
+                            >
+                                {category.name}
+                            </a>
+                        </li>
+                    ))}
                 </ul>
-            </div> */}
+            </div>
 
             {/* KHỐI 2: THƯƠNG HIỆU */}
             <div className="filter-section">
@@ -163,7 +189,7 @@ function Sidebar({ onFilterChange }) {
                 <h3 className="filter-heading">Kích cỡ</h3>
                 <div className="size-grid">
                     {[24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45].map(size => (
-                        <button 
+                        <button
                             key={size}
                             className="size-btn"
                             onClick={() => handleSizeToggle(size)}
