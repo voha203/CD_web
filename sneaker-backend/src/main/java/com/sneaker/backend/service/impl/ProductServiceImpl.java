@@ -10,8 +10,10 @@ import com.sneaker.backend.repository.CategoryRepository;
 import com.sneaker.backend.service.DiscountService;
 import com.sneaker.backend.service.ProductService;
 
+import com.sneaker.backend.specification.ProductSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,13 +38,18 @@ public class ProductServiceImpl implements ProductService {
     // GET ALL
     // =========================
     @Override
-    public List<ProductDTO> getAll(String sortBy, String sortDir) {
+    public List<ProductDTO> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice) {
         // Tạo đối tượng Sort từ tham số truyền vào
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort sort = Sort.by(direction, sortBy);
 
-        // Lấy dữ liệu đã sắp xếp
-        List<Product> products = productRepository.findAll(sort);
+        // Gom các điều kiện lọc động lại (Nếu param truyền vào là null, JPA tự động bỏ qua điều kiện đó)
+        Specification<Product> spec = Specification.where(ProductSpecification.hasBrands(brands))
+                .and(ProductSpecification.priceGreaterThanOrEqual(minPrice))
+                .and(ProductSpecification.priceLessThanOrEqual(maxPrice));
+
+        // Tìm kiếm theo cả Bộ lọc (Specification) và Sắp xếp (Sort)
+        List<Product> products = productRepository.findAll(spec, sort);
 
         return products.stream()
                 .map(this::enrichProductDTO)

@@ -19,8 +19,11 @@ public class ProductController {
 
     @GetMapping
     public List<ProductDTO> getAll(@RequestParam(defaultValue = "id") String sortBy,
-                                   @RequestParam (defaultValue = "asc") String sortDir) {
-        return service.getAll(sortBy, sortDir);
+                                   @RequestParam(defaultValue = "asc") String sortDir,
+                                   @RequestParam(required = false) List<String> brands,
+                                   @RequestParam(required = false) Double minPrice,
+                                   @RequestParam(required = false) Double maxPrice) {
+        return service.getAll(sortBy, sortDir,  brands, minPrice, maxPrice);
     }
 
     @GetMapping("/{id}")
