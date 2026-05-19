@@ -22,8 +22,9 @@ public class ProductController {
                                    @RequestParam(defaultValue = "asc") String sortDir,
                                    @RequestParam(required = false) List<String> brands,
                                    @RequestParam(required = false) Double minPrice,
-                                   @RequestParam(required = false) Double maxPrice) {
-        return service.getAll(sortBy, sortDir,  brands, minPrice, maxPrice);
+                                   @RequestParam(required = false) Double maxPrice,
+                                   @RequestParam(required = false) Long categoryId) {
+        return service.getAll(sortBy, sortDir,  brands, minPrice, maxPrice, categoryId);
     }
 
     @GetMapping("/{id}")

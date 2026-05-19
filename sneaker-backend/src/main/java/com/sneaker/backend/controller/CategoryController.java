@@ -40,7 +40,7 @@ public class CategoryController {
 
         Category c = new Category();
         c.setName(request.getName());
-        c.setDescription(request.getDescription());
+        c.setCode(request.getCode());
 
         return toDTO(categoryService.create(c));
     }
@@ -52,7 +52,7 @@ public class CategoryController {
 
         Category c = new Category();
         c.setName(request.getName());
-        c.setDescription(request.getDescription());
+        c.setCode(request.getCode());
 
         return toDTO(categoryService.update(id, c));
     }
@@ -68,7 +68,7 @@ public class CategoryController {
         CategoryDTO dto = new CategoryDTO();
         dto.setId(c.getId());
         dto.setName(c.getName());
-        dto.setDescription(c.getDescription());
+        dto.setCode(c.getCode());
         return dto;
     }
 }

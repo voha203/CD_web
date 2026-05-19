@@ -27,4 +27,11 @@ public class ProductSpecification {
                 ? null
                 : cb.lessThanOrEqualTo(root.get("price"), maxPrice);
     }
+
+    // Lọc theo danh sách danh mục (WHERE category_id = ...)
+    public static Specification<Product> hasCategory(Long categoryId) {
+        return (root, query, cb) -> categoryId == null
+                ? null
+                : cb.equal(root.get("category").get("id"), categoryId);
+    }
 }
