@@ -11,6 +11,7 @@ import com.sneaker.backend.service.DiscountService;
 import com.sneaker.backend.service.ProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,9 +36,15 @@ public class ProductServiceImpl implements ProductService {
     // GET ALL
     // =========================
     @Override
-    public List<ProductDTO> getAll() {
-        return productRepository.findAll()
-                .stream()
+    public List<ProductDTO> getAll(String sortBy, String sortDir) {
+        // Tạo đối tượng Sort từ tham số truyền vào
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort sort = Sort.by(direction, sortBy);
+
+        // Lấy dữ liệu đã sắp xếp
+        List<Product> products = productRepository.findAll(sort);
+
+        return products.stream()
                 .map(this::enrichProductDTO)
                 .collect(Collectors.toList());
     }
