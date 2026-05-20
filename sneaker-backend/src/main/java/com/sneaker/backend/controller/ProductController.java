@@ -23,8 +23,9 @@ public class ProductController {
                                    @RequestParam(required = false) List<String> brands,
                                    @RequestParam(required = false) Double minPrice,
                                    @RequestParam(required = false) Double maxPrice,
-                                   @RequestParam(required = false) Long categoryId) {
-        return service.getAll(sortBy, sortDir,  brands, minPrice, maxPrice, categoryId);
+                                   @RequestParam(required = false) Long categoryId,
+                                   @RequestParam(required = false) List<Integer> sizes) {
+        return service.getAll(sortBy, sortDir,  brands, minPrice, maxPrice, categoryId, sizes);
     }
 
     @GetMapping("/{id}")

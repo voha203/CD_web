@@ -1,6 +1,7 @@
 package com.sneaker.backend.specification;
 
 import com.sneaker.backend.entity.Product;
+import jakarta.persistence.criteria.Join;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.List;
@@ -33,5 +34,29 @@ public class ProductSpecification {
         return (root, query, cb) -> categoryId == null
                 ? null
                 : cb.equal(root.get("category").get("id"), categoryId);
+    }
+
+    // Lọc theo danh sách Kích cỡ
+    public static Specification<Product> hasSizes(List<Integer> sizes) {
+        return (root, query, cb) -> {
+            if (sizes == null || sizes.isEmpty()) {
+                return null;
+            }
+
+            // Đảm bảo không bị lặp lại Product khi một sản phẩm khớp nhiều size trùng nhau
+            query.distinct(true);
+
+            // Join từ Product vào ProductVariant
+            Join<?, ?> variantJoin = root.join("variants");
+
+            // Join từ ProductVariant lặn tiếp vào ProductVariantSize
+            Join<?, ?> variantSizeJoin = variantJoin.join("sizes");
+
+            // Join từ ProductVariantSize vào Size
+            Join<?, ?> sizeJoin = variantSizeJoin.join("size");
+
+            // Lấy ra giá trị số nguyên để so sánh điều kiện IN
+            return sizeJoin.get("value").in(sizes);
+        };
     }
 }

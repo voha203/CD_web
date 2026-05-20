@@ -20,6 +20,7 @@ public class ProductVariantSize {
     private ProductVariant variant;
 
     @ManyToOne
+    @JoinColumn(name = "size_id")
     private Size size;
 
     private Integer quantity;

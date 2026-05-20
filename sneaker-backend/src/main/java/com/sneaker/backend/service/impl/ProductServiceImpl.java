@@ -38,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
     // GET ALL
     // =========================
     @Override
-    public List<ProductDTO> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId) {
+    public List<ProductDTO> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes) {
         // Tạo đối tượng Sort từ tham số truyền vào
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort sort = Sort.by(direction, sortBy);
@@ -47,7 +47,8 @@ public class ProductServiceImpl implements ProductService {
         Specification<Product> spec = Specification.where(ProductSpecification.hasBrands(brands))
                 .and(ProductSpecification.priceGreaterThanOrEqual(minPrice))
                 .and(ProductSpecification.priceLessThanOrEqual(maxPrice))
-                .and(ProductSpecification.hasCategory(categoryId));
+                .and(ProductSpecification.hasCategory(categoryId))
+                .and(ProductSpecification.hasSizes(sizes));
 
         // Tìm kiếm theo cả Bộ lọc (Specification) và Sắp xếp (Sort)
         List<Product> products = productRepository.findAll(spec, sort);
