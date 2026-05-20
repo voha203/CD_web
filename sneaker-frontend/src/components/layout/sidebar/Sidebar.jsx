@@ -99,10 +99,10 @@ function Sidebar({ onFilterChange }) {
                 <ul className="category-list">
                     {categories.map((category) => (
                         <li key={category.id}>
-                            <a 
-                                href="#" 
+                            <a
+                                href="#"
                                 // Nếu ID đang chọn trùng với ID của category này thì thêm class 'active' (để bạn tự CSS tô đậm lên)
-                                className={`category-link ${selectedCategory === category.id ? 'active-category' : ''}`} 
+                                className={`category-link ${selectedCategory === category.id ? 'active-category' : ''}`}
                                 onClick={(e) => handleCategoryClick(e, category.id)}
                             >
                                 {category.name}
@@ -150,19 +150,35 @@ function Sidebar({ onFilterChange }) {
                 {/* Danh sách các khoảng giá (Dùng Radio để chọn 1) */}
                 <div className="price-ranges">
                     <label className="radio-label">
-                        <input type="radio" name="price-filter" value="under-1m" className="radio-input" checked={priceRange === "under-1m"} onChange={handleRadioPriceChange} />
+                        <input type="radio" name="price-filter" value="under-1m" className="radio-input" checked={priceRange === "under-1m"} onChange={handleRadioPriceChange} onClick={(e) => {
+                            if (priceRange === e.target.value) {
+                                setPriceRange("");
+                            }
+                        }} />
                         <span className="radio-text">Dưới 1.000.000₫</span>
                     </label>
                     <label className="radio-label">
-                        <input type="radio" name="price-filter" value="1m-3m" className="radio-input" checked={priceRange === "1m-3m"} onChange={handleRadioPriceChange} />
+                        <input type="radio" name="price-filter" value="1m-3m" className="radio-input" checked={priceRange === "1m-3m"} onChange={handleRadioPriceChange} onClick={(e) => {
+                            if (priceRange === e.target.value) {
+                                setPriceRange("");
+                            }
+                        }} />
                         <span className="radio-text">1.000.000₫ - 3.000.000₫</span>
                     </label>
                     <label className="radio-label">
-                        <input type="radio" name="price-filter" value="3m-5m" className="radio-input" checked={priceRange === "3m-5m"} onChange={handleRadioPriceChange} />
+                        <input type="radio" name="price-filter" value="3m-5m" className="radio-input" checked={priceRange === "3m-5m"} onChange={handleRadioPriceChange} onClick={(e) => {
+                            if (priceRange === e.target.value) {
+                                setPriceRange("");
+                            }
+                        }} />
                         <span className="radio-text">3.000.000₫ - 5.000.000₫</span>
                     </label>
                     <label className="radio-label">
-                        <input type="radio" name="price-filter" value="over-5m" className="radio-input" checked={priceRange === "over-5m"} onChange={handleRadioPriceChange} />
+                        <input type="radio" name="price-filter" value="over-5m" className="radio-input" checked={priceRange === "over-5m"} onChange={handleRadioPriceChange} onClick={(e) => {
+                            if (priceRange === e.target.value) {
+                                setPriceRange("");
+                            }
+                        }} />
                         <span className="radio-text">Trên 5.000.000₫</span>
                     </label>
                 </div>
