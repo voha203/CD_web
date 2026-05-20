@@ -1,51 +1,143 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './Sidebar.css';
 
-function Sidebar() {
+function Sidebar({ onFilterChange }) {
+    const [selectedBrands, setSelectedBrands] = useState([]);
+    const [priceRange, setPriceRange] = useState("");
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");
+    const [selectedSizes, setSelectedSizes] = useState([]);
+
+    const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState(null);
+
+    // Lấy danh mục từ Backend khi load trang
+    useEffect(() => {
+        fetch("http://localhost:8080/api/categories")
+            .then(res => res.json())
+            .then(data => setCategories(data))
+            .catch(err => console.error("Lỗi khi lấy danh mục:", err));
+    }, []);
+
+    // Xử lý khi người dùng click vào một danh mục
+    const handleCategoryClick = (e, id) => {
+        e.preventDefault(); // Ngăn trình duyệt load lại trang do thẻ <a>
+        // Nếu bấm lại vào cái đang chọn thì bỏ chọn (set null), nếu bấm cái khác thì gán id mới
+        setSelectedCategory(prevId => prevId === id ? null : id);
+    };
+
+    // Xử lý khi chọn/bỏ chọn Thương hiệu
+    const handleBrandChange = (e) => {
+        const value = e.target.value;
+        if (e.target.checked) {
+            setSelectedBrands([...selectedBrands, value]);
+        } else {
+            setSelectedBrands(selectedBrands.filter(brand => brand !== value));
+        }
+    };
+
+    // Xử lý khi chọn khoảng giá có sẵn (Radio)
+    const handleRadioPriceChange = (e) => {
+        setPriceRange(e.target.value);
+        // Xóa giá trị trong ô nhập tay nếu người dùng chọn radio
+        setMinPrice("");
+        setMaxPrice("");
+    };
+
+    // Xử lý khi bấm nút "Áp dụng mức giá" nhập tay
+    const handleCustomPriceSubmit = () => {
+        // Kiểm tra xem người dùng có nhập gì không (xóa bỏ khoảng trắng dư thừa)
+        const min = minPrice.toString().trim();
+        const max = maxPrice.toString().trim();
+
+        if (min === "" && max === "") {
+            // NẾU ĐỂ TRỐNG CẢ 2 Ô -> CHUYỂN VỀ TRẠNG THÁI 'ALL' (RESET)
+            setPriceRange("all");
+            triggerFilterChange("all");
+        } else {
+            // NẾU CÓ NHẬP ÍT NHẤT 1 Ô -> ÁP DỤNG LỌC CUSTOM
+            setPriceRange("custom");
+            triggerFilterChange("custom");
+        }
+    };
+
+    // Xử lý khi chọn/bỏ chọn Kích cỡ
+    const handleSizeToggle = (size) => {
+        if (selectedSizes.includes(size)) {
+            setSelectedSizes(selectedSizes.filter(s => s !== size));
+        } else {
+            setSelectedSizes([...selectedSizes, size]);
+        }
+    };
+
+    // Sử dụng useEffect để theo dõi, mỗi khi các State thay đổi thì gửi lên ProductList
+    useEffect(() => {
+        triggerFilterChange(priceRange);
+    }, [selectedBrands, selectedSizes, priceRange, selectedCategory, categories]); // Chạy lại khi mảng này thay đổi
+
+    const triggerFilterChange = (currentPriceRange) => {
+        if (onFilterChange) {
+            const activeCategoryObj = categories.find(c => c.id === selectedCategory);
+
+            onFilterChange({
+                categoryId: selectedCategory,
+                categoryName: activeCategoryObj ? activeCategoryObj.name : null,
+                brands: selectedBrands,
+                priceOption: currentPriceRange,
+                customPrice: { min: minPrice, max: maxPrice },
+                sizes: selectedSizes
+            });
+        }
+    };
+
     return (
         <aside className="sidebar-wrapper">
 
             {/* KHỐI 1: DANH MỤC */}
-            {/* <div className="filter-section">
+            <div className="filter-section">
                 <h3 className="filter-heading">Danh mục</h3>
                 <ul className="category-list">
-                    <li><a href="#" className="category-link">Giày Nam</a></li>
-                    <li className="sub-item">
-                        <a href="#" className="category-link active">Sneakers</a>
-                    </li>
-                    <li className="sub-item"><a href="#" className="category-link">Giày Chạy Bộ</a></li>
-                    <li className="sub-item"><a href="#" className="category-link">Giày Bóng Rổ</a></li>
-                    <li><a href="#" className="category-link mt-1">Giày Nữ</a></li>
-                    <li><a href="#" className="category-link mt-1">Giày Trẻ Em</a></li>
+                    {categories.map((category) => (
+                        <li key={category.id}>
+                            <a 
+                                href="#" 
+                                // Nếu ID đang chọn trùng với ID của category này thì thêm class 'active' (để bạn tự CSS tô đậm lên)
+                                className={`category-link ${selectedCategory === category.id ? 'active-category' : ''}`} 
+                                onClick={(e) => handleCategoryClick(e, category.id)}
+                            >
+                                {category.name}
+                            </a>
+                        </li>
+                    ))}
                 </ul>
-            </div> */}
+            </div>
 
             {/* KHỐI 2: THƯƠNG HIỆU */}
             <div className="filter-section">
                 <h3 className="filter-heading">Thương hiệu</h3>
                 <div>
                     <div className="checkbox-group">
-                        <input type="checkbox" id="brand-nike" />
+                        <input type="checkbox" id="brand-nike" value="Nike" onChange={handleBrandChange} />
                         <label htmlFor="brand-nike" className="checkbox-label">Nike</label>
                     </div>
                     <div className="checkbox-group">
-                        <input type="checkbox" id="brand-adidas" />
+                        <input type="checkbox" id="brand-adidas" value="Adidas" onChange={handleBrandChange} />
                         <label htmlFor="brand-adidas" className="checkbox-label">Adidas</label>
                     </div>
                     <div className="checkbox-group">
-                        <input type="checkbox" id="brand-jordan" />
+                        <input type="checkbox" id="brand-jordan" value="Air Jordan" onChange={handleBrandChange} />
                         <label htmlFor="brand-jordan" className="checkbox-label">Air Jordan</label>
                     </div>
                     <div className="checkbox-group">
-                        <input type="checkbox" id="brand-converse" />
+                        <input type="checkbox" id="brand-converse" value="Converse" onChange={handleBrandChange} />
                         <label htmlFor="brand-converse" className="checkbox-label">Converse</label>
                     </div>
                     <div className="checkbox-group">
-                        <input type="checkbox" id="brand-new-balance" />
+                        <input type="checkbox" id="brand-new-balance" value="New Balance" onChange={handleBrandChange} />
                         <label htmlFor="brand-new-balance" className="checkbox-label">New Balance</label>
                     </div>
                     <div className="checkbox-group">
-                        <input type="checkbox" id="brand-vans" />
+                        <input type="checkbox" id="brand-vans" value="Vans" onChange={handleBrandChange} />
                         <label htmlFor="brand-vans" className="checkbox-label">Vans</label>
                     </div>
                 </div>
@@ -58,19 +150,19 @@ function Sidebar() {
                 {/* Danh sách các khoảng giá (Dùng Radio để chọn 1) */}
                 <div className="price-ranges">
                     <label className="radio-label">
-                        <input type="radio" name="price-filter" value="under-1m" className="radio-input" />
+                        <input type="radio" name="price-filter" value="under-1m" className="radio-input" checked={priceRange === "under-1m"} onChange={handleRadioPriceChange} />
                         <span className="radio-text">Dưới 1.000.000₫</span>
                     </label>
                     <label className="radio-label">
-                        <input type="radio" name="price-filter" value="1m-3m" className="radio-input" />
+                        <input type="radio" name="price-filter" value="1m-3m" className="radio-input" checked={priceRange === "1m-3m"} onChange={handleRadioPriceChange} />
                         <span className="radio-text">1.000.000₫ - 3.000.000₫</span>
                     </label>
                     <label className="radio-label">
-                        <input type="radio" name="price-filter" value="3m-5m" className="radio-input" />
+                        <input type="radio" name="price-filter" value="3m-5m" className="radio-input" checked={priceRange === "3m-5m"} onChange={handleRadioPriceChange} />
                         <span className="radio-text">3.000.000₫ - 5.000.000₫</span>
                     </label>
                     <label className="radio-label">
-                        <input type="radio" name="price-filter" value="over-5m" className="radio-input" />
+                        <input type="radio" name="price-filter" value="over-5m" className="radio-input" checked={priceRange === "over-5m"} onChange={handleRadioPriceChange} />
                         <span className="radio-text">Trên 5.000.000₫</span>
                     </label>
                 </div>
@@ -79,16 +171,16 @@ function Sidebar() {
                 <div className="custom-price-area">
                     <div className="price-inputs-row">
                         <div className="input-wrapper">
-                            <input type="number" placeholder="TỐI THIỂU" className="price-input-new" />
+                            <input type="number" placeholder="TỐI THIỂU" className="price-input-new" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
                             <span className="currency-badge">₫</span>
                         </div>
                         <span className="price-separator">-</span>
                         <div className="input-wrapper">
-                            <input type="number" placeholder="TỐI ĐA" className="price-input-new" />
+                            <input type="number" placeholder="TỐI ĐA" className="price-input-new" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
                             <span className="currency-badge">₫</span>
                         </div>
                     </div>
-                    <button className="price-submit-btn">Áp dụng mức giá</button>
+                    <button className="price-submit-btn" onClick={handleCustomPriceSubmit}>Áp dụng mức giá</button>
                 </div>
             </div>
 
@@ -96,28 +188,16 @@ function Sidebar() {
             <div className="filter-section">
                 <h3 className="filter-heading">Kích cỡ</h3>
                 <div className="size-grid">
-                    <button className="size-btn">24</button>
-                    <button className="size-btn">25</button>
-                    <button className="size-btn">26</button>
-                    <button className="size-btn">27</button>
-                    <button className="size-btn">28</button>
-                    <button className="size-btn">29</button>
-                    <button className="size-btn">30</button>
-                    <button className="size-btn">31</button>
-                    <button className="size-btn">32</button>
-                    <button className="size-btn">33</button>
-                    <button className="size-btn">34</button>
-                    <button className="size-btn">35</button>
-                    <button className="size-btn">36</button>
-                    <button className="size-btn">37</button>
-                    <button className="size-btn">38</button>
-                    <button className="size-btn">39</button>
-                    <button className="size-btn">40</button>
-                    <button className="size-btn">41</button>
-                    <button className="size-btn">42</button>
-                    <button className="size-btn">43</button>
-                    <button className="size-btn">44</button>
-                    <button className="size-btn">45</button>
+                    {[24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45].map(size => (
+                        <button
+                            key={size}
+                            type="button"
+                            className={`size-btn ${selectedSizes.includes(size) ? 'active-size' : ''}`}
+                            onClick={() => handleSizeToggle(size)}
+                        >
+                            {size}
+                        </button>
+                    ))}
                 </div>
             </div>
 

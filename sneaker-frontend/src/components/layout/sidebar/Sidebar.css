@@ -227,7 +227,7 @@ h6,
     background-color: #f9fafb;
 }
 
-.size-btn:focus {
+.size-btn.active-size {
     background-color: #475a6f;
     color: #ffffff;
     border-color: #000000;

@@ -18,8 +18,14 @@ public class ProductController {
     private ProductService service;
 
     @GetMapping
-    public List<ProductDTO> getAll() {
-        return service.getAll();
+    public List<ProductDTO> getAll(@RequestParam(defaultValue = "id") String sortBy,
+                                   @RequestParam(defaultValue = "asc") String sortDir,
+                                   @RequestParam(required = false) List<String> brands,
+                                   @RequestParam(required = false) Double minPrice,
+                                   @RequestParam(required = false) Double maxPrice,
+                                   @RequestParam(required = false) Long categoryId,
+                                   @RequestParam(required = false) List<Integer> sizes) {
+        return service.getAll(sortBy, sortDir,  brands, minPrice, maxPrice, categoryId, sizes);
     }
 
     @GetMapping("/{id}")
