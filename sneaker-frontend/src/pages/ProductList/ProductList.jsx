@@ -12,7 +12,14 @@ function ProductList() {
     const [sortOption, setSortOption] = useState("Featured");
 
     // Lưu thuộc tính bộ lọc sản phẩm
-    const [filters, setFilters] = useState({ categoryId: null, categoryName: null, brands: [], priceOption: "", customPrice: { min: "", max: "" } });
+    const [filters, setFilters] = useState({
+        categoryId: null,
+        categoryName: null,
+        brands: [],
+        priceOption: "",
+        customPrice: { min: "", max: "" },
+        sizes: []
+    });
 
     // Lấy dữ liệu từ cơ sở dữ liệu
     useEffect(() => {
@@ -44,9 +51,14 @@ function ProductList() {
             params.append("categoryId", filters.categoryId);
         }
 
-        // Xử lý Lọc theo Hãng (Nối chuỗi ?brands=Nike&brands=Adidas...)
-        if (filters.brands.length > 0) {
-            filters.brands.forEach(b => params.append("brands", b));
+        // Xử lý Lọc theo Hãng (Nối chuỗi ?brands=Nike,Adidas)
+        if (filters.brands && filters.brands.length > 0) {
+            params.append("brands", filters.brands.join(","));
+        }
+
+        // Xử lý Lọc theo Kích cỡ (Nối chuỗi ?sizes=40,41)
+        if (filters.sizes && filters.sizes.length > 0) {
+            params.append("sizes", filters.sizes.join(","));
         }
 
         // Xử lý Lọc theo Giá (Tính toán khoảng Min - Max dựa vào option được chọn)
