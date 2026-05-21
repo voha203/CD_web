@@ -66,9 +66,9 @@ body {
     display: flex;
     height: 40px;
     border-radius: 4px;
-    overflow: hidden;
     margin: 0 16px;
     background-color: white;
+    position: relative;
 }
 
 .search-container:focus-within {
@@ -83,6 +83,8 @@ body {
     align-items: center;
     padding: 0 10px;
     cursor: pointer;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
 }
 
 .search-select-wrapper:hover {
@@ -128,11 +130,50 @@ body {
     align-items: center;
     justify-content: center;
     transition: background-color 0.2s;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
 }
 
 .search-btn:hover {
     background-color: #f3a847;
 }
+
+/* ==================== HỘP GỢI Ý ================= */
+.search-suggestions-dropdown {
+    position: absolute;
+    top: 42px;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 999;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    cursor: pointer;
+    color: #111111;
+    font-size: 14px;
+    text-align: left;
+}
+
+.suggestion-item:hover {
+    background-color: #f3f3f3;
+}
+
+.suggestion-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
 
 /* ============ TÍNH NĂNG CHUYỂN ĐỔI NGÔN NGỮ (LANGUAGE SWITCHER) ============== */
 .language-select-wrapper {
