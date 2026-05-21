@@ -24,8 +24,14 @@ public class ProductController {
                                    @RequestParam(required = false) Double minPrice,
                                    @RequestParam(required = false) Double maxPrice,
                                    @RequestParam(required = false) Long categoryId,
-                                   @RequestParam(required = false) List<Integer> sizes) {
-        return service.getAll(sortBy, sortDir,  brands, minPrice, maxPrice, categoryId, sizes);
+                                   @RequestParam(required = false) List<Integer> sizes,
+                                   @RequestParam(required = false) String keyword) {
+        return service.getAll(sortBy, sortDir,  brands, minPrice, maxPrice, categoryId, sizes, keyword);
+    }
+
+    @GetMapping("/suggestions")
+    public List<ProductDTO> getSuggestions(@RequestParam(required = false) String keyword) {
+        return service.getSuggestions(keyword);
     }
 
     @GetMapping("/{id}")

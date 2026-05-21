@@ -7,7 +7,9 @@ import java.util.List;
 
 public interface ProductService {
 
-    List<ProductDTO> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes);
+    List<ProductDTO> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes, String keyword);
+
+    List<ProductDTO> getSuggestions(String keyword);
 
     ProductDTO getById(Long id);
 
