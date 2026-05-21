@@ -12,10 +12,12 @@ import com.sneaker.backend.service.ProductService;
 
 import com.sneaker.backend.specification.ProductSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
     // GET ALL
     // =========================
     @Override
-    public List<ProductDTO> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes) {
+    public List<ProductDTO> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes, String keyword) {
         // Tạo đối tượng Sort từ tham số truyền vào
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort sort = Sort.by(direction, sortBy);
@@ -48,10 +50,31 @@ public class ProductServiceImpl implements ProductService {
                 .and(ProductSpecification.priceGreaterThanOrEqual(minPrice))
                 .and(ProductSpecification.priceLessThanOrEqual(maxPrice))
                 .and(ProductSpecification.hasCategory(categoryId))
-                .and(ProductSpecification.hasSizes(sizes));
+                .and(ProductSpecification.hasSizes(sizes))
+                .and(ProductSpecification.hasKeyword(keyword));
 
         // Tìm kiếm theo cả Bộ lọc (Specification) và Sắp xếp (Sort)
         List<Product> products = productRepository.findAll(spec, sort);
+
+        return products.stream()
+                .map(this::enrichProductDTO)
+                .collect(Collectors.toList());
+    }
+
+    // =========================
+    // GET SUGGESTIONS (Phục vụ Header gợi ý nhanh)
+    // =========================
+    @Override
+    public List<ProductDTO> getSuggestions(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Tạo điều kiện lọc chỉ theo từ khóa
+        Specification<Product> spec = Specification.where(ProductSpecification.hasKeyword(keyword));
+
+        // Giới hạn chỉ lấy tối đa 5 sản phẩm khớp nhất (PageRequest.of(trang_số_0, kích_thước_5))
+        List<Product> products = productRepository.findAll(spec, PageRequest.of(0, 5)).getContent();
 
         return products.stream()
                 .map(this::enrichProductDTO)

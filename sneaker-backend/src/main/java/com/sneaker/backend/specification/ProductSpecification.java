@@ -59,4 +59,34 @@ public class ProductSpecification {
             return sizeJoin.get("value").in(sizes);
         };
     }
+
+    // Lọc theo từ khóa hiện tại
+    public static Specification<Product> hasKeyword(String keyword) {
+        return (root, query, criteriaBuilder) -> {
+            if (keyword == null || keyword.trim().isEmpty()) {
+                return null;
+            }
+
+            // Tạo chuỗi tìm kiếm (chuyển về chữ thường để không phân biệt hoa thường)
+            String searchPattern = "%" + keyword.trim().toLowerCase() + "%";
+
+            // 1. Tìm trong Tên sản phẩm
+            var namePredicate = criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("name")), searchPattern
+            );
+
+            // 2. Tìm trong Thương hiệu (Brand)
+            var brandPredicate = criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("brand")), searchPattern
+            );
+
+            // 3. Tìm trong Mô tả (Description)
+            var descPredicate = criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("description")), searchPattern
+            );
+
+            // Gộp tất cả lại bằng toán tử OR
+            return criteriaBuilder.or(namePredicate, brandPredicate, descPredicate);
+        };
+    }
 }

@@ -1,40 +1,132 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Header.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 
 import logo_flag_vn from '../../../assets/images/flag/vn.svg'
 import logo_flag_en from '../../../assets/images/flag/en.svg'
 
 import { isAuthenticated } from "../../utils/auth";
 import { useCart } from "../../../context/CartContext"
+import { getProductSuggestions } from '../../../services/api';
 
 function Header() {
+    const navigate = useNavigate();
+    const location = useLocation();
+    // Thêm hook để đọc tham số từ URL
+    const [searchParams] = useSearchParams();
+
     const [selectedCategory, setSelectedCategory] = useState("All");
+    // State quản lý ô nhập liệu tìm kiếm
+    const [keyword, setKeyword] = useState("");
+    // State cho tính năng gợi ý
+    const [suggestions, setSuggestions] = useState([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const isSearching = useRef(false);
+    // Xác định vùng thanh tìm kiếm, phục vụ tính năng "click ra ngoài để ẩn hộp gợi ý"
+    const searchRef = useRef(null);
+
     const [language, setLanguage] = useState("VN");
 
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    
+
     const { cartCount, fetchCartCount } = useCart();
 
-    const navigate = useNavigate();
+    // Đồng bộ URL vào state khi Component được load
+    useEffect(() => {
+        const urlCategory = searchParams.get("category");
+        const urlKeyword = searchParams.get("keyword");
+
+        if (urlCategory) setSelectedCategory(urlCategory);
+        if (urlKeyword) {
+            isSearching.current = true;
+            setKeyword(urlKeyword);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
+        // Nếu ô tìm kiếm trống, xóa danh sách gợi ý và ẩn dropdown
+        if (!keyword.trim() || isSearching.current) {
+            setSuggestions([]);
+            setShowDropdown(false);
+            return;
+        }
 
+        // Tạo một bộ đếm lùi 300ms
+        const delayDebounceFn = setTimeout(async () => {
+            const data = await getProductSuggestions(keyword);
+            if (!isSearching.current) {
+                setSuggestions(data);
+                setShowDropdown(data.length > 0);
+            }
+        }, 300);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [keyword]);
+
+    // Click ra ngoài để ẩm dropdown
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setShowDropdown(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // Tự động đóng dropdown khi URL thay đổi (chuyển trang)
+    useEffect(() => {
+        setShowDropdown(false);
+        setSuggestions([]);
+    }, [location]);
+
+    useEffect(() => {
         if (isAuthenticated()) {
             setIsLoggedIn(true);
             fetchCartCount();
         }
-
     }, []);
 
     const handleCartClick = () => {
-
         if (isLoggedIn) {
             navigate("/cart");
         } else {
             navigate("/login");
         }
+    };
 
+    // Hàm thực hiện tìm kiếm chính
+    const performSearch = (searchWord, categoryWord) => {
+        const params = new URLSearchParams();
+        if (searchWord.trim()) {
+            params.append("keyword", searchWord.trim());
+        }
+        if (categoryWord && categoryWord !== "All") {
+            params.append("category", categoryWord);
+        }
+
+        isSearching.current = true;
+        setShowDropdown(false);
+        setSuggestions([]);
+
+        navigate(`/products?${params.toString()}`);
+    };
+
+    // Xử lý khi click vào một sản phẩm trong danh sách gợi ý
+    const handleSuggestionClick = (productName) => {
+        isSearching.current = true;
+        setKeyword(productName);
+        setShowDropdown(false);
+        setSuggestions([]);
+        performSearch(productName, selectedCategory);
+    };
+
+    // Hàm xử lý logic khi submit tìm kiếm
+    const handleSearch = (e) => {
+        e.preventDefault(); // Ngăn chặn trang bị reload mặc định của form
+        isSearching.current = true;
+        performSearch(keyword, selectedCategory);
     };
 
     return (
@@ -61,7 +153,7 @@ function Header() {
                 </div>
 
                 {/* Thanh tìm kiếm */}
-                <div className="search-container">
+                <form className="search-container" ref={searchRef} onSubmit={handleSearch}>
                     <div className="search-select-wrapper">
                         <span className="search-select-text">
                             {selectedCategory}
@@ -82,14 +174,39 @@ function Header() {
                         </select>
                     </div>
 
-                    <input type="text" placeholder="Search mysneaker" className="search-input" />
+                    <input
+                        type="text"
+                        placeholder="Search mysneaker"
+                        className="search-input"
+                        value={keyword}
+                        onChange={(e) => { isSearching.current = false; setKeyword(e.target.value);}}
+                        onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
+                    />
 
-                    <button className="search-btn">
+                    {/* Hộp gợi ý tìm kiếm (Suggestions Dropdown) */}
+                    {showDropdown && (
+                        <div className="search-suggestions-dropdown">
+                            {suggestions.map((product) => (
+                                <div
+                                    key={product.id}
+                                    className="suggestion-item"
+                                    onClick={() => handleSuggestionClick(product.name)}
+                                >
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ marginRight: '10px', color: '#565959' }}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                    </svg>
+                                    <span className="suggestion-name">{product.name}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <button type="submit" className="search-btn">
                         <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </button>
-                </div>
+                </form>
 
                 {/* Chọn ngôn ngữ (Language Switcher) */}
                 <div className="nav-item language-select-wrapper">

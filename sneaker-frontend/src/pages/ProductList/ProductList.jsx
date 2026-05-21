@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "../../components/layout/header/Header";
 import Footer from "../../components/layout/footer/Footer";
 import Sidebar from "../../components/layout/sidebar/Sidebar";
@@ -7,6 +8,10 @@ import './ProductList.css'
 
 function ProductList() {
     const [products, setProducts] = useState([]);
+
+    // Đọc parameters từ URL do Header đẩy sang
+    const [searchParams] = useSearchParams();
+    const keyword = searchParams.get("keyword");
 
     // Lưu tiêu chí sắp xếp sản phẩm hiện tại của người dùng
     const [sortOption, setSortOption] = useState("Featured");
@@ -47,6 +52,11 @@ function ProductList() {
                 break;
         }
 
+        // Nếu có từ khóa tìm kiếm trên url, đưa vào API
+        if (keyword) {
+            params.append("keyword", keyword.trim());
+        }
+
         if (filters.categoryId) {
             params.append("categoryId", filters.categoryId);
         }
@@ -82,7 +92,16 @@ function ProductList() {
                 setProducts(data);
             })
             .catch(err => console.error(err));
-    }, [sortOption, filters]);
+    }, [sortOption, filters, keyword]);
+
+    let displayTitle = "Tất cả sản phẩm";
+    if (keyword && filters.categoryName) {
+        displayTitle = `Kết quả tìm kiếm "${keyword}" trong danh mục ${filters.categoryName}`;
+    } else if (keyword) {
+        displayTitle = `Kết quả tìm kiếm cho "${keyword}"`;
+    } else if (filters.categoryName) {
+        displayTitle = `Kết quả tìm kiếm cho ${filters.categoryName}`;
+    }
 
     return (
         <div className="product-list-container">
@@ -92,9 +111,7 @@ function ProductList() {
             <div className="product-list-top">
                 {/* Tiêu đề và kết quả tìm kiếm */}
                 <div className="product-list-title">
-                    <h2>
-                        {filters.categoryName ? `Kết quả tìm kiếm cho ${filters.categoryName}` : "Tất cả sản phẩm"}
-                    </h2>
+                    <h2>{displayTitle}</h2>
                     <p>Hiển thị {products.length} kết quả</p>
                 </div>
 

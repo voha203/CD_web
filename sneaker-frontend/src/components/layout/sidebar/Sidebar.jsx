@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import './Sidebar.css';
 
 function Sidebar({ onFilterChange }) {
+    // Khai báo hook để đọc URL
+    const [searchParams] = useSearchParams();
+    const urlCategory = searchParams.get("category");
+
     const [selectedBrands, setSelectedBrands] = useState([]);
     const [priceRange, setPriceRange] = useState("");
     const [minPrice, setMinPrice] = useState("");
@@ -18,6 +23,21 @@ function Sidebar({ onFilterChange }) {
             .then(data => setCategories(data))
             .catch(err => console.error("Lỗi khi lấy danh mục:", err));
     }, []);
+
+    // THEO DÕI URL: Nếu trên URL có category, tự động mapping tên danh mục sang ID để Sidebar tô đậm đúng chỗ
+    useEffect(() => {
+        if (categories.length > 0) {
+            if (urlCategory && urlCategory !== "All") {
+                const matchedCat = categories.find(c => c.name.toLowerCase() === urlCategory.toLowerCase());
+                if (matchedCat) {
+                    setSelectedCategory(matchedCat.id);
+                }
+            } else {
+                // Nếu URL là All hoặc không có, bỏ chọn ở Sidebar
+                setSelectedCategory(null);
+            }
+        }
+    }, [urlCategory, categories]);
 
     // Xử lý khi người dùng click vào một danh mục
     const handleCategoryClick = (e, id) => {
