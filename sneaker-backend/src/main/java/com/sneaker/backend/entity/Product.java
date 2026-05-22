@@ -38,4 +38,12 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ProductVariant> variants;
+
+    // Điểm đánh giá trung bình (Ví dụ: 4.5) - Mặc định khi mới tạo là 0.0
+    @Column(name = "average_rating", columnDefinition = "DOUBLE DEFAULT 0.0")
+    private Double averageRating = 0.0;
+
+    // Tổng số lượt đánh giá - Mặc định khi mới tạo là 0
+    @Column(name = "review_count", columnDefinition = "INT DEFAULT 0")
+    private Integer reviewCount = 0;
 }
