@@ -1,39 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams } from 'react-router-dom';
 import './ProductDetail.css'
 import Header from "../../components/layout/header/Header"
 import Footer from "../../components/layout/footer/Footer";
 
+import { useProductDetail } from "../../components/hooks/useProductDetail";
+
 function ProductDetail() {
     // Lấy id từ trên thanh URL xuống
     const { id } = useParams();
 
-    // State để lưu dữ liệu chi tiết sản phẩm
-    const [product, setProduct] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const {
+        product,
+        loading,
+        reviews,
+        reviewStats,
+        currentPage,
+        setCurrentPage,
+        isSubmitting,
+        addReview
+    } = useProductDetail(id);
 
     // Quản lý xem đang xem màu (variant) thứ mấy
     const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
     // State lưu vị trí ảnh đang được chọn (mặc định là 0 - ảnh đầu tiên)
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // State quản lý việc đóng/mở phần Delivery (mặc định là đóng - false)
+    // State quản lý việc đóng/mở phần Delivery và Reviews (mặc định là đóng - false)
     const [isDeliveryOpen, setIsDeliveryOpen] = useState(false);
+    const [isReviewsOpen, setIsReviewsOpen] = useState(false);
 
-    // Gọi API khi component vừa load
-    useEffect(() => {
-        setLoading(true); // Reset loading mỗi khi id thay đổi
-        fetch(`http://localhost:8080/api/products/${id}`)
-            .then(res => res.json())
-            .then(data => {
-                setProduct(data);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("Lỗi lấy chi tiết sản phẩm:", err);
-                setLoading(false);
-            });
-    }, [id]);
+    // State cho Form gửi đánh giá
+    const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
+
+    // Hàm gửi đánh giá mới
+    const handleReviewSubmit = async (e) => {
+        e.preventDefault();
+        const success = await addReview(newReview);
+        if (success) {
+            setNewReview({ rating: 5, comment: "" });   // Gửi thành công thì reset form
+        }
+    };
 
     // Hiển thị trong lúc chờ gọi API
     if (loading) {
@@ -226,6 +233,114 @@ function ProductDetail() {
                                 </ul>
                                 <p>Orders are processed and delivered Monday-Friday (excluding public holidays)</p>
                                 <p className="text">mysneaker Members enjoy <a href="#!">free returns</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ===================== Phần Reviews (Accordion) ================= */}
+                    <div className="accordion-section">
+                        <div
+                            className="accordion-header"
+                            onClick={() => setIsReviewsOpen(!isReviewsOpen)}
+                        >
+                            <h3>Reviews ({product.reviewCount || reviewStats.totalElements || 0})</h3>
+                            <span
+                                className="material-symbols-outlined"
+                                style={{
+                                    transform: isReviewsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                                    transition: 'transform 0.3s ease'
+                                }}
+                            >
+                                expand_more
+                            </span>
+                        </div>
+
+                        <div className={`accordion-content-wrapper ${isReviewsOpen ? 'open' : ''}`}>
+                            <div className="accordion-content" style={{ paddingBottom: '20px' }}>
+
+                                {/* --- Form gửi bình luận mới --- */}
+                                <div className="review-form-container" style={{ marginBottom: '30px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+                                    <h4 style={{ margin: '0 0 10px 0' }}>Write a Review</h4>
+                                    <form onSubmit={handleReviewSubmit}>
+                                        <div style={{ marginBottom: '10px', display: 'flex', gap: '5px' }}>
+                                            {[1, 2, 3, 4, 5].map(star => (
+                                                <span
+                                                    key={star}
+                                                    className="material-symbols-outlined"
+                                                    style={{
+                                                        cursor: 'pointer',
+                                                        color: '#faaf00',
+                                                        fontVariationSettings: `'FILL' ${star <= newReview.rating ? 1 : 0}`
+                                                    }}
+                                                    onClick={() => setNewReview({ ...newReview, rating: star })}
+                                                >
+                                                    star
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <textarea
+                                            style={{ width: '100%', minHeight: '80px', padding: '10px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc', resize: 'vertical' }}
+                                            placeholder="How did you like this product?"
+                                            value={newReview.comment}
+                                            onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                                        />
+                                        <button
+                                            type="submit"
+                                            className="btn btn-add"
+                                            style={{ padding: '8px 16px', width: 'auto' }}
+                                            disabled={isSubmitting}
+                                        >
+                                            {isSubmitting ? 'Submitting...' : 'Submit Review'}
+                                        </button>
+                                    </form>
+                                </div>
+
+                                {/* --- Danh sách hiển thị bình luận khách hàng --- */}
+                                <div className="reviews-list">
+                                    {reviews.length === 0 ? (
+                                        <p style={{ color: '#757575' }}>No reviews yet. Be the first to review!</p>
+                                    ) : (
+                                        reviews.map(review => (
+                                            <div key={review.id} className="review-item" style={{ borderBottom: '1px solid #eee', paddingBottom: '15px', marginBottom: '15px' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                                                    <strong>{review.username}</strong>
+                                                    <span style={{ color: '#757575', fontSize: '12px' }}>
+                                                        {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+                                                    </span>
+                                                </div>
+                                                <div style={{ color: '#faaf00', display: 'flex', marginBottom: '5px' }}>
+                                                    {[1, 2, 3, 4, 5].map(star => (
+                                                        <span key={star} className="material-symbols-outlined" style={{ fontSize: '16px', fontVariationSettings: `'FILL' ${star <= review.rating ? 1 : 0}` }}>
+                                                            star
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                                <p style={{ margin: 0, fontSize: '14px', color: '#111' }}>{review.comment}</p>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+
+                                {/* --- Nút Phân trang của mục Review --- */}
+                                {reviewStats.totalPages > 1 && (
+                                    <div className="review-pagination" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginTop: '20px' }}>
+                                        <button
+                                            disabled={currentPage === 0}
+                                            onClick={() => setCurrentPage(prev => prev - 1)}
+                                            style={{ padding: '5px 10px', cursor: currentPage === 0 ? 'not-allowed' : 'pointer', border: '1px solid #ccc', background: '#fff' }}
+                                        >
+                                            Prev
+                                        </button>
+                                        <span style={{ fontSize: '14px' }}>Page {currentPage + 1} of {reviewStats.totalPages}</span>
+                                        <button
+                                            disabled={currentPage === reviewStats.totalPages - 1}
+                                            onClick={() => setCurrentPage(prev => prev + 1)}
+                                            style={{ padding: '5px 10px', cursor: currentPage === reviewStats.totalPages - 1 ? 'not-allowed' : 'pointer', border: '1px solid #ccc', background: '#fff' }}
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
