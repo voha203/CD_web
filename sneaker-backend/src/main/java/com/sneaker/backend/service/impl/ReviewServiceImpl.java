@@ -57,14 +57,6 @@ public class ReviewServiceImpl implements ReviewService {
         review.setUser(user);
 
         Review savedReview = reviewRepository.save(review);
-
-        // TÍNH TOÁN LẠI ĐIỂM TRUNG BÌNH CHO SẢN PHẨM
-        Integer oldCount = product.getReviewCount();
-        Double oldAvg = product.getAverageRating();
-        Double newAvg = ((oldAvg * oldCount) + request.getRating()) / (oldCount + 1);
-
-        product.setReviewCount(oldCount + 1);
-        product.setAverageRating(Math.round(newAvg * 10.0) / 10.0);
         productRepository.save(product);
 
         return reviewMapper.toDTO(savedReview);

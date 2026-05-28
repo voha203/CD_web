@@ -2,6 +2,7 @@ package com.sneaker.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Formula;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,11 +40,11 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<ProductVariant> variants;
 
-    // Điểm đánh giá trung bình (Ví dụ: 4.5) - Mặc định khi mới tạo là 0.0
-    @Column(name = "average_rating", columnDefinition = "DOUBLE DEFAULT 0.0")
-    private Double averageRating = 0.0;
+    // Lấy điểm trung bình trực tiếp từ bảng reviews
+    @Formula("(SELECT COALESCE(AVG(r.rating), 0.0) FROM reviews r WHERE r.product_id = id)")
+    private Double averageRating;
 
-    // Tổng số lượt đánh giá - Mặc định khi mới tạo là 0
-    @Column(name = "review_count", columnDefinition = "INT DEFAULT 0")
-    private Integer reviewCount = 0;
+    // Đếm tổng số bình luận trực tiếp từ bảng reviews
+    @Formula("(SELECT COUNT(r.id) FROM reviews r WHERE r.product_id = id)")
+    private Integer reviewCount;
 }
