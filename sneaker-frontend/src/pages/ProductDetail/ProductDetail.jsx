@@ -84,13 +84,80 @@ function ProductDetail() {
         setCurrentIndex(0); // Reset về ảnh đầu tiên của màu mới
     };
 
+    // Hàm xử lí tô màu sao đánh giá
+    const renderStars = (rating) => {
+        // Ép về số float an toàn, nếu null/undefined thì gán bằng 0
+        const currentRating = parseFloat(rating || 0);
+
+        return Array.from({ length: 5 }, (_, index) => {
+            const starValue = index + 1; // Vị trí ngôi sao (1, 2, 3, 4, 5)
+            let fillPercent = 0;
+            const decimal = currentRating - (starValue - 1);
+            fillPercent = decimal * 100;
+
+            return (
+                <div
+                    key={index}
+                    style={{
+                        position: 'relative',
+                        display: 'inline-block',
+                        width: '20px',
+                        height: '20px',
+                        marginRight: '2px',
+                        marginBottom: '2px',
+                        verticalAlign: 'middle'
+                    }}
+                >
+                    {/* LỚP NỀN: Ngôi sao rỗng màu xám */}
+                    <span
+                        className="material-symbols-outlined"
+                        style={{
+                            color: '#ffd814',
+                            fontSize: '20px',
+                            position: 'absolute',
+                            left: 0,
+                            top: 0
+                        }}
+                    >
+                        star
+                    </span>
+
+                    {/* LỚP ĐÈ: Ngôi sao vàng đặc bị cắt theo tỷ lệ phần trăm */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: 0,
+                            width: `${fillPercent}%`,
+                            overflow: 'hidden',
+                            height: '100%'
+                        }}
+                    >
+                        <span
+                            className="material-symbols-outlined"
+                            style={{
+                                color: '#ffd814',
+                                fontSize: '20px',
+                                fontVariationSettings: "'FILL' 1, 'wght' 400",
+                                display: 'block',
+                                width: '20px'
+                            }}
+                        >
+                            star
+                        </span>
+                    </div>
+                </div>
+            );
+        });
+    };
+
     return (
         <div className="product-detail-container">
             <Header />
 
             <div className="product-detail">
 
-                {/* =================== CỘT  TRÁI: DANH SÁCH HÌNH ẢNH SẢN PHẨM ================ */}
+                {/* =================== CỘT TRÁI: DANH SÁCH HÌNH ẢNH SẢN PHẨM ================ */}
                 <div className="gallery-section">
                     <div className="thumbnails">
                         {images.map((img, index) => (
@@ -238,109 +305,63 @@ function ProductDetail() {
                     </div>
 
                     {/* ===================== Phần Reviews (Accordion) ================= */}
-                    <div className="accordion-section">
+                    <div className="accordion-section reviews-section">
                         <div
                             className="accordion-header"
                             onClick={() => setIsReviewsOpen(!isReviewsOpen)}
                         >
                             <h3>Reviews ({product.reviewCount || reviewStats.totalElements || 0})</h3>
-                            <span
-                                className="material-symbols-outlined"
-                                style={{
-                                    transform: isReviewsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                                    transition: 'transform 0.3s ease'
-                                }}
-                            >
-                                expand_more
-                            </span>
+
+                            <div className="accordion-right-group">
+                                <div className="header-stars-preview">
+                                    {renderStars(product?.averageRating)}
+                                </div>
+                                <span
+                                    className="material-symbols-outlined"
+                                    style={{
+                                        transform: isReviewsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                                        transition: 'transform 0.3s ease'
+                                    }}
+                                >
+                                    expand_more
+                                </span>
+                            </div>
                         </div>
 
                         <div className={`accordion-content-wrapper ${isReviewsOpen ? 'open' : ''}`}>
-                            <div className="accordion-content" style={{ paddingBottom: '20px' }}>
-
-                                {/* --- Form gửi bình luận mới --- */}
-                                <div className="review-form-container" style={{ marginBottom: '30px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
-                                    <h4 style={{ margin: '0 0 10px 0' }}>Write a Review</h4>
-                                    <form onSubmit={handleReviewSubmit}>
-                                        <div style={{ marginBottom: '10px', display: 'flex', gap: '5px' }}>
-                                            {[1, 2, 3, 4, 5].map(star => (
-                                                <span
-                                                    key={star}
-                                                    className="material-symbols-outlined"
-                                                    style={{
-                                                        cursor: 'pointer',
-                                                        color: '#faaf00',
-                                                        fontVariationSettings: `'FILL' ${star <= newReview.rating ? 1 : 0}`
-                                                    }}
-                                                    onClick={() => setNewReview({ ...newReview, rating: star })}
-                                                >
-                                                    star
-                                                </span>
-                                            ))}
-                                        </div>
-                                        <textarea
-                                            style={{ width: '100%', minHeight: '80px', padding: '10px', marginBottom: '10px', borderRadius: '4px', border: '1px solid #ccc', resize: 'vertical' }}
-                                            placeholder="How did you like this product?"
-                                            value={newReview.comment}
-                                            onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                                        />
-                                        <button
-                                            type="submit"
-                                            className="btn btn-add"
-                                            style={{ padding: '8px 16px', width: 'auto' }}
-                                            disabled={isSubmitting}
-                                        >
-                                            {isSubmitting ? 'Submitting...' : 'Submit Review'}
-                                        </button>
-                                    </form>
-                                </div>
+                            <div className="accordion-content">
 
                                 {/* --- Danh sách hiển thị bình luận khách hàng --- */}
                                 <div className="reviews-list">
                                     {reviews.length === 0 ? (
-                                        <p style={{ color: '#757575' }}>No reviews yet. Be the first to review!</p>
+                                        <p className="no-reviews">No reviews yet. Be the first to review!</p>
                                     ) : (
                                         reviews.map(review => (
-                                            <div key={review.id} className="review-item" style={{ borderBottom: '1px solid #eee', paddingBottom: '15px', marginBottom: '15px' }}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                                                    <strong>{review.username}</strong>
-                                                    <span style={{ color: '#757575', fontSize: '12px' }}>
-                                                        {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+                                            <div key={review.id} className="review-item">
+                                                {/* Hàng chứa: Sao -> Tên -> Ngày tháng */}
+                                                <div className="review-meta-row">
+                                                    <div className="item-stars">
+                                                        {renderStars(review?.rating)}
+                                                    </div>
+                                                    <span className="review-username">{review.username}</span>
+                                                    <span className="review-divider">-</span>
+                                                    <span className="review-date">
+                                                        {new Date(review.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                                                     </span>
                                                 </div>
-                                                <div style={{ color: '#faaf00', display: 'flex', marginBottom: '5px' }}>
-                                                    {[1, 2, 3, 4, 5].map(star => (
-                                                        <span key={star} className="material-symbols-outlined" style={{ fontSize: '16px', fontVariationSettings: `'FILL' ${star <= review.rating ? 1 : 0}` }}>
-                                                            star
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                                <p style={{ margin: 0, fontSize: '14px', color: '#111' }}>{review.comment}</p>
+
+                                                {/* Nội dung bình luận */}
+                                                <p className="review-comment-content">{review.comment}</p>
                                             </div>
                                         ))
                                     )}
                                 </div>
 
-                                {/* --- Nút Phân trang của mục Review --- */}
-                                {reviewStats.totalPages > 1 && (
-                                    <div className="review-pagination" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginTop: '20px' }}>
-                                        <button
-                                            disabled={currentPage === 0}
-                                            onClick={() => setCurrentPage(prev => prev - 1)}
-                                            style={{ padding: '5px 10px', cursor: currentPage === 0 ? 'not-allowed' : 'pointer', border: '1px solid #ccc', background: '#fff' }}
-                                        >
-                                            Prev
-                                        </button>
-                                        <span style={{ fontSize: '14px' }}>Page {currentPage + 1} of {reviewStats.totalPages}</span>
-                                        <button
-                                            disabled={currentPage === reviewStats.totalPages - 1}
-                                            onClick={() => setCurrentPage(prev => prev + 1)}
-                                            style={{ padding: '5px 10px', cursor: currentPage === reviewStats.totalPages - 1 ? 'not-allowed' : 'pointer', border: '1px solid #ccc', background: '#fff' }}
-                                        >
-                                            Next
-                                        </button>
-                                    </div>
-                                )}
+                                {/* ======== Các nút hành động dưới đáy (See Reviews & Write a review) ======== */}
+                                <div className="review-actions">
+                                    <button className="btn-outline">See Reviews</button>
+                                    <button className="btn-outline">Write a review</button>
+                                </div>
                             </div>
                         </div>
                     </div>

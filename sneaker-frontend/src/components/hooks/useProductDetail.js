@@ -8,7 +8,7 @@ export function useProductDetail(id) {
 
     // State quản lý phần bình luận và đánh giá (REVIEWS)
     const [reviews, setReviews] = useState([]);
-    const [reviewStats, setReviewStats] = useState({ totalElements: 0, totalPages: 0, averageRating: 0 });
+    const [reviewStats, setReviewStats] = useState({ totalElements: 0, totalPages: 0 });
     const [currentPage, setCurrentPage] = useState(0);
 
     // State cho Form gửi đánh giá
@@ -22,7 +22,6 @@ export function useProductDetail(id) {
                 setReviewStats({
                     totalElements: data.totalElements,
                     totalPages: data.totalPages,
-                    averageRating: product?.averageRating || 0   // Lấy số sao trung bình từ product
                 });
             })
             .catch(err => console.error("Lỗi lấy bình luận:", err.message));
