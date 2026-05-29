@@ -38,7 +38,7 @@ INSERT INTO cart_items (id, cart_id, variant_size_id, quantity) VALUES (1, 1, 10
 -- Clear cart: DELETE http://localhost:8080/api/cart/clear
 
 
------------------------------- TEST CART API (TRANG THANH TOÁN) ------------------------------
+------------------------------ TEST CHECKOUT API (TRANG THANH TOÁN) ------------------------------
 -- Chuyển dữ liệu từ giỏ hàng sang trang thanh toán: POST http://localhost:8080/api/orders/checkout
 -- {
 --     "userId": 1,
@@ -48,3 +48,13 @@ INSERT INTO cart_items (id, cart_id, variant_size_id, quantity) VALUES (1, 1, 10
 --     "paymentMethod": "COD",
 --     "note": "Giao hàng giờ hành chính giúp mình nhé!"
 -- }
+
+
+------------------------------ TEST REVIEW API (BÌNH LUẬN VÀ ĐÁNH GIÁ SẢN PHẨM) ------------------------------
+-- Thêm đánh giá: POST http://localhost:8080/api/products/1/reviews
+-- {
+--     "rating": 5,
+--     "comment": "Giày đi rất êm chân, đúng chính hãng Nike, giao hàng siêu nhanh!"
+-- }
+
+-- Lấy ra danh sách đánh giá: GET http://localhost:8080/api/products/1/reviews?page=0&size=5

@@ -16,5 +16,8 @@ public class ProductDTO {
     private Long categoryId;
     private Double finalPrice;
 
+    private Double averageRating;
+    private Integer reviewCount;
+
     private List<ProductVariantDTO> variants;
 }

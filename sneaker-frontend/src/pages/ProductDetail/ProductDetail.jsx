@@ -1,39 +1,46 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams } from 'react-router-dom';
 import './ProductDetail.css'
 import Header from "../../components/layout/header/Header"
 import Footer from "../../components/layout/footer/Footer";
 
+import { useProductDetail } from "../../components/hooks/useProductDetail";
+
 function ProductDetail() {
     // Lấy id từ trên thanh URL xuống
     const { id } = useParams();
 
-    // State để lưu dữ liệu chi tiết sản phẩm
-    const [product, setProduct] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const {
+        product,
+        loading,
+        reviews,
+        reviewStats,
+        currentPage,
+        setCurrentPage,
+        isSubmitting,
+        addReview
+    } = useProductDetail(id);
 
     // Quản lý xem đang xem màu (variant) thứ mấy
     const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
     // State lưu vị trí ảnh đang được chọn (mặc định là 0 - ảnh đầu tiên)
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // State quản lý việc đóng/mở phần Delivery (mặc định là đóng - false)
+    // State quản lý việc đóng/mở phần Delivery và Reviews (mặc định là đóng - false)
     const [isDeliveryOpen, setIsDeliveryOpen] = useState(false);
+    const [isReviewsOpen, setIsReviewsOpen] = useState(false);
 
-    // Gọi API khi component vừa load
-    useEffect(() => {
-        setLoading(true); // Reset loading mỗi khi id thay đổi
-        fetch(`http://localhost:8080/api/products/${id}`)
-            .then(res => res.json())
-            .then(data => {
-                setProduct(data);
-                setLoading(false);
-            })
-            .catch(err => {
-                console.error("Lỗi lấy chi tiết sản phẩm:", err);
-                setLoading(false);
-            });
-    }, [id]);
+    // State cho Form gửi đánh giá
+    const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
+
+    // Hàm gửi đánh giá mới
+    const handleReviewSubmit = async (e) => {
+        e.preventDefault();
+        const success = await addReview(newReview);
+        if (success) {
+            setNewReview({ rating: 5, comment: "" });   // Gửi thành công thì reset form
+        }
+    };
 
     // Hiển thị trong lúc chờ gọi API
     if (loading) {
@@ -77,13 +84,80 @@ function ProductDetail() {
         setCurrentIndex(0); // Reset về ảnh đầu tiên của màu mới
     };
 
+    // Hàm xử lí tô màu sao đánh giá
+    const renderStars = (rating) => {
+        // Ép về số float an toàn, nếu null/undefined thì gán bằng 0
+        const currentRating = parseFloat(rating || 0);
+
+        return Array.from({ length: 5 }, (_, index) => {
+            const starValue = index + 1; // Vị trí ngôi sao (1, 2, 3, 4, 5)
+            let fillPercent = 0;
+            const decimal = currentRating - (starValue - 1);
+            fillPercent = decimal * 100;
+
+            return (
+                <div
+                    key={index}
+                    style={{
+                        position: 'relative',
+                        display: 'inline-block',
+                        width: '20px',
+                        height: '20px',
+                        marginRight: '2px',
+                        marginBottom: '2px',
+                        verticalAlign: 'middle'
+                    }}
+                >
+                    {/* LỚP NỀN: Ngôi sao rỗng màu xám */}
+                    <span
+                        className="material-symbols-outlined"
+                        style={{
+                            color: '#ffd814',
+                            fontSize: '20px',
+                            position: 'absolute',
+                            left: 0,
+                            top: 0
+                        }}
+                    >
+                        star
+                    </span>
+
+                    {/* LỚP ĐÈ: Ngôi sao vàng đặc bị cắt theo tỷ lệ phần trăm */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: 0,
+                            width: `${fillPercent}%`,
+                            overflow: 'hidden',
+                            height: '100%'
+                        }}
+                    >
+                        <span
+                            className="material-symbols-outlined"
+                            style={{
+                                color: '#ffd814',
+                                fontSize: '20px',
+                                fontVariationSettings: "'FILL' 1, 'wght' 400",
+                                display: 'block',
+                                width: '20px'
+                            }}
+                        >
+                            star
+                        </span>
+                    </div>
+                </div>
+            );
+        });
+    };
+
     return (
         <div className="product-detail-container">
             <Header />
 
             <div className="product-detail">
 
-                {/* =================== CỘT  TRÁI: DANH SÁCH HÌNH ẢNH SẢN PHẨM ================ */}
+                {/* =================== CỘT TRÁI: DANH SÁCH HÌNH ẢNH SẢN PHẨM ================ */}
                 <div className="gallery-section">
                     <div className="thumbnails">
                         {images.map((img, index) => (
@@ -226,6 +300,68 @@ function ProductDetail() {
                                 </ul>
                                 <p>Orders are processed and delivered Monday-Friday (excluding public holidays)</p>
                                 <p className="text">mysneaker Members enjoy <a href="#!">free returns</a>.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ===================== Phần Reviews (Accordion) ================= */}
+                    <div className="accordion-section reviews-section">
+                        <div
+                            className="accordion-header"
+                            onClick={() => setIsReviewsOpen(!isReviewsOpen)}
+                        >
+                            <h3>Reviews ({product.reviewCount || reviewStats.totalElements || 0})</h3>
+
+                            <div className="accordion-right-group">
+                                <div className="header-stars-preview">
+                                    {renderStars(product?.averageRating)}
+                                </div>
+                                <span
+                                    className="material-symbols-outlined"
+                                    style={{
+                                        transform: isReviewsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                                        transition: 'transform 0.3s ease'
+                                    }}
+                                >
+                                    expand_more
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className={`accordion-content-wrapper ${isReviewsOpen ? 'open' : ''}`}>
+                            <div className="accordion-content">
+
+                                {/* --- Danh sách hiển thị bình luận khách hàng --- */}
+                                <div className="reviews-list">
+                                    {reviews.length === 0 ? (
+                                        <p className="no-reviews">No reviews yet. Be the first to review!</p>
+                                    ) : (
+                                        reviews.map(review => (
+                                            <div key={review.id} className="review-item">
+                                                {/* Hàng chứa: Sao -> Tên -> Ngày tháng */}
+                                                <div className="review-meta-row">
+                                                    <div className="item-stars">
+                                                        {renderStars(review?.rating)}
+                                                    </div>
+                                                    <span className="review-username">{review.username}</span>
+                                                    <span className="review-divider">-</span>
+                                                    <span className="review-date">
+                                                        {new Date(review.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                    </span>
+                                                </div>
+
+                                                {/* Nội dung bình luận */}
+                                                <p className="review-comment-content">{review.comment}</p>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+
+                                {/* ======== Các nút hành động dưới đáy (See Reviews & Write a review) ======== */}
+                                <div className="review-actions">
+                                    <button className="btn-outline">See Reviews</button>
+                                    <button className="btn-outline">Write a review</button>
+                                </div>
                             </div>
                         </div>
                     </div>
