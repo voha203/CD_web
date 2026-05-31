@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import './Home.css'
 import Header from "../../components/layout/header/Header";
 import logo_nike from "../../assets/images/logoBrand/nike.jpg";
@@ -10,31 +11,27 @@ import logo_new_balance from "../../assets/images/logoBrand/new_balance.svg"
 import ProductCard from '../../components/layout/productCard/ProductCard';
 import Footer from "../../components/layout/footer/Footer";
 
-function Home() {
-  // MÔ PHỎNG DỮ LIỆU
-  const sampleProducts = [
-    {
-      id: 1, brand: 'Nike', name: 'Nike Air Max 270 React',
-      price: 3500000, isNew: true,
-      imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-    },
-    {
-      id: 2, brand: 'Jordan', name: 'Air Jordan 1 Retro High OG Black Toe',
-      price: 4800000, oldPrice: 6000000, salePercentage: 20,
-      imageUrl: 'https://images.unsplash.com/photo-1608231387042-66d1773070a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'
-    },
-  ];
+import { getProducts } from "../../services/api";
 
+function Home() {
   const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/products")
-      .then(res => res.json())
-      .then(data => {
-        console.log("DATA:", data);
+    const fetchApi = async () => {
+      try {
+        const data = await getProducts();
         setProducts(data);
-      })
-      .catch(err => console.error(err));
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Lỗi khi tải sản phẩm:", err);
+        setIsLoading(false);
+      }
+    };
+
+    fetchApi();
   }, []);
 
   const brands = [
@@ -48,21 +45,7 @@ function Home() {
 
   const duplicatedBrands = [...brands, ...brands];
 
-  // if (products.length === 0) {
-  //   return (
-  //     <div>
-  //       <h1>Shop Sneaker</h1>
-  //       <p>Đang tải...</p>
-  //     </div>
-  //   );
-  // }
-
   return (
-    // products.map(p => (
-    //   <div key={p.id}>
-    //     {p.name} - {p.price}
-    //   </div>
-    // ))
     <div>
       {/* HEADER */}
       <Header />
@@ -74,7 +57,12 @@ function Home() {
         <div className="hero-content">
           <h1 className="hero-title">New Era of Streetwear</h1>
           <p className="hero-subtitle">Khám phá những bộ sưu tập Sneaker độc quyền và hot nhất mùa này. Bước đi tự tin, khẳng định chất riêng.</p>
-          <button className="hero-btn">Shop The Collection</button>
+          <button
+            className="hero-btn"
+            onClick={() => navigate('/products')}
+          >
+            Shop The Collection
+          </button>
         </div>
       </div>
 
@@ -83,7 +71,13 @@ function Home() {
         <div className="marquee-container">
           <div className="marquee-track">
             {duplicatedBrands.map((brand, index) => (
-              <div key={index} className="marquee-item" title={brand.name}>
+              <div
+                key={index}
+                className="marquee-item"
+                title={brand.name}
+                style={{ cursor: "pointer" }}
+                onClick={() => navigate(`/products?brand=${encodeURIComponent(brand.name)}`)}
+              >
                 <img src={brand.logo} alt={brand.name} />
               </div>
             ))}
@@ -94,11 +88,18 @@ function Home() {
       {/* HIỂN THỊ NHỮNG SẢN PHẨM "HÀNG MỚI VỀ", "BÁN CHẠY NHẤT", "ĐANG GIẢM GIÁ" */}
       <div className="featuredProducts">
         <h2>NEW ARRIVALS</h2>
-        <div className="products-grid">
-          {sampleProducts.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+
+        {isLoading ? (
+          <div style={{ textAlign: "center", padding: "50px" }}>Đang tải sản phẩm mới nhất...</div>
+        ) : products.length > 0 ? (
+          <div className="products-grid">
+            {products.slice(0, 8).map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        ) : (
+          <div style={{ textAlign: "center", padding: "50px" }}>Chưa có sản phẩm nào.</div>
+        )}
       </div>
 
       {/* FOOTER */}
