@@ -12,6 +12,7 @@ function ProductList() {
     // Đọc parameters từ URL do Header đẩy sang
     const [searchParams] = useSearchParams();
     const keyword = searchParams.get("keyword");
+    const brandFromUrl = searchParams.get("brand");
 
     // Lưu tiêu chí sắp xếp sản phẩm hiện tại của người dùng
     const [sortOption, setSortOption] = useState("Featured");
@@ -20,11 +21,26 @@ function ProductList() {
     const [filters, setFilters] = useState({
         categoryId: null,
         categoryName: null,
-        brands: [],
+        brands: brandFromUrl ? [brandFromUrl] : [],
         priceOption: "",
         customPrice: { min: "", max: "" },
         sizes: []
     });
+
+    useEffect(() => {
+        setFilters(prev => {
+            if (brandFromUrl && prev.brands.length === 1 && prev.brands[0] === brandFromUrl) {
+                return prev;
+            }
+            if (!brandFromUrl && prev.brands.length === 0) {
+                return prev;
+            }
+            return {
+                ...prev,
+                brands: brandFromUrl ? [brandFromUrl] : []
+            };
+        });
+    }, [brandFromUrl]);
 
     // Lấy dữ liệu từ cơ sở dữ liệu
     useEffect(() => {
@@ -99,6 +115,8 @@ function ProductList() {
         displayTitle = `Kết quả tìm kiếm "${keyword}" trong danh mục ${filters.categoryName}`;
     } else if (keyword) {
         displayTitle = `Kết quả tìm kiếm cho "${keyword}"`;
+    } else if (filters.brands && filters.brands.length === 1) {
+        displayTitle = `Bộ sưu tập giày ${filters.brands[0]}`;
     } else if (filters.categoryName) {
         displayTitle = `Kết quả tìm kiếm cho ${filters.categoryName}`;
     }
@@ -130,7 +148,7 @@ function ProductList() {
             {/* Nội dung trang danh sách */}
             <main>
                 {/* Sidebar */}
-                <Sidebar onFilterChange={(newFilters) => setFilters(newFilters)} />
+                <Sidebar filters={filters} onFilterChange={(newFilters) => setFilters(newFilters)} />
 
                 <div>
                     <div className="text-result">

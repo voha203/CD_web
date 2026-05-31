@@ -6,8 +6,9 @@ function Sidebar({ onFilterChange }) {
     // Khai báo hook để đọc URL
     const [searchParams] = useSearchParams();
     const urlCategory = searchParams.get("category");
+    const urlBrand = searchParams.get("brand");
 
-    const [selectedBrands, setSelectedBrands] = useState([]);
+    const [selectedBrands, setSelectedBrands] = useState(urlBrand ? [urlBrand] : []);
     const [priceRange, setPriceRange] = useState("");
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
@@ -38,6 +39,12 @@ function Sidebar({ onFilterChange }) {
             }
         }
     }, [urlCategory, categories]);
+
+    useEffect(() => {
+        if (urlBrand) {
+            setSelectedBrands([urlBrand]);
+        }
+    }, [urlBrand]);
 
     // Xử lý khi người dùng click vào một danh mục
     const handleCategoryClick = (e, id) => {
@@ -137,27 +144,27 @@ function Sidebar({ onFilterChange }) {
                 <h3 className="filter-heading">Thương hiệu</h3>
                 <div>
                     <div className="checkbox-group">
-                        <input type="checkbox" id="brand-nike" value="Nike" onChange={handleBrandChange} />
+                        <input type="checkbox" id="brand-nike" value="Nike" checked={selectedBrands.includes("Nike")} onChange={handleBrandChange} />
                         <label htmlFor="brand-nike" className="checkbox-label">Nike</label>
                     </div>
                     <div className="checkbox-group">
-                        <input type="checkbox" id="brand-adidas" value="Adidas" onChange={handleBrandChange} />
+                        <input type="checkbox" id="brand-adidas" value="Adidas" checked={selectedBrands.includes("Adidas")} onChange={handleBrandChange} />
                         <label htmlFor="brand-adidas" className="checkbox-label">Adidas</label>
                     </div>
                     <div className="checkbox-group">
-                        <input type="checkbox" id="brand-jordan" value="Air Jordan" onChange={handleBrandChange} />
+                        <input type="checkbox" id="brand-jordan" value="Air Jordan" checked={selectedBrands.includes("Air Jordan")} onChange={handleBrandChange} />
                         <label htmlFor="brand-jordan" className="checkbox-label">Air Jordan</label>
                     </div>
                     <div className="checkbox-group">
-                        <input type="checkbox" id="brand-converse" value="Converse" onChange={handleBrandChange} />
+                        <input type="checkbox" id="brand-converse" value="Converse" checked={selectedBrands.includes("Converse")} onChange={handleBrandChange} />
                         <label htmlFor="brand-converse" className="checkbox-label">Converse</label>
                     </div>
                     <div className="checkbox-group">
-                        <input type="checkbox" id="brand-new-balance" value="New Balance" onChange={handleBrandChange} />
+                        <input type="checkbox" id="brand-new-balance" value="New Balance" checked={selectedBrands.includes("New Balance")} onChange={handleBrandChange} />
                         <label htmlFor="brand-new-balance" className="checkbox-label">New Balance</label>
                     </div>
                     <div className="checkbox-group">
-                        <input type="checkbox" id="brand-vans" value="Vans" onChange={handleBrandChange} />
+                        <input type="checkbox" id="brand-vans" value="Vans" checked={selectedBrands.includes("Vans")} onChange={handleBrandChange} />
                         <label htmlFor="brand-vans" className="checkbox-label">Vans</label>
                     </div>
                 </div>

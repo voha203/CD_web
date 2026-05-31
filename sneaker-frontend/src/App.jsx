@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import ScrollToTop from "./components/layout/scrollToTop/ScrollToTop";
 import Header from './components/layout/header/Header'
 import Footer from './components/layout/header/Header'
 
@@ -14,6 +15,7 @@ function App() {
   return (
     <CartProvider>
       <Router>
+        <ScrollToTop />
         <Routes>
           {/* Trang chủ: Mặc định chuyển hướng về danh sách sản phẩm */}
           <Route path="/" element={<Home />} />
