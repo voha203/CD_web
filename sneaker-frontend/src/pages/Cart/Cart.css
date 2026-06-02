@@ -1,6 +1,8 @@
 .cart-page-container {
     background-color: #eaeded;
-    min-height: 100vh;
+    flex: 1; 
+    display: flex;
+    flex-direction: column;
 }
 
 /* ============== XỬ LÍ TRƯỜNG HỢP NGƯỜI DÙNG CHƯA ĐĂNG NHẬP =============== */

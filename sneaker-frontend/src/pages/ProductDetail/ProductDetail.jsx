@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { useParams } from 'react-router-dom';
 import './ProductDetail.css'
-import Header from "../../components/layout/header/Header"
-import Footer from "../../components/layout/footer/Footer";
 
 import { useProductDetail } from "../../components/hooks/useProductDetail";
 
@@ -153,8 +151,6 @@ function ProductDetail() {
 
     return (
         <div className="product-detail-container">
-            <Header />
-
             <div className="product-detail">
 
                 {/* =================== CỘT TRÁI: DANH SÁCH HÌNH ẢNH SẢN PHẨM ================ */}
@@ -367,8 +363,6 @@ function ProductDetail() {
                     </div>
                 </div>
             </div>
-
-            <Footer />
         </div >
     );
 }

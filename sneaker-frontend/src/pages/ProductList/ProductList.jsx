@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import Header from "../../components/layout/header/Header";
-import Footer from "../../components/layout/footer/Footer";
 import Sidebar from "../../components/layout/sidebar/Sidebar";
 import ProductCard from '../../components/layout/productCard/ProductCard';
 import './ProductList.css'
@@ -123,8 +121,6 @@ function ProductList() {
 
     return (
         <div className="product-list-container">
-            <Header />
-
             {/* Thanh đếm số lượng tìm kiếm và sắp xếp danh sách theo yêu cầu */}
             <div className="product-list-top">
                 {/* Tiêu đề và kết quả tìm kiếm */}
@@ -163,8 +159,6 @@ function ProductList() {
                     </div>
                 </div>
             </main>
-
-            <Footer />
         </div >
     );
 }
