@@ -2,6 +2,7 @@
     background-color: #232f3e;
     color: #ffffff;
     font-family: Arial, sans-serif;
+    width: 100%;
 }
 
 /* THANH "BACK TO TOP" */
@@ -126,24 +127,53 @@
     font-size: 13px;
 }
 
-@media (max-width: 768px) {
+
+
+/* =========================== GIAO DIỆN RESPONSIVE =========================== */
+/* MÀN HÌNH TABLET VÀ LAPTOP NHỎ */
+@media (max-width: 992px) {
     .footer-content {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 30px 30px;
+        padding: 40px 20px;
+        margin-bottom: 0;
+    }
+
+    .footer-brand .footer-logo {
+        margin-top: 0;
+    }
+    
+    .footer-heading {
+        margin-top: 0;
     }
 }
 
-@media (max-width: 480px) {
+/* MÀN HÌNH ĐIỆN THOẠI */
+@media (max-width: 520px) {
     .footer-content {
         grid-template-columns: 1fr;
+        gap: 35px;
         text-align: center;
+        padding-top: 30px;
+        padding-left: 20px;
+        padding-right: 20px;
+        padding-bottom: 45px;
+    }
+
+    .footer-heading {
+        margin-bottom: 12px;
     }
 
     .newsletter-form {
         flex-direction: column;
+        gap: 10px;
+    }
+
+    .newsletter-form input {
+        text-align: center;
     }
 
     .footer-bottom {
-        flex-direction: column;
-        gap: 15px;
+        padding: 15px 20px;
     }
 }
