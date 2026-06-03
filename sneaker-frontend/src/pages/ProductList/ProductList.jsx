@@ -15,6 +15,9 @@ function ProductList() {
     // Lưu tiêu chí sắp xếp sản phẩm hiện tại của người dùng
     const [sortOption, setSortOption] = useState("Featured");
 
+    // State điều khiển ẩn/hiện sidebar trên mobile
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
     // Lưu thuộc tính bộ lọc sản phẩm
     const [filters, setFilters] = useState({
         categoryId: null,
@@ -131,6 +134,13 @@ function ProductList() {
 
                 {/* Bộ lọc sắp xếp theo yêu cầu */}
                 <div className="product-list-arrange">
+                    <button 
+                        className="btn-show-filter" 
+                        onClick={() => setIsMobileFilterOpen(true)}
+                    >
+                        Bộ lọc 🔍
+                    </button>
+
                     <label>Sort by:</label>
                     <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
                         <option value="Featured">Featured</option>
@@ -144,9 +154,25 @@ function ProductList() {
             {/* Nội dung trang danh sách */}
             <main>
                 {/* Sidebar */}
-                <Sidebar filters={filters} onFilterChange={(newFilters) => setFilters(newFilters)} />
+                {isMobileFilterOpen && (
+                    <div className="sidebar-overlay" onClick={() => setIsMobileFilterOpen(false)}></div>
+                )}
 
-                <div>
+                <div className={`sidebar-mobile-wrapper ${isMobileFilterOpen ? 'open' : ''}`}>
+                    <div className="sidebar-mobile-header">
+                        <h3>Bộ lọc sản phẩm</h3>
+                        <button 
+                            className="btn-close-filter" 
+                            onClick={() => setIsMobileFilterOpen(false)}
+                        >
+                            ✕
+                        </button>
+                    </div>
+                    
+                    <Sidebar filters={filters} onFilterChange={(newFilters) => setFilters(newFilters)} />
+                </div>
+
+                <div className="content-wrapper">
                     <div className="text-result">
                         <h2>Results</h2>
                         <span>Check each product page for other buying options. Price and other details may vary based on product size and color.</span>
