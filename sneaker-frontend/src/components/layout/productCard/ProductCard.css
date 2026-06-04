@@ -6,7 +6,14 @@
     overflow: hidden;
     transition: all 0.3s ease-in-out;
     cursor: pointer;
-    width: 280px;
+
+    width: 100%;
+    max-width: 280px;
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .product-card:hover {
@@ -98,4 +105,46 @@
     font-size: 14px;
     color: #aaaaaa;
     text-decoration: line-through;
+}
+
+
+
+/* =========================== GIAO DIỆN RESPONSIVE =========================== */
+/* MÀN HÌNH ĐIỆN THOẠI */
+@media (max-width: 520px) {
+    .card-details {
+        padding: 10px;
+        gap: 2px;
+    }
+
+    .product-brand {
+        font-size: 10px;
+    }
+
+    .product-name {
+        font-size: 13px;
+        height: 14px;
+        margin-top: 2px;
+    }
+
+    .price-row {
+        gap: 4px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .current-price {
+        font-size: 14px;
+    }
+
+    .old-price {
+        font-size: 11px;
+    }
+
+    .badge {
+        top: 6px;
+        left: 6px;
+        padding: 2px 6px;
+        font-size: 9px;
+    }
 }

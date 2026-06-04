@@ -71,20 +71,6 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
 }
 
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.5rem;
-    }
-
-    .hero-subtitle {
-        font-size: 1rem;
-    }
-
-    .hero-container {
-        height: 60vh;
-    }
-}
-
 /* ============== Dải logo thương hiệu chạy tự động ============== */
 .marquee-section {
     height: 110px;
@@ -168,4 +154,88 @@
     grid-template-columns: repeat(4, 1fr);
     gap: 30px;
     padding: 20px 0;
+}
+
+
+
+/* =========================== GIAO DIỆN RESPONSIVE =========================== */
+/* MÀN HÌNH TABLET VÀ LAPTOP NHỎ */
+@media (max-width: 1024px) {
+    .products-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+}
+
+/* MÀN HÌNH TABLET DỌC VÀ MOBILE LỚN */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.8rem;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .hero-container {
+        height: 60vh;
+        min-height: 400px;
+        background-attachment: scroll; 
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+}
+
+/* MÀN HÌNH ĐIỆN THOẠI NHỎ */
+@media (max-width: 520px) {
+    .hero-title {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .hero-btn {
+        padding: 12px 24px;
+        font-size: 0.9rem;
+    }
+    
+    .hero-container {
+        height: 50vh;
+        min-height: 350px;
+    }
+
+    .marquee-section {
+        height: 80px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+
+    .marquee-item {
+        width: 140px; 
+    }
+
+    .featuredProducts {
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 25px;
+        padding-bottom: 40px;
+    }
+
+    .featuredProducts h2 {
+        font-size: 22px;
+    }
+    
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px; 
+        padding: 10px 0;
+    }
 }

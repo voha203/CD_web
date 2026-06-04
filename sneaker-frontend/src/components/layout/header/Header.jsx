@@ -141,7 +141,7 @@ function Header() {
                 </a>
 
                 {/* Vị trí giao hàng */}
-                <div className="nav-item">
+                <div className="nav-item hide-on-mobile">
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ marginBottom: '4px', marginRight: '4px' }}>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -209,7 +209,7 @@ function Header() {
                 </form>
 
                 {/* Chọn ngôn ngữ (Language Switcher) */}
-                <div className="nav-item language-select-wrapper">
+                <div className="nav-item language-select-wrapper hide-on-mobile">
                     <div className="language-trigger">
                         <img src={language === 'VN' ? logo_flag_vn : logo_flag_en} alt="flag" className="header-flag" />
                         <span className="header-lang-text">{language}</span>
@@ -271,7 +271,7 @@ function Header() {
                     </div>
                 </div>
 
-                <div className="nav-item">
+                <div className="nav-item hide-on-mobile">
                     <div className="flex-col-text">
                         <span className="nav-text-small">Returns</span>
                         <span className="nav-text-bold">& Orders</span>
@@ -300,7 +300,7 @@ function Header() {
                     All
                 </button>
 
-                <div className="nav-sub-links">
+                <div className="nav-sub-links hide-on-mobile">
                     <a href="/" className="nav-item">Today's Deals</a>
                     <a href="/" className="nav-item">Customer Service</a>
                     <a href="/" className="nav-item">Registry</a>

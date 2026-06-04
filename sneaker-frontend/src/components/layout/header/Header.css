@@ -5,7 +5,6 @@ body {
 .header {
     font-family: Arial, sans-serif;
     width: 100%;
-    min-width: 1000px;
     color: white;
 }
 
@@ -322,4 +321,90 @@ body {
     font-size: 14px;
     font-weight: 500;
     padding: 4px 8px;
+}
+
+
+
+/* =========================== GIAO DIỆN RESPONSIVE =========================== */
+/* MÀN HÌNH TABLET */
+@media (max-width: 860px) {
+    .nav-main {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 8px 12px 10px 12px;
+        gap: 4px;
+    }
+
+    .search-container {
+        order: 4;
+        flex: 0 0 100%;
+        margin: 8px 0 2px 0;
+        height: 38px;
+    }
+
+    .nav-sub {
+        overflow-x: auto;
+        white-space: nowrap;
+        height: 34px;
+        padding: 0 8px;
+    }
+
+    .nav-sub::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/* MÀN HÌNH ĐIỆN THOẠI NHỎ */
+@media (max-width: 520px) {
+    .hide-on-mobile {
+        display: none !important;
+    }
+    
+    .logo-text {
+        font-size: 19px;
+        letter-spacing: -0.5px;
+    }
+
+    .nav-main .nav-item:nth-child(5) .nav-text-small {
+        display: none;
+    }
+
+    .nav-main .nav-item:nth-child(5) .nav-text-bold {
+        font-size: 13px;
+    }
+
+    .cart-text {
+        display: none;
+    }
+
+    .cart-container svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    .cart-count {
+        font-size: 13px;
+        top: -6px;
+        left: 11px;
+    }
+
+    .search-select-wrapper {
+        display: none !important;
+    }
+
+    .search-input {
+        max-width: 100%;
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+        font-size: 14px;
+        padding: 0 10px;
+    }
+
+    .search-btn {
+        padding: 0 12px;
+    }
+
+    .nav-item:hover {
+        border-color: transparent;
+    }
 }

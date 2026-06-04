@@ -530,3 +530,81 @@
     font-size: 15px;
     margin: 20px 0;
 }
+
+
+
+/* =========================== GIAO DIỆN RESPONSIVE =========================== */
+/* MÀN HÌNH TABLET VÀ LAPTOP NHỎ */
+@media (max-width: 1024px) {
+    .product-detail-container {
+        min-height: 0;
+    }
+    
+    .product-detail-container .product-detail {
+        padding-left: 30px;
+        padding-right: 30px;
+        gap: 25px;
+    }
+
+    .gallery-section .main-image-container {
+        height: 362px;
+    }
+}
+
+/* MÀN HÌNH ĐIỆN THOẠI */
+@media (max-width: 768px) {
+    .product-detail-container .product-detail {
+        flex-direction: column;
+        padding-left: 15px;
+        padding-right: 15px;
+        margin: 20px auto;
+    }
+
+    .product-detail-container .product-detail .gallery-section {
+        width: 100%;
+        position: relative;
+        top: 0;
+        flex-direction: column-reverse;
+        gap: 15px;
+    }
+
+    .gallery-section .main-image-container {
+        height: 400px;
+    }
+
+    .gallery-section .thumbnails {
+        flex-direction: row;
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+
+    .gallery-section .thumbnails::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .gallery-section .thumbnails::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 4px;
+    }
+
+    .product-detail-container .product-detail .details-section {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .details-section .size-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* MÀN HÌNH ĐIỆN THOẠI NHỎ */
+@media (max-width: 480px) {
+    .gallery-section .main-image-container {
+        height: 320px;
+    }
+
+    .details-section .size-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

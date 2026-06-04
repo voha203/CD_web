@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import './Home.css'
-import Header from "../../components/layout/header/Header";
 import logo_nike from "../../assets/images/logoBrand/nike.jpg";
 import logo_converse from "../../assets/images/logoBrand/converse.svg"
 import logo_adidas from "../../assets/images/logoBrand/adidas.svg"
@@ -9,7 +8,6 @@ import logo_jordan from "../../assets/images/logoBrand/jordan.svg"
 import logo_vans from "../../assets/images/logoBrand/vans.svg"
 import logo_new_balance from "../../assets/images/logoBrand/new_balance.svg"
 import ProductCard from '../../components/layout/productCard/ProductCard';
-import Footer from "../../components/layout/footer/Footer";
 
 import { getProducts } from "../../services/api";
 
@@ -47,9 +45,6 @@ function Home() {
 
   return (
     <div>
-      {/* HEADER */}
-      <Header />
-
       {/* BANNER BỰ THU HÚT NGƯỜI NHÌN */}
       <div className="hero-container">
         <div className="hero-overlay"></div>
@@ -101,9 +96,6 @@ function Home() {
           <div style={{ textAlign: "center", padding: "50px" }}>Chưa có sản phẩm nào.</div>
         )}
       </div>
-
-      {/* FOOTER */}
-      <Footer />
     </div>
   );
 }

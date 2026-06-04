@@ -13,6 +13,11 @@
     margin-bottom: 50px;
 }
 
+.content-wrapper {
+    flex: 1; 
+    min-width: 0;
+}
+
 /* ================ Thanh đếm số lượng tìm kiếm và sắp xếp danh sách theo yêu cầu ================== */
 .product-list-top {
     display: flex;
@@ -67,7 +72,7 @@
 .product-list-grid {
     flex: 1;
     display: grid;
-    grid-template-columns: repeat(4, minmax(240px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
 }
 
@@ -79,14 +84,161 @@
     margin-bottom: 5px;
 }
 
-@media (max-width: 1024px) {
+
+
+/* ================= CÁC THÀNH PHẦN ẨN TRÊN DESKTOP ================= */
+.btn-show-filter,
+.btn-close-filter,
+.sidebar-overlay,
+.sidebar-mobile-header {
+    display: none;
+}
+
+/* =========================== GIAO DIỆN RESPONSIVE =========================== */
+/* MÀN HÌNH TABLET VÀ LAPTOP NHỎ */
+@media (max-width: 1200px) {
     .product-list-grid {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
+/* MÀN HÌNH TABLET */
+@media (max-width: 992px) {
+    .product-list-container {
+        min-height: 0;
+    }
+    
+    .product-list-container main {
+        display: flex;
+    }
+
+    .content-wrapper {
+        width: 100%;
+        display: block;
+    }
+
+    .product-list-grid {
+        grid-template-columns: repeat(3, 1fr); 
+    }
+
+    /* Nút bật tắt bộ lọc trên mobile */
+    .btn-show-filter {
+        display: inline-block;
+        padding: 6px 15px;
+        background-color: #131921;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-right: 15px;
+        font-weight: bold;
+        transition: background-color 0.2s;
+    }
+
+    .btn-show-filter:hover {
+        background-color: #475a6f;
+    }
+
+    /* Nền tối che lấp web khi mở Sidebar */
+    .sidebar-overlay {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 998;
+    }
+
+    /* Khung Sidebar biến thành ngăn kéo trượt */
+    .sidebar-mobile-wrapper {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 300px;
+        height: 100vh;
+        background-color: #ffffff;
+        z-index: 999;
+        transition: left 0.35s ease-in-out;
+        overflow-y: auto;
+        padding: 20px;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .sidebar-mobile-wrapper.open {
+        left: 0;
+    }
+
+    /* Header bên trong ngăn kéo */
+    .sidebar-mobile-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 15px;
+    }
+
+    .sidebar-mobile-header h3 {
+        margin: 0;
+        font-size: 18px;
+        color: #111827;
+    }
+
+    .btn-close-filter {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 22px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #555;
+    }
+}
+
+/* MÀN HÌNH MOBILE LỚN */
 @media (max-width: 768px) {
+    .product-list-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px 20px;
+    }
+
+    .product-list-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .product-list-title p {
+        border-left: none;
+        padding-left: 0;
+    }
+
+    .product-list-arrange {
+        width: 100%;
+        justify-content: space-between;
+    }
+
     .product-list-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+}
+
+/* MÀN HÌNH MOBILE NHỎ */
+@media (max-width: 520px) {
+    .product-list-container main {
+        padding: 10px;
+    }
+
+    .product-list-grid {
+        gap: 10px;
+    }
+
+    .text-result h2 {
+        font-size: 18px;
     }
 }

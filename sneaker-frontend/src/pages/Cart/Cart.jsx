@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header from "../../components/layout/header/Header";
-import Footer from "../../components/layout/footer/Footer";
 import './Cart.css';
 
 import { useCart } from "../../context/CartContext";
@@ -90,7 +88,6 @@ function Cart() {
     if (!isLoggedIn) {
         return (
             <div className="cart-page-container">
-                <Header />
                 <main className="cart-unauth-container">
                     <div className="unauth-content-box">
                         <div className="unauth-image-wrapper">
@@ -114,7 +111,6 @@ function Cart() {
                         </div>
                     </div>
                 </main>
-                <Footer />
             </div>
         );
     }
@@ -123,7 +119,6 @@ function Cart() {
     if (cartItems.length === 0) {
         return (
             <div className="cart-page-container">
-                <Header />
                 <main className="cart-empty-error-state">
                     <img src="https://cdn-icons-png.flaticon.com/512/11329/11329060.png" alt="Empty Cart" className="state-image" />
                     <div className="row-header">
@@ -135,15 +130,12 @@ function Cart() {
                         </button>
                     </div>
                 </main>
-                <Footer />
             </div>
         );
     }
 
     return (
         <div className="cart-page-container">
-            <Header />
-
             <main className="cart-main-content">
                 {/* CỘT TRÁI: DANH SÁCH SẢN PHẨM */}
                 <div className="cart-items-section">
@@ -256,8 +248,6 @@ function Cart() {
                     </div>
                 </div>
             </main>
-
-            <Footer />
         </div>
     );
 }
