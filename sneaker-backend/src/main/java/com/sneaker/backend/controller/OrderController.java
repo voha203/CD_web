@@ -28,4 +28,19 @@ public class OrderController {
             return ResponseEntity.internalServerError().body("Lỗi hệ thống: " + e.getMessage());
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOrderById(@PathVariable Long id) {
+        try {
+            OrderDTO result = orderService.getOrderById(id);
+
+            if (result != null) {
+                return ResponseEntity.ok(result);
+            } else {
+                return ResponseEntity.badRequest().body("Không tìm thấy đơn hàng này trên hệ thống.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Lỗi khi tra cứu đơn hàng: " + e.getMessage());
+        }
+    }
 }
