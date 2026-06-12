@@ -37,11 +37,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDTO placeOrder(OrderRequest request) {
+        Long currentUserId = getCurrentUserId();
+
         // Lấy thông tin khách hàng và giỏ hàng
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
 
-        Cart cart = cartRepository.findByUserId(user.getId())
+        Cart cart = cartRepository.findByUserId(currentUserId)
                 .orElseThrow(() -> new RuntimeException("Giỏ hàng không tồn tại"));
 
         if (cart.getItems().isEmpty()) {
@@ -97,5 +99,33 @@ public class OrderServiceImpl implements OrderService {
         cartRepository.save(cart);
 
         return orderMapper.toDTO(savedOrder);
+    }
+
+    @Override
+    public OrderDTO getOrderById(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với mã số này."));
+
+        return orderMapper.toDTO(order);
+    }
+
+    private String getCurrentUsername() {
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (auth == null || auth.getPrincipal() == null) {
+//            throw new RuntimeException("Unauthenticated");
+//        }
+//
+//        return auth.getPrincipal().toString();
+        return "admin";
+    }
+
+    private Long getCurrentUserId() {
+        String username = getCurrentUsername();
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return user.getId();
     }
 }
