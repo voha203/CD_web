@@ -169,7 +169,7 @@
 /* ============== CỘT TRÁI: DANH SÁCH SẢN PHẨM =============== */
 .cart-main-content {
     max-width: 1500px;
-    margin: 0 auto;
+    margin: 0;
     padding: 25px 20px;
     display: flex;
     justify-content: space-between;
