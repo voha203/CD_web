@@ -195,6 +195,12 @@
     display: flex;
     align-items: center;
     gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.step-title-wrapper h3 {
+    color: #131921;
 }
 
 .step-number-badge {
@@ -208,16 +214,22 @@
     align-items: center;
     font-size: 14px;
     font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .checkout-step.active .step-number-badge {
-    background: #000000;
+    background: #131921;
     color: #ffffff;
 }
 
 .step-number-badge.completed {
     background: #10b981;
     color: #ffffff;
+}
+
+.step-title-content {
+    color: #131921;
 }
 
 .step-title-content p {
@@ -231,6 +243,8 @@
     font-size: 14px;
     cursor: pointer;
     padding: 14px 18px;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .change-btn:hover {
@@ -243,7 +257,13 @@
 }
 
 /* =================== Form Địa chỉ ====================== */
+.address-form .form-row {
+    display: flex;
+    gap: 15px;
+}
+
 .address-form .form-group {
+    flex: 1;
     margin-bottom: 15px;
     max-width: 400px;
 }
@@ -255,18 +275,97 @@
     margin-bottom: 5px;
 }
 
-.address-form input,
-.address-form textarea {
+.address-form input[type="text"],
+.address-form input[type="tel"] {
     width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #888c8c;
-    border-radius: 4px;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
     font-size: 14px;
+    box-sizing: border-box;
+    transition: border 0.2s;
+}
+
+.address-form input:focus {
+    border-color: #007185;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 113, 133, 0.2);
 }
 
 .address-form textarea {
     height: 80px;
     resize: vertical;
+}
+
+.locate-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background-color: #ffffff;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.locate-btn:hover {
+    border-color: #007bff;
+    color: #007bff;
+    background-color: #f0f7ff;
+}
+
+.locate-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.spinner-icon {
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.suggestions-dropdown {
+    width: 550px;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    z-index: 2000;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.suggestions-dropdown li {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.suggestions-dropdown li:hover {
+    background-color: #f5f5f5;
 }
 
 .error-message {
@@ -373,6 +472,7 @@
 }
 
 .review-item-info h4 {
+    color: #131921;
     margin: 0 0 6px 0;
     font-size: 15px;
     font-weight: 600;
@@ -395,6 +495,7 @@
     font-size: 14px;
     font-weight: 700;
     margin-top: 6px;
+    color: #131921;
 }
 
 /* ================== CỘT PHẢI: PHƯƠNG THỨC THANH TOÁN ============== --- */
@@ -413,6 +514,7 @@
 }
 
 .summary-box h3 {
+    color: #131921;
     margin: 0 0 20px 0;
     font-size: 18px;
     font-weight: 700;
@@ -449,7 +551,7 @@
 
 .total-price-row .price-tag {
     font-weight: 800;
-    color: #000000;
+    color: #131921;
 }
 
 /* Checkbox điều khoản */

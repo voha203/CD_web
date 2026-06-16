@@ -1,0 +1,9 @@
+.map-container-wrapper {
+    height: 350px;
+    width: 813px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    margin-top: 18px;
+    position: relative;
+}

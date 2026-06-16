@@ -1,78 +1,120 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useCheckoutForm } from '../../components/hooks/useCheckoutForm';
 import './Checkout.css';
 
-import { getCart } from "../../services/cartService";
 import { placeOrder } from "../../services/orderService";
 import { useCart } from "../../context/CartContext";
-import { getProfile } from "../../services/authService";
 import { createPaymentUrl } from "../../services/paymentService"
 
+import { FiMapPin, FiLoader } from "react-icons/fi";
+import MapPicker from '../../components/layout/mapPicker/MapPicker';
+
 function Checkout() {
+    const {
+        formData, setFormData, isLoading, errors, setErrors,
+        mapPosition, setMapPosition, suggestions, setSuggestions,
+        showSuggestions, setShowSuggestions, cartData,
+        handleChange, validateAddressStep
+    } = useCheckoutForm();
+
     const [activeStep, setActiveStep] = useState(1);
     const [isSecurePopupOpen, setIsSecurePopupOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-    const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);    // State chống click spam khi đặt hàng
+
+    // State lưu vị trí ghim trên Bản đồ
+    const [isSearchingLocation, setIsSearchingLocation] = useState(false);
+
+    // Kiểm tra người dùng có đồng ý các điều khoản trước khi đặt hàng
+    const [isAgreed, setIsAgreed] = useState(false);
+
+    // Đồng bộ map ban đầu (tránh gọi API liên tục)
+    const hasSyncedInitialMap = useRef(false);
 
     const navigate = useNavigate();
     const { fetchCartCount } = useCart();
 
-    const [cartData, setCartData] = useState(null);
-    const [formData, setFormData] = useState({
-        receiverName: '',
-        receiverPhone: '',
-        shippingAddress: '',
-        paymentMethod: 'COD',
-        note: '',
-    });
-
+    // Đồng bộ map với địa chỉ ban đầu
     useEffect(() => {
-        // Lấy dữ liệu giỏ hàng
-        const fetchCartSummary = async () => {
-            try {
-                const res = await getCart();
-                setCartData(res.data);
-            } catch (err) {
-                console.error("Lỗi lấy giỏ hàng:", err)
-            }
-        };
-
-        // Lấy dữ liệu người dùng để điền sẵn
-        const fetchUserProfile = async () => {
-            try {
-                const res = await getProfile();
-                const { fullName, phone, address } = res.data || {};
-
-                // Cập nhật formData với thông tin từ Database
-                setFormData(prev => ({
-                    ...prev,
-                    receiverName: fullName || '',
-                    receiverPhone: phone || '',
-                    shippingAddress: address || ''
-                }));
-            } catch (err) {
-                console.log("User chưa cập nhật profile hoặc lỗi server");
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        fetchCartSummary();
-        fetchUserProfile();
-    }, []);
-
-    // Cập nhật hàm thay đổi input chung
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-
-        // Xóa thông báo lỗi khi người dùng bắt đầu nhập lại
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
+        // Nếu đã load xong, có địa chỉ giao hàng và chưa từng đồng bộ map
+        if (!isLoading && formData.shippingAddress && !hasSyncedInitialMap.current) {
+            hasSyncedInitialMap.current = true; // Đánh dấu là đã xử lý
+            
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(formData.shippingAddress)}&countrycodes=vn&limit=1&accept-language=vi`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lon = parseFloat(data[0].lon);
+                        setMapPosition([lat, lon]);
+                    }
+                })
+                .catch(err => console.error("Lỗi đồng bộ tọa độ bản đồ ban đầu:", err));
         }
+    }, [isLoading, formData.shippingAddress, setMapPosition]);
+
+    // Gợi ý địa chỉ (Autocomplete)
+    useEffect(() => {
+        let active = true;
+        const delayDebounceFn = setTimeout(() => {
+            if (formData.shippingAddress && formData.shippingAddress.length > 4 && showSuggestions) {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(formData.shippingAddress)}&countrycodes=vn&limit=5&accept-language=vi`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (active) setSuggestions(data);
+                    })
+                    .catch(err => console.error("Lỗi tìm địa chỉ:", err));
+            } else {
+                setSuggestions([]);
+            }
+        }, 800);
+
+        return () => {
+            active = false;
+            clearTimeout(delayDebounceFn);
+        }
+    }, [formData.shippingAddress, showSuggestions, setSuggestions]);
+
+    const handleSelectSuggestion = (suggestion) => {
+        const lat = parseFloat(suggestion.lat);
+        const lon = parseFloat(suggestion.lon);
+
+        setShowSuggestions(false);  // Ngừng hiển thị gợi ý
+        setSuggestions([]);
+
+        setFormData(prev => ({ ...prev, shippingAddress: suggestion.display_name }));
+        setMapPosition([lat, lon]);
+    };
+
+    // Lấy ra vị trí hiện tại của người dùng dựa trên dữ liệu "Address" trong cơ sở dữ liệu
+    const handleAutoLocate = () => {
+        if (!("geolocation" in navigator)) return alert("Trình duyệt không hỗ trợ.");
+
+        setIsSearchingLocation(true);
+
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                const { latitude: lat, longitude: lng } = position.coords;
+                setMapPosition([lat, lng]);
+
+                try {
+                    // Thêm một khoảng trễ nhỏ để tránh spam API liên tục
+                    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=vi`);
+                    const data = await response.json();
+                    if (data?.display_name) {
+                        setFormData(prev => ({ ...prev, shippingAddress: data.display_name }));
+                    }
+                } catch (error) {
+                    console.error("Lỗi lấy địa chỉ:", error);
+                } finally {
+                    setIsSearchingLocation(false);
+                }
+            },
+            (error) => {
+                alert("Vui lòng cấp quyền định vị.");
+                setIsSearchingLocation(false);
+            }
+        );
     };
 
     // Hàm xử lý chọn phương thức thanh toán
@@ -81,21 +123,6 @@ function Checkout() {
             ...prev,
             paymentMethod: value
         }));
-    };
-
-    // Hàm kiểm tra hợp lệ của địa chỉ trước khi sang bước tiếp theo
-    const validateAddressStep = () => {
-        const newErrors = {};
-        if (!formData.receiverName.trim()) newErrors.receiverName = "Vui lòng nhập họ và tên người nhận";
-        if (!formData.receiverPhone.trim()) {
-            newErrors.receiverPhone = "Vui lòng nhập số điện thoại";
-        } else if (!/^\d{10}$/.test(formData.receiverPhone.trim())) {
-            newErrors.receiverPhone = "Số điện thoại không hợp lệ (Phải gồm 10 chữ số)";
-        }
-        if (!formData.shippingAddress.trim()) newErrors.shippingAddress = "Vui lòng nhập địa chỉ cụ thể để giao hàng";
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
     };
 
     const handleNextToPayment = () => {
@@ -111,17 +138,17 @@ function Checkout() {
             return;
         }
 
+        setIsSubmitting(true);
         try {
             const res = await placeOrder(formData);
             fetchCartCount();
             navigate('/thank-you');
         } catch (err) {
             alert("Lỗi: " + (err.response?.data || "Không thể đặt hàng"));
+        } finally {
+            setIsSubmitting(false);
         }
     };
-
-    // Kiểm tra người dùng có đồng ý các điều khoản trước khi đặt hàng
-    const [isAgreed, setIsAgreed] = useState(false);
 
     if (isLoading) {
         return <div className="checkout-loading">Đang tải thông tin đơn hàng...</div>;
@@ -204,44 +231,104 @@ function Checkout() {
                                     )}
                                 </div>
                             </div>
-                            {activeStep !== 1 && <button className="change-btn">Thay đổi</button>}
+                            {activeStep !== 1 && (
+                                <button
+                                    className="change-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setActiveStep(1);
+                                    }}
+                                >
+                                    Thay đổi
+                                </button>
+                            )}
                         </div>
                         {activeStep === 1 && (
                             <div className="step-body fade-in">
                                 <form className="address-form">
-                                    <div className={`form-group ${errors.receiverName ? 'has-error' : ''}`}>
-                                        <label>Họ và tên</label>
-                                        <input
-                                            name="receiverName"
-                                            value={formData.receiverName}
-                                            onChange={handleChange}
-                                            type="text"
-                                            placeholder="Nhập họ và tên..."
-                                        />
-                                        {errors.receiverName && <span className="error-message">*{errors.receiverName}</span>}
+                                    <div className="form-row">
+                                        <div className={`form-group ${errors.receiverName ? 'has-error' : ''}`}>
+                                            <label>Họ và tên</label>
+                                            <input
+                                                name="receiverName"
+                                                value={formData.receiverName}
+                                                onChange={handleChange}
+                                                type="text"
+                                                placeholder="Nhập họ và tên..."
+                                            />
+                                            {errors.receiverName && <span className="error-message">*{errors.receiverName}</span>}
+                                        </div>
+                                        <div className={`form-group ${errors.receiverPhone ? 'has-error' : ''}`}>
+                                            <label>Số điện thoại</label>
+                                            <input
+                                                name="receiverPhone"
+                                                value={formData.receiverPhone}
+                                                onChange={handleChange}
+                                                type="tel"
+                                                placeholder="Nhập số điện thoại..."
+                                            />
+                                            {errors.receiverPhone && <span className="error-message">*{errors.receiverPhone}</span>}
+                                        </div>
                                     </div>
-                                    <div className={`form-group ${errors.receiverPhone ? 'has-error' : ''}`}>
-                                        <label>Số điện thoại</label>
-                                        <input
-                                            name="receiverPhone"
-                                            value={formData.receiverPhone}
-                                            onChange={handleChange}
-                                            type="tel"
-                                            placeholder="Nhập số điện thoại..."
-                                        />
-                                        {errors.receiverPhone && <span className="error-message">*{errors.receiverPhone}</span>}
-                                    </div>
-                                    <div className={`form-group ${errors.shippingAddress ? 'has-error' : ''}`}>
+
+                                    {/* KHU VỰC NHẬP ĐỊA CHỈ & BẢN ĐỒ */}
+                                    <div className={`form-group ${errors.shippingAddress ? 'has-error' : ''}`} style={{ position: 'relative' }}>
                                         <label>Địa chỉ cụ thể</label>
-                                        <textarea
-                                            name="shippingAddress"
-                                            value={formData.shippingAddress}
-                                            onChange={handleChange}
-                                            type="text"
-                                            placeholder="Số nhà, tên đường, tòa nhà, phường/xã..."
-                                            rows="3"
-                                        ></textarea>
+
+                                        <div style={{ width: '700px', display: 'flex', gap: '8px' }}>
+                                            <input
+                                                name="shippingAddress"
+                                                value={formData.shippingAddress}
+                                                onChange={handleChange}
+                                                type="text"
+                                                placeholder="Gõ để tìm kiếm (Số nhà, tên đường, phường/xã)..."
+                                                style={{ flex: 1 }}
+                                                autoComplete="off"
+                                            />
+                                            <button
+                                                type="button"
+                                                className="locate-btn"
+                                                onClick={handleAutoLocate}
+                                                disabled={isSearchingLocation}
+                                            >
+                                                {isSearchingLocation ? (
+                                                    <>
+                                                        <FiLoader className="spinner-icon" />
+                                                        <span>Đang xác định...</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <FiMapPin />
+                                                        <span>Vị trí hiện tại</span>
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+
+                                        {/* Dropdown Gợi ý địa chỉ */}
+                                        {suggestions.length > 0 && showSuggestions && (
+                                            <ul className="suggestions-dropdown">
+                                                {suggestions.map((sug, idx) => (
+                                                    <li
+                                                        key={idx}
+                                                        onClick={() => handleSelectSuggestion(sug)}
+                                                        style={{ padding: '10px', borderBottom: '1px solid #eee', cursor: 'pointer', fontSize: '14px' }}
+                                                    >
+                                                        {sug.display_name}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        )}
+
                                         {errors.shippingAddress && <span className="error-message">*{errors.shippingAddress}</span>}
+
+                                        {/* Bản đồ tích hợp */}
+                                        <MapPicker
+                                            mapPosition={mapPosition}
+                                            setMapPosition={setMapPosition}
+                                            setFormData={setFormData}
+                                            setShowSuggestions={setShowSuggestions}
+                                        />
                                     </div>
                                     <button
                                         type="button"
@@ -274,7 +361,17 @@ function Checkout() {
                                     )}
                                 </div>
                             </div>
-                            {activeStep !== 2 && activeStep > 2 && <button className="change-btn">Thay đổi</button>}
+                            {activeStep !== 2 && activeStep > 2 && (
+                                <button
+                                    className="change-btn"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setActiveStep(2);
+                                    }}
+                                >
+                                    Thay đổi
+                                </button>
+                            )}
                         </div>
                         {activeStep === 2 && (
                             <div className="step-body fade-in">
@@ -405,11 +502,11 @@ function Checkout() {
 
                         {/* Nút đặt hàng */}
                         <button
-                            className={`place-order-btn ${!isAgreed ? 'btn-disabled' : ''}`}
+                            className={`place-order-btn ${(!isAgreed || isSubmitting) ? 'btn-disabled' : ''}`}
                             onClick={handlePlaceOrder}
-                            disabled={!isAgreed} // Chỉ cho phép ấn khi isAgreed === true
+                            disabled={!isAgreed || isSubmitting} // Chỉ cho phép ấn khi isAgreed === true
                         >
-                            Đặt hàng (Place your order)
+                            {isSubmitting ? 'Đang xử lý...' : 'Đặt hàng (Place your order)'}
                         </button>
                     </div>
                 </div>
