@@ -149,7 +149,7 @@
     margin-bottom: 10px;
 }
 
-.products-grid {
+.home-products-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 30px;
@@ -161,7 +161,7 @@
 /* =========================== GIAO DIỆN RESPONSIVE =========================== */
 /* MÀN HÌNH TABLET VÀ LAPTOP NHỎ */
 @media (max-width: 1024px) {
-    .products-grid {
+    .home-products-grid {
         grid-template-columns: repeat(3, 1fr);
         gap: 20px;
     }
@@ -184,7 +184,7 @@
         background-attachment: scroll; 
     }
 
-    .products-grid {
+    .home-products-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 15px;
     }
@@ -233,7 +233,7 @@
         font-size: 22px;
     }
     
-    .products-grid {
+    .home-products-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 10px; 
         padding: 10px 0;
