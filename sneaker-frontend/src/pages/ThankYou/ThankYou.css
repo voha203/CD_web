@@ -1,0 +1,317 @@
+.thankyou-page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background-color: #f8f9fa;
+    padding: 40px 0;
+    font-family: Arial, sans-serif;
+    flex-direction: column;
+    gap: 60px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ==================== THẺ CẢM ƠN CHÍNH ==================== */
+.thankyou-card {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    max-width: 530px;
+    width: 100%;
+    text-align: center;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.success-icon-wrapper {
+    margin-bottom: 20px;
+}
+
+.success-icon {
+    font-size: 72px;
+    color: #2ec4b6;
+}
+
+.thankyou-title {
+    font-size: 28px;
+    color: #222222;
+    margin-bottom: 10px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.thankyou-subtitle {
+    font-size: 16px;
+    color: #666666;
+    line-height: 1.5;
+    margin-bottom: 30px;
+}
+
+/* ==================== KHỐI TÓM TẮT ĐƠN HÀNG ==================== */
+.order-info-box {
+    background-color: #fafafa;
+    border: 1px dashed #e0e0e0;
+    padding: 20px 25px;
+    border-radius: 8px;
+    margin-bottom: 35px;
+    text-align: left;
+}
+
+.order-summary-title {
+    font-size: 16px;
+    margin-bottom: 13px;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    margin-top: 3px;
+}
+
+.order-summary-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 10px 0;
+    font-size: 14px;
+}
+
+.order-summary-divider {
+    border-top: 1px solid #eeeeee;
+    margin: 12px 0;
+}
+
+.total-row {
+    font-size: 16px;
+    font-weight: bold;
+    color: #111;
+}
+
+.total-price {
+    color: #e74c3c;
+    font-size: 18px;
+}
+
+.status-badge {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.note-text {
+    font-size: 13px !important;
+    color: #888888 !important;
+    line-height: 1.4;
+    margin-top: 15px !important;
+    border-top: 1px solid #eeeeee;
+    padding-top: 12px;
+    margin-bottom: 3px;
+}
+
+/* ==================== CÁC NÚT TƯƠNG TÁC CHÍNH ==================== */
+.thankyou-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    flex: 1;
+}
+
+.btn-primary {
+    background-color: #111111;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #333333;
+}
+
+.btn-secondary {
+    background-color: #ffffff;
+    color: #111111;
+    border: 1px solid #cccccc;
+}
+
+.btn-secondary:hover {
+    background-color: #f5f5f5;
+    border-color: #aaaaaa;
+}
+
+/* ==================== KHU VỰC GỢI Ý SẢN PHẨM ==================== */
+.recommendation-section {
+    max-width: 1400px;
+    width: 100%;
+    animation: fadeInUp 0.7s ease-out;
+}
+
+.recommendation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eeeeee;
+    padding-bottom: 10px;
+}
+
+.recommendation-header h2 {
+    font-size: 20px;
+    color: #111111;
+    font-weight: 700;
+}
+
+.view-all-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #666666;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.view-all-link:hover {
+    color: #111111;
+}
+
+.slider-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #111111;
+    transition: all 0.25s ease;
+}
+
+.nav-btn:hover {
+    background-color: #ffffff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    transform: translateY(-50%) scale(1.08);
+}
+
+.nav-btn-left {
+    left: -23px;
+}
+
+.nav-btn-right {
+    right: -23px;
+}
+
+/* ==================== DANH SÁCH SẢN PHẨM TRƯỢT NGANG ==================== */
+.thankyou-products-grid {
+    display: flex;
+    overflow-x: auto;
+    gap: 18px;
+    padding: 15px 0;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    width: 100%;
+}
+
+.thankyou-products-grid::-webkit-scrollbar {
+    display: none;
+}
+
+.slider-item {
+    min-width: calc((100% - (18px * 4)) / 5);
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+}
+
+
+
+/* =========================== GIAO DIỆN RESPONSIVE =========================== */
+/* MÀN HÌNH TABLET  */
+@media (max-width: 1024px) {
+    .slider-item {
+        /* Chuyển sang hiển thị 3 sản phẩm */
+        min-width: calc((100% - (18px * 2)) / 3);
+    }
+
+    .nav-btn-left {
+        left: -10px;
+    }
+
+    .nav-btn-right {
+        right: -10px;
+    }
+}
+
+/* MÀN HÌNH ĐIỆN THOẠI LỚN */
+@media (max-width: 768px) {
+    .thankyou-page-container {
+        gap: 40px;
+        padding: 20px 15px;
+    }
+
+    .slider-item {
+        min-width: calc((100% - (12px * 1)) / 2);
+    }
+
+    .thankyou-products-grid {
+        gap: 12px;
+    }
+
+    .nav-btn {
+        display: none !important;
+    }
+}
+
+/* MÀN HÌNH ĐIỆN THOẠI NHỎ */
+@media (max-width: 480px) {
+    .thankyou-card {
+        padding: 30px 15px;
+    }
+
+    .thankyou-actions {
+        flex-direction: column-reverse;
+    }
+
+    .recommendation-header h2 {
+        font-size: 16px;
+    }
+}

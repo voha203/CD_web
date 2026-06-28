@@ -1,0 +1,293 @@
+.orders-page-container {
+    background-color: #f8f9fa;
+    min-height: 100vh;
+    padding: 20px;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    justify-content: center;
+}
+
+.orders-layout {
+    max-width: 900px;
+    width: 100%;
+}
+
+/* ==================== PHẦN HEADER VÀ TABS ==================== */
+.orders-main-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #111111;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+}
+
+.orders-tabs {
+    display: flex;
+    gap: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 30px;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 10px 0;
+    font-size: 15px;
+    color: #666;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+}
+
+.tab-btn.active {
+    color: #111;
+    font-weight: 600;
+}
+
+.tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #111;
+}
+
+/* ==================== CARD ĐƠN HÀNG ==================== */
+.order-card {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e6e6e6;
+    margin-bottom: 24px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* HEADER KIỂU */
+.order-card-header {
+    background-color: #f0f2f2;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.header-info-group {
+    display: flex;
+    gap: 40px;
+}
+
+.header-item,
+.header-order-id {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.header-order-id {
+    text-align: right;
+}
+
+.header-item .label,
+.header-order-id .label {
+    font-size: 11px;
+    color: #555;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.header-item .value {
+    font-size: 14px;
+    color: #111;
+    font-weight: 500;
+}
+
+.hover-link {
+    color: #007185;
+    cursor: pointer;
+}
+
+.hover-link:hover {
+    text-decoration: underline;
+    color: #c45500;
+}
+
+/* BODY KIỂU NIKE */
+.order-card-body {
+    padding: 24px;
+}
+
+.order-status-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.status-icon {
+    font-size: 20px;
+}
+
+.status-icon.delivered {
+    color: #067a46;
+}
+
+.status-icon.processing {
+    color: #e77600;
+}
+
+.status-text {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.status-text.delivered {
+    color: #067a46;
+}
+
+.status-text.processing {
+    color: #111;
+}
+
+/* SẢN PHẨM BÊN TRONG */
+.order-product-item {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.order-product-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.product-image-wrapper {
+    width: 100px;
+    height: 100px;
+    background: #f6f6f6;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.product-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    mix-blend-mode: multiply;
+}
+
+.product-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.product-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111;
+    margin: 0 0 4px 0;
+}
+
+.product-meta {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 4px 0;
+}
+
+.product-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: #111;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 0;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn-text:hover {
+    opacity: 0.6;
+}
+
+.divider-vertical {
+    width: 1px;
+    height: 14px;
+    background-color: #ddd;
+}
+
+/* NÚT BẤM HÀNH ĐỘNG */
+.order-card-footer {
+    padding: 16px 24px;
+    background-color: #fafafa;
+    border-top: 1px solid #e6e6e6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary {
+    background-color: #ffffff;
+    color: #111111;
+    border: 1px solid #cccccc;
+}
+
+.btn-secondary:hover {
+    border-color: #111;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+    .order-card-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .header-order-id {
+        text-align: left;
+    }
+
+    .header-info-group {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .ship-to {
+        display: none;
+    }
+
+    .order-card-footer {
+        flex-direction: column;
+    }
+
+    .btn-action {
+        width: 100%;
+    }
+}

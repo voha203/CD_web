@@ -87,7 +87,7 @@ function Home() {
         {isLoading ? (
           <div style={{ textAlign: "center", padding: "50px" }}>Đang tải sản phẩm mới nhất...</div>
         ) : products.length > 0 ? (
-          <div className="products-grid">
+          <div className="home-products-grid">
             {products.slice(0, 8).map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
