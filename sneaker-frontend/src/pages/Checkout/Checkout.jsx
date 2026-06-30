@@ -142,7 +142,24 @@ function Checkout() {
         try {
             const res = await placeOrder(formData);
             fetchCartCount();
-            navigate('/thank-you');
+
+            const orderId = res.data.orderId;
+
+            if (formData.paymentMethod === 'CARD' || formData.paymentMethod === 'E-WALLET') {
+                const paymentRes = await createPaymentUrl(orderId);
+                const paymentUrl = paymentRes.data?.paymentUrl || paymentRes.paymentUrl;
+
+                if (paymentUrl) {
+                    // Đưa khách hàng sang cổng VNPay
+                    window.location.href = paymentUrl;
+                } else {
+                    alert("Lỗi: Không thể khởi tạo link thanh toán VNPay!");
+                    setIsSubmitting(false); // Mở khóa nút bấm nếu lỗi
+                }
+            } else {
+                // Phương thức thanh toán: COD
+                navigate('/thank-you');
+            }
         } catch (err) {
             alert("Lỗi: " + (err.response?.data || "Không thể đặt hàng"));
         } finally {
