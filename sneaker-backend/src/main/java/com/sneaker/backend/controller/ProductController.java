@@ -34,6 +34,11 @@ public class ProductController {
         return service.getSuggestions(keyword);
     }
 
+    @GetMapping("/recommendations")
+    public List<ProductDTO> getRecommendations(@RequestParam Long orderId) {
+        return service.getRecommendations(orderId);
+    }
+
     @GetMapping("/{id}")
     public ProductDTO getById(@PathVariable Long id) {
         return service.getById(id);

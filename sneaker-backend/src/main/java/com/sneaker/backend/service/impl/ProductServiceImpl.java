@@ -7,6 +7,7 @@ import com.sneaker.backend.entity.Category;
 import com.sneaker.backend.mapper.ProductMapper;
 import com.sneaker.backend.repository.ProductRepository;
 import com.sneaker.backend.repository.CategoryRepository;
+import com.sneaker.backend.repository.OrderItemRepository;
 import com.sneaker.backend.service.DiscountService;
 import com.sneaker.backend.service.ProductService;
 
@@ -26,6 +27,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private OrderItemRepository orderItemRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -77,6 +81,60 @@ public class ProductServiceImpl implements ProductService {
         List<Product> products = productRepository.findAll(spec, PageRequest.of(0, 5)).getContent();
 
         return products.stream()
+                .map(this::enrichProductDTO)
+                .collect(Collectors.toList());
+    }
+
+    // =========================
+    // GET RECOMMENDATIONS (Gợi ý dựa trên đơn hàng đã mua)
+    // =========================
+    @Override
+    public List<ProductDTO> getRecommendations(Long orderId) {
+        // Lấy danh sách ID sản phẩm khách đã mua trong đơn hàng này
+        List<Long> purchasedProductIds = orderItemRepository.findProductIdsByOrderId(orderId);
+
+        // Nếu đơn hàng trống (chống lỗi), lấy đại 7 sản phẩm bất kỳ
+        if (purchasedProductIds == null || purchasedProductIds.isEmpty()) {
+            return productRepository.findAll(PageRequest.of(0, 7)).getContent()
+                    .stream().map(this::enrichProductDTO).collect(Collectors.toList());
+        }
+
+        // Lấy thông tin các sản phẩm đã mua để trích xuất Brand (Thương hiệu)
+        List<Product> purchasedProducts = productRepository.findAllById(purchasedProductIds);
+        List<String> purchasedBrands = purchasedProducts.stream()
+                .map(Product::getBrand)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // Query tìm tối đa 7 sản phẩm cùng Brand, nhưng loại trừ những đôi vừa mua
+        List<Product> recommendedProducts = new ArrayList<>(
+                productRepository.findByBrandInAndIdNotIn(
+                        purchasedBrands,
+                        purchasedProductIds,
+                        PageRequest.of(0, 7)
+                ).getContent()
+        );
+
+        // Nếu tìm được ít hơn 4 đôi, lấy thêm các đôi khác đắp vào cho đẹp Slider
+        if (recommendedProducts.size() < 4) {
+            int missingCount = 7 - recommendedProducts.size();
+
+            // Tạo danh sách loại trừ mới: Bao gồm cả hàng ĐÃ MUA + hàng ĐÃ GỢI Ý ở trên
+            List<Long> excludeIds = new ArrayList<>(purchasedProductIds);
+            for (Product p : recommendedProducts) {
+                excludeIds.add(p.getId()); // Thêm ID sản phẩm đã được gợi ý vào list loại trừ
+            }
+
+            // Tìm thêm các đôi chưa mua (không quan tâm brand nữa)
+            List<Product> fallbackProducts = productRepository.findByIdNotIn(
+                    excludeIds,
+                    PageRequest.of(0, missingCount)
+            ).getContent();
+
+            recommendedProducts.addAll(fallbackProducts);
+        }
+
+        return recommendedProducts.stream()
                 .map(this::enrichProductDTO)
                 .collect(Collectors.toList());
     }

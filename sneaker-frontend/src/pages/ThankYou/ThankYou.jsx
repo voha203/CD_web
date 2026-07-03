@@ -24,6 +24,9 @@ function ThankYou() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // State lưu dữ liệu danh sách sản phẩm gợi ý
+    const [recommendedProducts, setRecommendedProducts] = useState([]);
+
     useEffect(() => {
         if (orderId) {
             fetch(`http://localhost:8080/api/orders/${orderId}`)
@@ -39,6 +42,21 @@ function ThankYou() {
                     setError(err.message);
                     setIsLoading(false);
                 });
+
+            fetch(`http://localhost:8080/api/products/recommendations?orderId=${orderId}`)
+                .then((response) => {
+                    if (!response.ok) throw new Error("Lỗi khi tải gợi ý");
+                    return response.json();
+                })
+                .then((data) => {
+                    setRecommendedProducts(data);
+                    setIsLoading(false);
+                })
+                .catch((err) => {
+                    setError(err.message);
+                    setIsLoading(false);
+                });
+
         } else {
             setError("Không tìm thấy mã đơn hàng hợp lệ.");
             setIsLoading(false);
@@ -60,65 +78,6 @@ function ThankYou() {
             }
         }
     };
-
-    // Mock data
-    const recommendedProducts = [
-        {
-            id: 1,
-            name: "Nike Air Force 1 '07 All White",
-            brand: "Nike",
-            price: 2950000,
-            isNew: true,
-            variants: [{ images: [{ imageUrl: "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=500&q=80", isMain: true }] }]
-        },
-        {
-            id: 2,
-            name: "Adidas Originals Superstar Black",
-            brand: "Adidas",
-            price: 2600000,
-            oldPrice: 3000000,
-            salePercentage: 15,
-            variants: [{ images: [{ imageUrl: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500&q=80", isMain: true }] }]
-        },
-        {
-            id: 3,
-            name: "Jordan 1 Low 'Wolf Grey'",
-            brand: "Nike",
-            price: 3850000,
-            isNew: true,
-            variants: [{ images: [{ imageUrl: "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=500&q=80", isMain: true }] }]
-        },
-        {
-            id: 4,
-            name: "Nike Dunk Low Retro Panda",
-            brand: "Nike",
-            price: 3200000,
-            variants: [{ images: [{ imageUrl: "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=500&q=80", isMain: true }] }]
-        },
-        {
-            id: 5,
-            name: "New Balance 550 'White Green'",
-            brand: "New Balance",
-            price: 3500000,
-            oldPrice: 4000000,
-            salePercentage: 12,
-            variants: [{ images: [{ imageUrl: "https://images.unsplash.com/photo-1539185441755-769473a23570?w=500&q=80", isMain: true }] }]
-        },
-        {
-            id: 6,
-            name: "Puma Suede Classic XXI",
-            brand: "Puma",
-            price: 1850000,
-            variants: [{ images: [{ imageUrl: "https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?w=500&q=80", isMain: true }] }]
-        },
-        {
-            id: 7,
-            name: "Vans Old Skool Core Classics",
-            brand: "Vans",
-            price: 1750000,
-            variants: [{ images: [{ imageUrl: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500&q=80", isMain: true }] }]
-        }
-    ];
 
     // Xử lý giao diện khi đang tải hoặc có lỗi
     if (isLoading) return <div className="thankyou-page-container"><h2>Đang tải thông tin đơn hàng...</h2></div>;
@@ -220,32 +179,34 @@ function ThankYou() {
             </div>
 
             {/* DANH SÁCH SẢN PHẨM GỢI Ý */}
-            <div className="recommendation-section">
-                <div className="recommendation-header">
-                    <h2>Có thể bạn cũng thích (You may also like)</h2>
-                    <a href="/products" className="view-all-link">
-                        Xem tất cả <FiArrowRight />
-                    </a>
-                </div>
-
-                <div className="slider-wrapper">
-                    <button className="nav-btn nav-btn-left" onClick={() => handleScroll('left')}>
-                        <FiChevronLeft />
-                    </button>
-
-                    <div className="thankyou-products-grid" ref={scrollContainerRef}>
-                        {recommendedProducts.map((product) => (
-                            <div key={product.id} className="slider-item">
-                                <ProductCard product={product} />
-                            </div>
-                        ))}
+            {recommendedProducts && recommendedProducts.length > 0 && (
+                <div className="recommendation-section">
+                    <div className="recommendation-header">
+                        <h2>Có thể bạn cũng thích (You may also like)</h2>
+                        <a href="/products" className="view-all-link">
+                            Xem tất cả <FiArrowRight />
+                        </a>
                     </div>
 
-                    <button className="nav-btn nav-btn-right" onClick={() => handleScroll('right')}>
-                        <FiChevronRight />
-                    </button>
+                    <div className="slider-wrapper">
+                        <button className="nav-btn nav-btn-left" onClick={() => handleScroll('left')}>
+                            <FiChevronLeft />
+                        </button>
+
+                        <div className="thankyou-products-grid" ref={scrollContainerRef}>
+                            {recommendedProducts.map((product) => (
+                                <div key={product.id} className="slider-item">
+                                    <ProductCard product={product} />
+                                </div>
+                            ))}
+                        </div>
+
+                        <button className="nav-btn nav-btn-right" onClick={() => handleScroll('right')}>
+                            <FiChevronRight />
+                        </button>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
