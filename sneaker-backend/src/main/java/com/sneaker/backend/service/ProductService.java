@@ -11,6 +11,8 @@ public interface ProductService {
 
     List<ProductDTO> getSuggestions(String keyword);
 
+    List<ProductDTO> getRecommendations(Long orderId);
+
     ProductDTO getById(Long id);
 
     ProductDTO create(ProductRequest request);

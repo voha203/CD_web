@@ -16,4 +16,5 @@ public class OrderDTO {
     private String receiverPhone;
     private String shippingAddress;
     private List<OrderItemDTO> items;
+    private String paymentMethod;
 }

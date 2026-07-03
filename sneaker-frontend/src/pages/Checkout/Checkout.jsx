@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useCheckoutForm } from '../../components/hooks/useCheckoutForm';
 import './Checkout.css';
 
@@ -22,6 +22,9 @@ function Checkout() {
     const [isSecurePopupOpen, setIsSecurePopupOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);    // State chống click spam khi đặt hàng
 
+    // State quản lý mảng các thông báo lỗi
+    const [toasts, setToasts] = useState([]);
+
     // State lưu vị trí ghim trên Bản đồ
     const [isSearchingLocation, setIsSearchingLocation] = useState(false);
 
@@ -39,11 +42,11 @@ function Checkout() {
         // Nếu đã load xong, có địa chỉ giao hàng và chưa từng đồng bộ map
         if (!isLoading && formData.shippingAddress && !hasSyncedInitialMap.current) {
             hasSyncedInitialMap.current = true; // Đánh dấu là đã xử lý
-            
+
             fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(formData.shippingAddress)}&countrycodes=vn&limit=1&accept-language=vi`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data && data.length > 0) {
+                    if (data && Array.isArray(data) && data.length > 0) {
                         const lat = parseFloat(data[0].lat);
                         const lon = parseFloat(data[0].lon);
                         setMapPosition([lat, lon]);
@@ -88,7 +91,7 @@ function Checkout() {
 
     // Lấy ra vị trí hiện tại của người dùng dựa trên dữ liệu "Address" trong cơ sở dữ liệu
     const handleAutoLocate = () => {
-        if (!("geolocation" in navigator)) return alert("Trình duyệt không hỗ trợ.");
+        if (!("geolocation" in navigator)) return showError("Trình duyệt không hỗ trợ.");
 
         setIsSearchingLocation(true);
 
@@ -111,7 +114,7 @@ function Checkout() {
                 }
             },
             (error) => {
-                alert("Vui lòng cấp quyền định vị.");
+                showError("Vui lòng cấp quyền định vị.");
                 setIsSearchingLocation(false);
             }
         );
@@ -133,8 +136,24 @@ function Checkout() {
 
     // Hàm xử lý Đặt hàng cuối cùng
     const handlePlaceOrder = async () => {
+        // KIỂM TRA BƯỚC 1: Địa chỉ giao hàng
         if (!validateAddressStep()) {
-            setActiveStep(1);
+            showError("Vui lòng hoàn thành chính xác thông tin địa chỉ giao hàng tại Bước 1.");
+            setActiveStep(1); // Tự động mở lại Bước 1 cho khách sửa
+            return;
+        }
+
+        // KIỂM TRA BƯỚC 2: Phương thức thanh toán
+        if (!formData.paymentMethod) {
+            showError("Vui lòng chọn một phương thức thanh toán tại Bước 2.");
+            setActiveStep(2); // Tự động mở Bước 2 nếu chưa chọn
+            return;
+        }
+
+        // KIỂM TRA BƯỚC 3: Ép người dùng phải ở Bước 3 để rà soát lại đơn hàng
+        if (activeStep !== 3) {
+            showError("Vui lòng kiểm tra lại danh sách sản phẩm và bấm xác nhận ở Bước 3 trước.");
+            setActiveStep(3); // Tự động đưa họ đến Bước 3 để review
             return;
         }
 
@@ -142,13 +161,43 @@ function Checkout() {
         try {
             const res = await placeOrder(formData);
             fetchCartCount();
-            navigate('/thank-you');
+
+            const orderId = res.data.orderId;
+
+            if (formData.paymentMethod === 'CARD' || formData.paymentMethod === 'E-WALLET') {
+                const paymentRes = await createPaymentUrl(orderId);
+                const paymentUrl = paymentRes.data?.paymentUrl || paymentRes.paymentUrl;
+
+                if (paymentUrl) {
+                    // Đưa khách hàng sang cổng VNPay
+                    window.location.href = paymentUrl;
+                } else {
+                    showError("Lỗi: Không thể khởi tạo link thanh toán VNPay!");
+                    setIsSubmitting(false); // Mở khóa nút bấm nếu lỗi
+                }
+            } else {
+                // Phương thức thanh toán: COD
+                navigate(`/thank-you?orderId=${orderId}`);
+            }
         } catch (err) {
-            alert("Lỗi: " + (err.response?.data || "Không thể đặt hàng"));
+            const errorMsg = err.response?.data?.message || err.response?.data || err.message || "Không thể đặt hàng";
+            showError("Lỗi: " + errorMsg);
         } finally {
             setIsSubmitting(false);
         }
     };
+
+    function showError(message) {
+        const id = Date.now(); // Tạo ID duy nhất cho mỗi item lỗi
+
+        // Thêm lỗi mới vào mảng toasts
+        setToasts(prevToasts => [...prevToasts, { id, message }]);
+
+        // Tự động xóa lỗi này sau 3 giây
+        setTimeout(() => {
+            setToasts(prevToasts => prevToasts.filter(toast => toast.id !== id));
+        }, 3000);
+    }
 
     if (isLoading) {
         return <div className="checkout-loading">Đang tải thông tin đơn hàng...</div>;
@@ -156,15 +205,22 @@ function Checkout() {
 
     return (
         <div className="checkout-page-container">
+            <div id="toast-container">
+                {toasts.map(toast => (
+                    <div key={toast.id} className="toast-error">
+                        {toast.message}
+                    </div>
+                ))}
+            </div>
             <header className="header">
 
                 {/* NavBar trên */}
                 <div className="nav-main">
 
                     {/* Cụm logo */}
-                    <a href="/" className="nav-item">
+                    <Link to="/" className="nav-item">
                         <span className="logo-text">mysneaker</span>
-                    </a>
+                    </Link>
 
                     <div className="secure-checkout-container">
                         <div
@@ -196,14 +252,14 @@ function Checkout() {
                     </div>
 
                     {/* Giỏ hàng */}
-                    <a href="/cart" className="nav-item">
+                    <Link to="/cart" className="nav-item">
                         <div className="cart-container">
                             <svg width="36" height="36" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
                             </svg>
                         </div>
                         <span className="cart-text">Cart</span>
-                    </a>
+                    </Link>
 
                 </div>
 
@@ -344,7 +400,7 @@ function Checkout() {
 
                     {/* PHƯƠNG THỨC THANH TOÁN */}
                     <div className={`checkout-step ${activeStep === 2 ? 'active' : ''}`}>
-                        <div className="step-header" onClick={() => validateAddressStep() && setActiveStep(2)}>
+                        <div className="step-header" onClick={() => validateAddressStep() ? setActiveStep(2) : showError("Vui lòng điền đủ thông tin Bước 1")}>
                             <div className="step-title-wrapper">
                                 <span className={`step-number-badge ${activeStep > 2 ? 'completed' : ''}`}>
                                     {activeStep > 2 ? "✓" : "2"}
@@ -418,7 +474,13 @@ function Checkout() {
                                 <button
                                     type="button"
                                     className="use-payment-btn"
-                                    onClick={() => setActiveStep(3)}
+                                    onClick={() => {
+                                        if (formData.paymentMethod) {
+                                            setActiveStep(3);
+                                        } else {
+                                            showError("Bạn chưa chọn phương thức thanh toán nào cả!");
+                                        }
+                                    }}
                                 >
                                     Dùng phương thức này
                                 </button>
@@ -428,7 +490,17 @@ function Checkout() {
 
                     {/* KIỂM TRA ĐƠN HÀNG */}
                     <div className={`checkout-step ${activeStep === 3 ? 'active' : ''}`}>
-                        <div className="step-header" onClick={() => validateAddressStep() && setActiveStep(3)}>
+                        <div className="step-header" onClick={() => {
+                            if (validateAddressStep() && formData.paymentMethod) {
+                                setActiveStep(3);
+                            } else if (!validateAddressStep()) {
+                                showError("Vui lòng hoàn thành Bước 1 trước.");
+                                setActiveStep(1);
+                            } else {
+                                showError("Vui lòng chọn phương thức thanh toán ở Bước 2.");
+                                setActiveStep(2);
+                            }
+                        }}>
                             <div className="step-title-wrapper">
                                 <span className="step-number-badge">3</span>
                                 <h3>Kiểm tra sản phẩm và vận chuyển (Review items)</h3>

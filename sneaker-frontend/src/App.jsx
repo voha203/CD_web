@@ -8,6 +8,8 @@ import ProductDetail from "./pages/productDetail/ProductDetail";
 import Cart from "./pages/Cart/Cart"
 import Checkout from "./pages/Checkout/Checkout"
 import ThankYou from './pages/ThankYou/ThankYou';
+import Orders from './pages/Orders/Orders';
+import OrderDetail from './pages/OrderDetail/OrderDetail';
 
 import { CartProvider } from './context/CartContext';
 
@@ -34,6 +36,12 @@ function App() {
 
             {/* Trang cảm ơn */}
             <Route path="/thank-you" element={<ThankYou />} />
+
+            {/* Trang lịch sử đơn hàng */}
+            <Route path="/orders" element={<Orders />} />
+
+            {/* Trang chi tiết đơn hàng */}
+            <Route path="/orders/:id" element={<OrderDetail />} />
 
             {/* Trang 404: Không tải được giao diện */}
             <Route path="*" element={<h1>404 - Not Found</h1>} />
