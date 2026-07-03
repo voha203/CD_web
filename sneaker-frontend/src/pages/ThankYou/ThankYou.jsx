@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useRef, useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
     FiCheckCircle,
     FiShoppingBag,
@@ -15,8 +15,35 @@ import './ThankYou.css';
 function ThankYou() {
     const navigate = useNavigate();
 
-    // Mã đơn hàng ngẫu nhiên để test
-    const orderCode = Math.floor(100000 + Math.random() * 900000);
+    // Lấy orderId từ tham số trên URL
+    const [searchParams] = useSearchParams();
+    const orderId = searchParams.get('orderId');
+
+    // State để lưu dữ liệu đơn hàng và trạng thái tải
+    const [orderData, setOrderData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (orderId) {
+            fetch(`http://localhost:8080/api/orders/${orderId}`)
+                .then((response) => {
+                    if (!response.ok) throw new Error("Không thể tải thông tin đơn hàng");
+                    return response.json();
+                })
+                .then((data) => {
+                    setOrderData(data);
+                    setIsLoading(false);
+                })
+                .catch((err) => {
+                    setError(err.message);
+                    setIsLoading(false);
+                });
+        } else {
+            setError("Không tìm thấy mã đơn hàng hợp lệ.");
+            setIsLoading(false);
+        }
+    }, [orderId]);
 
     // Điều khiển cuộn danh sách sản phẩm
     const scrollContainerRef = useRef(null);
@@ -93,6 +120,41 @@ function ThankYou() {
         }
     ];
 
+    // Xử lý giao diện khi đang tải hoặc có lỗi
+    if (isLoading) return <div className="thankyou-page-container"><h2>Đang tải thông tin đơn hàng...</h2></div>;
+    if (error) return <div className="thankyou-page-container"><h2>Có lỗi xảy ra: {error}</h2></div>;
+    if (!orderData) return null;
+
+    // Hàm xử lý nội dung theo thuộc tính paymentMethod lấy được (CARD, E-WALLET, COD)
+    const getPaymentDetails = (method, status) => {
+        const configs = {
+            'CARD': {
+                methodLabel: 'Thẻ tín dụng / Thẻ ghi nợ',
+                statusLabel: status === 'PROCESSING' ? 'Đã thanh toán' : 'Chờ xác thực thẻ',
+                note: 'Đơn hàng của bạn đã được thanh toán trực tuyến thành công bằng Thẻ. Hóa đơn chi tiết đã được gửi về email của bạn.'
+            },
+            'E-WALLET': {
+                methodLabel: 'Ví điện tử',
+                statusLabel: status === 'PROCESSING' ? 'Đã thanh toán' : 'Chờ ví phản hồi',
+                note: 'Giao dịch qua ví điện tử đã hoàn tất. Cảm ơn bạn đã lựa chọn hình thức thanh toán không tiền mặt!'
+            },
+            'COD': {
+                methodLabel: 'Thanh toán khi nhận hàng (COD)',
+                statusLabel: 'Chờ xử lý & Giao hàng',
+                note: 'Vui lòng chuẩn bị sẵn số tiền mặt tương ứng để thanh toán cho shipper khi đơn hàng được giao đến bạn.'
+            }
+        };
+
+        return configs[method] || {
+            methodLabel: 'Phương thức khác',
+            statusLabel: status,
+            note: 'Chúng tôi sẽ liên hệ lại qua số điện thoại để xác nhận đơn hàng trong thời gian sớm nhất.'
+        };
+    };
+
+    // Lấy thông tin tương ứng với đơn hàng hiện tại
+    const paymentDetails = getPaymentDetails(orderData.paymentMethod, orderData.status);
+
     return (
         <div className="thankyou-page-container">
 
@@ -112,31 +174,32 @@ function ThankYou() {
 
                     <div className="order-summary-row">
                         <span>Mã đơn hàng:</span>
-                        <strong>#MS-{orderCode}</strong>
+                        <strong>#MS-{orderData.orderId}</strong>
                     </div>
                     <div className="order-summary-row">
                         <span>Thời gian đặt:</span>
-                        <span>{new Date().toLocaleString('vi-VN')}</span>
+                        <span>{orderData.createdAt ? new Date(orderData.createdAt).toLocaleString('vi-VN') : new Date().toLocaleString('vi-VN')}</span>
                     </div>
                     <div className="order-summary-row">
                         <span>Trạng thái:</span>
-                        <span className="status-badge">Đang xử lý</span>
+                        <span className="status-badge">{paymentDetails.statusLabel}</span>
                     </div>
                     <div className="order-summary-row">
                         <span>Phương thức:</span>
-                        <span>Thanh toán khi nhận hàng (COD)</span>
+                        <span>{paymentDetails.methodLabel}</span>
                     </div>
 
                     <div className="order-summary-divider"></div>
 
                     <div className="order-summary-row total-row">
                         <span>Tổng thanh toán:</span>
-                        <span className="total-price">5.550.000 ₫</span>
+                        <span className="total-price">
+                            {orderData.totalAmount ? orderData.totalAmount.toLocaleString('vi-VN') : 0} ₫
+                        </span>
                     </div>
 
                     <p className="note-text">
-                        Một email xác nhận kèm chi tiết hóa đơn đã được gửi đến email của bạn.
-                        Chúng tôi sẽ liên hệ lại qua số điện thoại để xác nhận giao hàng trong thời gian sớm nhất.
+                        {paymentDetails.note}
                     </p>
                 </div>
 
@@ -149,7 +212,7 @@ function ThankYou() {
                     </button>
                     <button
                         className="btn-action btn-primary"
-                        onClick={() => navigate('/account/orders')}
+                        onClick={() => navigate('/orders')}
                     >
                         <FiShoppingBag /> Xem đơn hàng của tôi
                     </button>

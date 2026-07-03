@@ -158,7 +158,7 @@ function Checkout() {
                 }
             } else {
                 // Phương thức thanh toán: COD
-                navigate('/thank-you');
+                navigate(`/thank-you?orderId=${orderId}`);
             }
         } catch (err) {
             alert("Lỗi: " + (err.response?.data || "Không thể đặt hàng"));
