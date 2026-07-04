@@ -1,12 +1,12 @@
 package com.sneaker.backend.dto.cartItem;
 
-import com.sneaker.backend.dto.productImage.ProductImageDTO;
+import com.sneaker.backend.dto.productImage.ProductImageResponse;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class CartItemDTO {
+public class CartItemResponse {
     private Long id;
 
     private Long variantSizeId;
@@ -15,7 +15,7 @@ public class CartItemDTO {
     private String color;
     private String sizeValue;
 
-    private List<ProductImageDTO> images;
+    private List<ProductImageResponse> images;
 
     private String brand;
     private Long price;

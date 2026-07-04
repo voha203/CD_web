@@ -1,6 +1,6 @@
 package com.sneaker.backend.controller;
 
-import com.sneaker.backend.dto.productImage.ProductImageDTO;
+import com.sneaker.backend.dto.productImage.ProductImageResponse;
 import com.sneaker.backend.service.ProductImageService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public class ProductImageController {
     private ProductImageService productImageService;
 
     @GetMapping("/variant/{variantId}")
-    public List<ProductImageDTO> getByVariantId(@PathVariable Long variantId) {
+    public List<ProductImageResponse> getByVariantId(@PathVariable Long variantId) {
         return productImageService.getByVariantId(variantId);
     }
 }

@@ -1,12 +1,12 @@
 package com.sneaker.backend.dto.product;
 
-import com.sneaker.backend.dto.productVariant.ProductVariantDTO;
+import com.sneaker.backend.dto.productVariant.ProductVariantResponse;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class ProductDTO {
+public class ProductResponse {
 
     private Long id;
     private String name;
@@ -19,5 +19,5 @@ public class ProductDTO {
     private Double averageRating;
     private Integer reviewCount;
 
-    private List<ProductVariantDTO> variants;
+    private List<ProductVariantResponse> variants;
 }

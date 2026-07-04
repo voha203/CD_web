@@ -1,6 +1,6 @@
 package com.sneaker.backend.service.impl;
 
-import com.sneaker.backend.dto.product.ProductDTO;
+import com.sneaker.backend.dto.product.ProductResponse;
 import com.sneaker.backend.dto.product.ProductRequest;
 import com.sneaker.backend.entity.Product;
 import com.sneaker.backend.entity.Category;
@@ -44,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
     // GET ALL
     // =========================
     @Override
-    public List<ProductDTO> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes, String keyword) {
+    public List<ProductResponse> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes, String keyword) {
         // Tạo đối tượng Sort từ tham số truyền vào
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort sort = Sort.by(direction, sortBy);
@@ -69,7 +69,7 @@ public class ProductServiceImpl implements ProductService {
     // GET SUGGESTIONS (Phục vụ Header gợi ý nhanh)
     // =========================
     @Override
-    public List<ProductDTO> getSuggestions(String keyword) {
+    public List<ProductResponse> getSuggestions(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return new ArrayList<>();
         }
@@ -89,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
     // GET RECOMMENDATIONS (Gợi ý dựa trên đơn hàng đã mua)
     // =========================
     @Override
-    public List<ProductDTO> getRecommendations(Long orderId) {
+    public List<ProductResponse> getRecommendations(Long orderId) {
         // Lấy danh sách ID sản phẩm khách đã mua trong đơn hàng này
         List<Long> purchasedProductIds = orderItemRepository.findProductIdsByOrderId(orderId);
 
@@ -143,7 +143,7 @@ public class ProductServiceImpl implements ProductService {
     // GET BY ID
     // =========================
     @Override
-    public ProductDTO getById(Long id) {
+    public ProductResponse getById(Long id) {
         Product p = findProductById(id);
 
         return enrichProductDTO(p);
@@ -153,7 +153,7 @@ public class ProductServiceImpl implements ProductService {
     // CREATE
     // =========================
     @Override
-    public ProductDTO create(ProductRequest request) {
+    public ProductResponse create(ProductRequest request) {
 
         //  VALIDATE
         if (request.getName() == null || request.getName().trim().isEmpty()) {
@@ -180,7 +180,7 @@ public class ProductServiceImpl implements ProductService {
     // UPDATE
     // =========================
     @Override
-    public ProductDTO update(Long id, ProductRequest request) {
+    public ProductResponse update(Long id, ProductRequest request) {
 
         Product p = findProductById(id);
 
@@ -224,8 +224,8 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục id: " + id));
     }
 
-    private ProductDTO enrichProductDTO(Product p) {
-        ProductDTO dto = productMapper.toDTO(p);
+    private ProductResponse enrichProductDTO(Product p) {
+        ProductResponse dto = productMapper.toDTO(p);
 
         // 🔥 FINAL PRICE (có check null)
         if (p.getPrice() != null) {

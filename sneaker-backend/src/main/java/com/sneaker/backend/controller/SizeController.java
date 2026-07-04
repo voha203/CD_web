@@ -1,6 +1,6 @@
 package com.sneaker.backend.controller;
 
-import com.sneaker.backend.dto.size.SizeDTO;
+import com.sneaker.backend.dto.size.SizeResponse;
 import com.sneaker.backend.service.SizeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,7 +19,7 @@ public class SizeController {
     private SizeService sizeService;
 
     @GetMapping
-    public List<SizeDTO> getAll() {
+    public List<SizeResponse> getAll() {
         return sizeService.getAll();
     }
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class DiscountDTO {
+public class DiscountResponse {
 
     private Long id;
     private String name;

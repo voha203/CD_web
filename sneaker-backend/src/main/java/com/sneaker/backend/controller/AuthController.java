@@ -1,7 +1,7 @@
 package com.sneaker.backend.controller;
 
 import com.sneaker.backend.dto.auth.*;
-import com.sneaker.backend.dto.user.UserDTO;
+import com.sneaker.backend.dto.user.UserResponse;
 import com.sneaker.backend.entity.User;
 import com.sneaker.backend.security.JwtUtil;
 import com.sneaker.backend.service.UserService;
@@ -27,7 +27,7 @@ public class AuthController {
 
     // REGISTER
     @PostMapping("/register")
-    public UserDTO register(@RequestBody RegisterRequest request) {
+    public UserResponse register(@RequestBody RegisterRequest request) {
 
         User user = new User();
         user.setUsername(request.getUsername());
@@ -70,8 +70,8 @@ public class AuthController {
     }
 
     // convert User → DTO (RẤT QUAN TRỌNG)
-    private UserDTO toDTO(User u) {
-        UserDTO dto = new UserDTO();
+    private UserResponse toDTO(User u) {
+        UserResponse dto = new UserResponse();
         dto.setId(u.getId());
         dto.setUsername(u.getUsername());
         dto.setEmail(u.getEmail());

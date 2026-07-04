@@ -1,6 +1,6 @@
 package com.sneaker.backend.service.impl;
 
-import com.sneaker.backend.dto.productsize.ProductSizeDTO;
+import com.sneaker.backend.dto.productsize.ProductSizeResponse;
 import com.sneaker.backend.entity.ProductSize;
 import com.sneaker.backend.repository.ProductRepository;
 import com.sneaker.backend.repository.ProductSizeRepository;
@@ -21,11 +21,11 @@ public class ProductSizeServiceImpl implements ProductSizeService {
     private ProductRepository productRepository;
 
     @Override
-    public List<ProductSizeDTO> getByProduct(Long productId) {
+    public List<ProductSizeResponse> getByProduct(Long productId) {
         List<ProductSize> list = productSizeRepository.findByProductId(productId);
 
         return list.stream().map(ps -> {
-            ProductSizeDTO dto = new ProductSizeDTO();
+            ProductSizeResponse dto = new ProductSizeResponse();
             dto.setId(ps.getId());
             dto.setSize(ps.getSize());
             dto.setQuantity(ps.getQuantity());
