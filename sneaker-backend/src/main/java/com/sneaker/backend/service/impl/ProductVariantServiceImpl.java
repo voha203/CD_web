@@ -1,6 +1,6 @@
 package com.sneaker.backend.service.impl;
 
-import com.sneaker.backend.dto.productVariant.ProductVariantDTO;
+import com.sneaker.backend.dto.productVariant.ProductVariantResponse;
 import com.sneaker.backend.entity.ProductVariant;
 import com.sneaker.backend.repository.ProductVariantRepository;
 import com.sneaker.backend.service.ProductImageService;
@@ -23,8 +23,8 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     @Autowired
     private ProductVariantSizeService sizeService;
 
-    private ProductVariantDTO toDTO(ProductVariant v) {
-        ProductVariantDTO dto = new ProductVariantDTO();
+    private ProductVariantResponse toDTO(ProductVariant v) {
+        ProductVariantResponse dto = new ProductVariantResponse();
 
         dto.setId(v.getId());
         dto.setColor(v.getColor());
@@ -37,7 +37,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     }
 
     @Override
-    public List<ProductVariantDTO> getByProductId(Long productId) {
+    public List<ProductVariantResponse> getByProductId(Long productId) {
         return repository.findByProductId(productId)
                 .stream()
                 .map(this::toDTO)
@@ -45,14 +45,14 @@ public class ProductVariantServiceImpl implements ProductVariantService {
     }
 
     @Override
-    public ProductVariantDTO getById(Long id) {
+    public ProductVariantResponse getById(Long id) {
         return repository.findById(id)
                 .map(this::toDTO)
                 .orElseThrow();
     }
 
     @Override
-    public ProductVariantDTO create(ProductVariantDTO dto) {
+    public ProductVariantResponse create(ProductVariantResponse dto) {
 
         ProductVariant v = new ProductVariant();
         v.setColor(dto.getColor());

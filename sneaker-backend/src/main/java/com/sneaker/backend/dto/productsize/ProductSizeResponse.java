@@ -3,7 +3,7 @@ package com.sneaker.backend.dto.productsize;
 import lombok.Data;
 
 @Data
-public class ProductSizeDTO {
+public class ProductSizeResponse {
 
     private Long id;
     private Integer size;

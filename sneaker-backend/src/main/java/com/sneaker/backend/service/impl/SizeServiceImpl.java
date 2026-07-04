@@ -1,6 +1,6 @@
 package com.sneaker.backend.service.impl;
 
-import com.sneaker.backend.dto.size.SizeDTO;
+import com.sneaker.backend.dto.size.SizeResponse;
 import com.sneaker.backend.entity.Size;
 import com.sneaker.backend.repository.SizeRepository;
 import com.sneaker.backend.service.SizeService;
@@ -15,9 +15,9 @@ public class SizeServiceImpl implements SizeService {
     @Autowired
     private SizeRepository repository;
 
-    private SizeDTO toDTO(Size s) {
+    private SizeResponse toDTO(Size s) {
 
-        SizeDTO dto = new SizeDTO();
+        SizeResponse dto = new SizeResponse();
 
         dto.setId(s.getId());
         dto.setValue(s.getValue());
@@ -26,7 +26,7 @@ public class SizeServiceImpl implements SizeService {
     }
 
     @Override
-    public List<SizeDTO> getAll() {
+    public List<SizeResponse> getAll() {
         return repository.findAll()
                 .stream()
                 .map(this::toDTO)

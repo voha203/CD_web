@@ -1,6 +1,6 @@
 package com.sneaker.backend.service.impl;
 
-import com.sneaker.backend.dto.productVariantSize.ProductVariantSizeDTO;
+import com.sneaker.backend.dto.productVariantSize.ProductVariantSizeResponse;
 import com.sneaker.backend.entity.ProductVariantSize;
 import com.sneaker.backend.repository.ProductVariantSizeRepository;
 import com.sneaker.backend.service.ProductVariantSizeService;
@@ -15,9 +15,9 @@ public class ProductVariantSizeServiceImpl implements ProductVariantSizeService 
     @Autowired
     private ProductVariantSizeRepository repository;
 
-    private ProductVariantSizeDTO toDTO(ProductVariantSize s) {
+    private ProductVariantSizeResponse toDTO(ProductVariantSize s) {
 
-        ProductVariantSizeDTO dto = new ProductVariantSizeDTO();
+        ProductVariantSizeResponse dto = new ProductVariantSizeResponse();
 
         dto.setId(s.getId());
         dto.setVariantId(s.getVariant().getId());
@@ -29,7 +29,7 @@ public class ProductVariantSizeServiceImpl implements ProductVariantSizeService 
     }
 
     @Override
-    public List<ProductVariantSizeDTO> getByVariantId(Long variantId) {
+    public List<ProductVariantSizeResponse> getByVariantId(Long variantId) {
         return repository.findByVariantId(variantId)
                 .stream()
                 .map(this::toDTO)

@@ -1,6 +1,6 @@
 package com.sneaker.backend.controller;
 
-import com.sneaker.backend.dto.product.ProductDTO;
+import com.sneaker.backend.dto.product.ProductResponse;
 import com.sneaker.backend.dto.product.ProductRequest;
 import com.sneaker.backend.service.ProductService;
 
@@ -18,40 +18,40 @@ public class ProductController {
     private ProductService service;
 
     @GetMapping
-    public List<ProductDTO> getAll(@RequestParam(defaultValue = "id") String sortBy,
-                                   @RequestParam(defaultValue = "asc") String sortDir,
-                                   @RequestParam(required = false) List<String> brands,
-                                   @RequestParam(required = false) Double minPrice,
-                                   @RequestParam(required = false) Double maxPrice,
-                                   @RequestParam(required = false) Long categoryId,
-                                   @RequestParam(required = false) List<Integer> sizes,
-                                   @RequestParam(required = false) String keyword) {
+    public List<ProductResponse> getAll(@RequestParam(defaultValue = "id") String sortBy,
+                                        @RequestParam(defaultValue = "asc") String sortDir,
+                                        @RequestParam(required = false) List<String> brands,
+                                        @RequestParam(required = false) Double minPrice,
+                                        @RequestParam(required = false) Double maxPrice,
+                                        @RequestParam(required = false) Long categoryId,
+                                        @RequestParam(required = false) List<Integer> sizes,
+                                        @RequestParam(required = false) String keyword) {
         return service.getAll(sortBy, sortDir,  brands, minPrice, maxPrice, categoryId, sizes, keyword);
     }
 
     @GetMapping("/suggestions")
-    public List<ProductDTO> getSuggestions(@RequestParam(required = false) String keyword) {
+    public List<ProductResponse> getSuggestions(@RequestParam(required = false) String keyword) {
         return service.getSuggestions(keyword);
     }
 
     @GetMapping("/recommendations")
-    public List<ProductDTO> getRecommendations(@RequestParam Long orderId) {
+    public List<ProductResponse> getRecommendations(@RequestParam Long orderId) {
         return service.getRecommendations(orderId);
     }
 
     @GetMapping("/{id}")
-    public ProductDTO getById(@PathVariable Long id) {
+    public ProductResponse getById(@PathVariable Long id) {
         return service.getById(id);
     }
 
     @PostMapping
-    public ProductDTO create(@RequestBody ProductRequest request) {
+    public ProductResponse create(@RequestBody ProductRequest request) {
         return service.create(request);
     }
 
     @PutMapping("/{id}")
-    public ProductDTO update(@PathVariable Long id,
-                             @RequestBody ProductRequest request) {
+    public ProductResponse update(@PathVariable Long id,
+                                  @RequestBody ProductRequest request) {
         return service.update(id, request);
     }
 

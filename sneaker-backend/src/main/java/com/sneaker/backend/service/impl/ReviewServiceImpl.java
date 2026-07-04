@@ -1,6 +1,6 @@
 package com.sneaker.backend.service.impl;
 
-import com.sneaker.backend.dto.review.ReviewDTO;
+import com.sneaker.backend.dto.review.ReviewResponse;
 import com.sneaker.backend.dto.review.ReviewRequest;
 import com.sneaker.backend.entity.Product;
 import com.sneaker.backend.entity.Review;
@@ -38,7 +38,7 @@ public class ReviewServiceImpl implements ReviewService {
     // =========================
     @Override
     @Transactional
-    public ReviewDTO addReview(Long productId, ReviewRequest request) {
+    public ReviewResponse addReview(Long productId, ReviewRequest request) {
         Long userId = getCurrentUserId();
 
         if (request.getRating() == null || request.getRating() < 1 || request.getRating() > 5) {
@@ -66,7 +66,7 @@ public class ReviewServiceImpl implements ReviewService {
     // GET REVIEWS BY PRODUCT
     // =========================
     @Override
-    public Page<ReviewDTO> getReviewsByProduct(Long productId, int page, int size) {
+    public Page<ReviewResponse> getReviewsByProduct(Long productId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Review> reviews = reviewRepository.findByProductId(productId, pageable);
 

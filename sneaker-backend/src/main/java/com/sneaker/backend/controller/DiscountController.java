@@ -21,7 +21,7 @@ public class DiscountController {
 
     // GET ALL
     @GetMapping
-    public List<DiscountDTO> getAll() {
+    public List<DiscountResponse> getAll() {
         return discountService.getAll()
                 .stream()
                 .map(this::toDTO)
@@ -30,7 +30,7 @@ public class DiscountController {
 
     // CREATE
     @PostMapping
-    public DiscountDTO create(@RequestBody DiscountRequest request) {
+    public DiscountResponse create(@RequestBody DiscountRequest request) {
 
         // check productId
         if (request.getProductId() == null) {
@@ -60,7 +60,7 @@ public class DiscountController {
 
     // GET BY PRODUCT
     @GetMapping("/product/{id}")
-    public List<DiscountDTO> getByProduct(@PathVariable Long id) {
+    public List<DiscountResponse> getByProduct(@PathVariable Long id) {
         return discountService.getByProduct(id)
                 .stream()
                 .map(this::toDTO)
@@ -71,8 +71,8 @@ public class DiscountController {
         discountService.delete(id);
     }
     // NULL POINTER
-    private DiscountDTO toDTO(Discount d) {
-        DiscountDTO dto = new DiscountDTO();
+    private DiscountResponse toDTO(Discount d) {
+        DiscountResponse dto = new DiscountResponse();
 
         dto.setId(d.getId());
         dto.setName(d.getName());

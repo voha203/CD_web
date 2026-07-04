@@ -1,23 +1,23 @@
 package com.sneaker.backend.service;
 
-import com.sneaker.backend.dto.product.ProductDTO;
+import com.sneaker.backend.dto.product.ProductResponse;
 import com.sneaker.backend.dto.product.ProductRequest;
 
 import java.util.List;
 
 public interface ProductService {
 
-    List<ProductDTO> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes, String keyword);
+    List<ProductResponse> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes, String keyword);
 
-    List<ProductDTO> getSuggestions(String keyword);
+    List<ProductResponse> getSuggestions(String keyword);
 
-    List<ProductDTO> getRecommendations(Long orderId);
+    List<ProductResponse> getRecommendations(Long orderId);
 
-    ProductDTO getById(Long id);
+    ProductResponse getById(Long id);
 
-    ProductDTO create(ProductRequest request);
+    ProductResponse create(ProductRequest request);
 
-    ProductDTO update(Long id, ProductRequest request);
+    ProductResponse update(Long id, ProductRequest request);
 
     void delete(Long id);
 }

@@ -1,14 +1,14 @@
 package com.sneaker.backend.service;
 
-import com.sneaker.backend.dto.productVariant.ProductVariantDTO;
+import com.sneaker.backend.dto.productVariant.ProductVariantResponse;
 
 import java.util.List;
 
 public interface ProductVariantService {
 
-    List<ProductVariantDTO> getByProductId(Long productId);
+    List<ProductVariantResponse> getByProductId(Long productId);
 
-    ProductVariantDTO getById(Long id);
+    ProductVariantResponse getById(Long id);
 
-    ProductVariantDTO create(ProductVariantDTO dto);
+    ProductVariantResponse create(ProductVariantResponse dto);
 }

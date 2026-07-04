@@ -1,7 +1,7 @@
 package com.sneaker.backend.mapper;
 
-import com.sneaker.backend.dto.cart.CartDTO;
-import com.sneaker.backend.dto.cartItem.CartItemDTO;
+import com.sneaker.backend.dto.cart.CartResponse;
+import com.sneaker.backend.dto.cartItem.CartItemResponse;
 import com.sneaker.backend.entity.Cart;
 import com.sneaker.backend.entity.CartItem;
 import org.mapstruct.Mapper;
@@ -13,9 +13,9 @@ import java.util.List;
 public interface CartMapper {
 
     // ================= CART =================
-    CartDTO toDTO(Cart cart);
+    CartResponse toDTO(Cart cart);
 
-    List<CartItemDTO> toItemDTOList(List<CartItem> items);
+    List<CartItemResponse> toItemDTOList(List<CartItem> items);
 
     // ================= CART ITEM =================
     @Mapping(source = "variantSize.id", target = "variantSizeId")
@@ -25,5 +25,5 @@ public interface CartMapper {
     @Mapping(source = "variantSize.variant.product.brand", target = "brand")
     @Mapping(source = "variantSize.variant.product.price", target = "price")
     @Mapping(source = "variantSize.variant.images", target = "images")
-    CartItemDTO toItemDTO(CartItem item);
+    CartItemResponse toItemDTO(CartItem item);
 }

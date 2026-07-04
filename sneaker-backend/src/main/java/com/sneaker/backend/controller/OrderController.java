@@ -1,6 +1,6 @@
 package com.sneaker.backend.controller;
 
-import com.sneaker.backend.dto.order.OrderDTO;
+import com.sneaker.backend.dto.order.OrderResponse;
 import com.sneaker.backend.dto.order.OrderRequest;
 import com.sneaker.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ public class OrderController {
     @PostMapping("/checkout")
     public ResponseEntity<?> checkout(@RequestBody OrderRequest request) {
         try {
-            OrderDTO result = orderService.placeOrder(request);
+            OrderResponse result = orderService.placeOrder(request);
             return ResponseEntity.ok(result);
         } catch (RuntimeException e) {
             // Trả về HTTP 400 Bad Request nếu lỗi tồn kho hoặc giỏ hàng rỗng
@@ -32,7 +32,7 @@ public class OrderController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getOrderById(@PathVariable Long id) {
         try {
-            OrderDTO result = orderService.getOrderById(id);
+            OrderResponse result = orderService.getOrderById(id);
 
             if (result != null) {
                 return ResponseEntity.ok(result);

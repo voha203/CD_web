@@ -3,7 +3,7 @@ package com.sneaker.backend.dto.productVariantSize;
 import lombok.Data;
 
 @Data
-public class ProductVariantSizeDTO {
+public class ProductVariantSizeResponse {
 
     private Long id;
     private Long variantId;

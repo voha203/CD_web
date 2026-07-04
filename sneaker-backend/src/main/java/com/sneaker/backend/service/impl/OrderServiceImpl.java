@@ -1,6 +1,6 @@
 package com.sneaker.backend.service.impl;
 
-import com.sneaker.backend.dto.order.OrderDTO;
+import com.sneaker.backend.dto.order.OrderResponse;
 import com.sneaker.backend.dto.order.OrderRequest;
 import com.sneaker.backend.entity.*;
 import com.sneaker.backend.mapper.OrderMapper;
@@ -10,7 +10,6 @@ import com.sneaker.backend.repository.ProductVariantSizeRepository;
 import com.sneaker.backend.repository.UserRepository;
 import com.sneaker.backend.service.OrderService;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderDTO placeOrder(OrderRequest request) {
+    public OrderResponse placeOrder(OrderRequest request) {
         Long currentUserId = getCurrentUserId();
 
         // Lấy thông tin khách hàng và giỏ hàng
@@ -102,7 +101,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDTO getOrderById(Long id) {
+    public OrderResponse getOrderById(Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với mã số này."));
 

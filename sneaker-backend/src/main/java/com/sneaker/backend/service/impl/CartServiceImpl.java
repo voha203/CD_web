@@ -8,8 +8,6 @@ import com.sneaker.backend.service.CartService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,11 +33,11 @@ public class CartServiceImpl implements CartService {
     // GET CART
     // =========================
     @Override
-    public CartDTO getMyCart() {
+    public CartResponse getMyCart() {
         Long userId = getCurrentUserId();
         Cart cart = getOrCreateCart(userId);
 
-        CartDTO dto = cartMapper.toDTO(cart);
+        CartResponse dto = cartMapper.toDTO(cart);
 
         // TÍNH TOTAL PRICE
         Long total = cart.getItems().stream()

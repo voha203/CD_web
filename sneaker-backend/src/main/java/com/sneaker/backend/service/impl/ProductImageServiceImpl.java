@@ -1,6 +1,6 @@
 package com.sneaker.backend.service.impl;
 
-import com.sneaker.backend.dto.productImage.ProductImageDTO;
+import com.sneaker.backend.dto.productImage.ProductImageResponse;
 import com.sneaker.backend.entity.ProductImage;
 import com.sneaker.backend.repository.ProductImageRepository;
 import com.sneaker.backend.service.ProductImageService;
@@ -15,8 +15,8 @@ public class ProductImageServiceImpl implements ProductImageService {
     @Autowired
     private ProductImageRepository repository;
 
-    private ProductImageDTO toDTO(ProductImage img) {
-        ProductImageDTO dto = new ProductImageDTO();
+    private ProductImageResponse toDTO(ProductImage img) {
+        ProductImageResponse dto = new ProductImageResponse();
 
         dto.setId(img.getId());
         dto.setImageUrl(img.getImageUrl());
@@ -26,12 +26,12 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     @Override
-    public List<ProductImageDTO> toDTOList(List<ProductImage> images) {
+    public List<ProductImageResponse> toDTOList(List<ProductImage> images) {
         return images.stream().map(this::toDTO).toList();
     }
 
     @Override
-    public List<ProductImageDTO> getByVariantId(Long variantId) {
+    public List<ProductImageResponse> getByVariantId(Long variantId) {
         return repository.findByVariantId(variantId)
                 .stream()
                 .map(this::toDTO)

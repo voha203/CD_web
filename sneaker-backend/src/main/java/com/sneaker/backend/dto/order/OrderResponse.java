@@ -1,13 +1,13 @@
 package com.sneaker.backend.dto.order;
 
-import com.sneaker.backend.dto.orderItem.OrderItemDTO;
+import com.sneaker.backend.dto.orderItem.OrderItemResponse;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class OrderDTO {
+public class OrderResponse {
     private Long orderId;
     private String status;
     private double totalAmount;
@@ -15,6 +15,6 @@ public class OrderDTO {
     private String receiverName;
     private String receiverPhone;
     private String shippingAddress;
-    private List<OrderItemDTO> items;
+    private List<OrderItemResponse> items;
     private String paymentMethod;
 }

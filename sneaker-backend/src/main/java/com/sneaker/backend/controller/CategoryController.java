@@ -1,6 +1,6 @@
 package com.sneaker.backend.controller;
 
-import com.sneaker.backend.dto.category.CategoryDTO;
+import com.sneaker.backend.dto.category.CategoryResponse;
 import com.sneaker.backend.dto.category.CategoryRequest;
 import com.sneaker.backend.entity.Category;
 import com.sneaker.backend.service.CategoryService;
@@ -21,7 +21,7 @@ public class CategoryController {
 
     // 🔥 GET ALL
     @GetMapping
-    public List<CategoryDTO> getAll() {
+    public List<CategoryResponse> getAll() {
         return categoryService.getAll()
                 .stream()
                 .map(this::toDTO)
@@ -30,13 +30,13 @@ public class CategoryController {
 
     // GET BY ID
     @GetMapping("/{id}")
-    public CategoryDTO getById(@PathVariable Long id) {
+    public CategoryResponse getById(@PathVariable Long id) {
         return toDTO(categoryService.getById(id));
     }
 
     // CREATE
     @PostMapping
-    public CategoryDTO create(@RequestBody CategoryRequest request) {
+    public CategoryResponse create(@RequestBody CategoryRequest request) {
 
         Category c = new Category();
         c.setName(request.getName());
@@ -47,8 +47,8 @@ public class CategoryController {
 
     // UPDATE
     @PutMapping("/{id}")
-    public CategoryDTO update(@PathVariable Long id,
-                              @RequestBody CategoryRequest request) {
+    public CategoryResponse update(@PathVariable Long id,
+                                   @RequestBody CategoryRequest request) {
 
         Category c = new Category();
         c.setName(request.getName());
@@ -64,8 +64,8 @@ public class CategoryController {
     }
 
     //convert Entity → DTO
-    private CategoryDTO toDTO(Category c) {
-        CategoryDTO dto = new CategoryDTO();
+    private CategoryResponse toDTO(Category c) {
+        CategoryResponse dto = new CategoryResponse();
         dto.setId(c.getId());
         dto.setName(c.getName());
         dto.setCode(c.getCode());

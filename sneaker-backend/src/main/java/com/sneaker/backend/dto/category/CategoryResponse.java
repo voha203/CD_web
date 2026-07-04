@@ -3,7 +3,7 @@ package com.sneaker.backend.dto.category;
 import lombok.Data;
 
 @Data
-public class CategoryDTO {
+public class CategoryResponse {
     private Long id;
     private String name;
     private String code;

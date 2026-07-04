@@ -1,7 +1,7 @@
 package com.sneaker.backend.mapper;
 
-import com.sneaker.backend.dto.order.OrderDTO;
-import com.sneaker.backend.dto.orderItem.OrderItemDTO;
+import com.sneaker.backend.dto.order.OrderResponse;
+import com.sneaker.backend.dto.orderItem.OrderItemResponse;
 import com.sneaker.backend.entity.Order;
 import com.sneaker.backend.entity.OrderItem;
 import org.mapstruct.Mapper;
@@ -14,9 +14,9 @@ public interface OrderMapper {
 
     // ================= ORDER =================
     @Mapping(source = "id", target = "orderId")
-    OrderDTO toDTO(Order order);
+    OrderResponse toDTO(Order order);
 
-    List<OrderItemDTO> toItemDTOList(List<OrderItem> items);
+    List<OrderItemResponse> toItemDTOList(List<OrderItem> items);
 
     // ================= ORDER ITEM =================
     @Mapping(source = "variantSize.variant.product.id", target = "productId")
@@ -30,5 +30,5 @@ public interface OrderMapper {
     // Dùng Java Expression để tính Subtotal và lấy ảnh đầu tiên (nếu DTO của bạn cần 1 ảnh duy nhất)
     @Mapping(target = "subTotal", expression = "java(item.getPrice() * item.getQuantity())")
     @Mapping(source = "variantSize.variant.images", target = "images")
-    OrderItemDTO toItemDTO(OrderItem item);
+    OrderItemResponse toItemDTO(OrderItem item);
 }
