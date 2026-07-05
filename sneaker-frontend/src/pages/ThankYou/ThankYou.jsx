@@ -1,165 +1,166 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-    FiCheckCircle,
-    FiShoppingBag,
-    FiHome,
     FiArrowRight,
+    FiCheckCircle,
     FiChevronLeft,
-    FiChevronRight
+    FiChevronRight,
+    FiHome,
+    FiShoppingBag
 } from 'react-icons/fi';
 
 import ProductCard from '../../components/layout/productCard/ProductCard';
+import { getOrderById } from '../../services/orderService';
 import './ThankYou.css';
 
 function ThankYou() {
     const navigate = useNavigate();
-
-    // Lấy orderId từ tham số trên URL
     const [searchParams] = useSearchParams();
     const orderId = searchParams.get('orderId');
+    const scrollContainerRef = useRef(null);
 
-    // State để lưu dữ liệu đơn hàng và trạng thái tải
     const [orderData, setOrderData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    // State lưu dữ liệu danh sách sản phẩm gợi ý
     const [recommendedProducts, setRecommendedProducts] = useState([]);
 
     useEffect(() => {
-        if (orderId) {
-            fetch(`http://localhost:8080/api/orders/${orderId}`)
-                .then((response) => {
-                    if (!response.ok) throw new Error("Không thể tải thông tin đơn hàng");
-                    return response.json();
-                })
-                .then((data) => {
-                    setOrderData(data);
-                    setIsLoading(false);
-                })
-                .catch((err) => {
-                    setError(err.message);
-                    setIsLoading(false);
-                });
-
-            fetch(`http://localhost:8080/api/products/recommendations?orderId=${orderId}`)
-                .then((response) => {
-                    if (!response.ok) throw new Error("Lỗi khi tải gợi ý");
-                    return response.json();
-                })
-                .then((data) => {
-                    setRecommendedProducts(data);
-                    setIsLoading(false);
-                })
-                .catch((err) => {
-                    setError(err.message);
-                    setIsLoading(false);
-                });
-
-        } else {
-            setError("Không tìm thấy mã đơn hàng hợp lệ.");
+        if (!orderId) {
+            setError('Khong tim thay ma don hang hop le.');
             setIsLoading(false);
+            return;
         }
+
+        setIsLoading(true);
+        setError(null);
+
+        getOrderById(orderId)
+            .then((res) => {
+                setOrderData(res.data);
+            })
+            .catch((err) => {
+                setError(err.response?.data || err.message || 'Khong the tai thong tin don hang.');
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+
+        fetch(`http://localhost:8080/api/products/recommendations?orderId=${orderId}`)
+            .then((response) => {
+                if (!response.ok) throw new Error('Could not load recommendations');
+                return response.json();
+            })
+            .then((data) => {
+                setRecommendedProducts(data);
+            })
+            .catch((err) => {
+                console.error('Could not load recommendations:', err);
+            });
     }, [orderId]);
 
-    // Điều khiển cuộn danh sách sản phẩm
-    const scrollContainerRef = useRef(null);
-
-    // Xử lý bấm nút mũi tên trái/phải
     const handleScroll = (direction) => {
         const container = scrollContainerRef.current;
-        if (container) {
-            const scrollAmount = container.clientWidth;
-            if (direction === 'left') {
-                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-            } else {
-                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-            }
-        }
+        if (!container) return;
+
+        const scrollAmount = container.clientWidth;
+        container.scrollBy({
+            left: direction === 'left' ? -scrollAmount : scrollAmount,
+            behavior: 'smooth'
+        });
     };
 
-    // Xử lý giao diện khi đang tải hoặc có lỗi
-    if (isLoading) return <div className="thankyou-page-container"><h2>Đang tải thông tin đơn hàng...</h2></div>;
-    if (error) return <div className="thankyou-page-container"><h2>Có lỗi xảy ra: {error}</h2></div>;
-    if (!orderData) return null;
-
-    // Hàm xử lý nội dung theo thuộc tính paymentMethod lấy được (CARD, E-WALLET, COD)
     const getPaymentDetails = (method, status) => {
         const configs = {
-            'CARD': {
-                methodLabel: 'Thẻ tín dụng / Thẻ ghi nợ',
-                statusLabel: status === 'PROCESSING' ? 'Đã thanh toán' : 'Chờ xác thực thẻ',
-                note: 'Đơn hàng của bạn đã được thanh toán trực tuyến thành công bằng Thẻ. Hóa đơn chi tiết đã được gửi về email của bạn.'
+            CARD: {
+                methodLabel: 'The tin dung / The ghi no',
+                statusLabel: status === 'PROCESSING' ? 'Da thanh toan' : 'Cho xac thuc the',
+                note: 'Don hang cua ban da duoc thanh toan truc tuyen thanh cong.'
             },
             'E-WALLET': {
-                methodLabel: 'Ví điện tử',
-                statusLabel: status === 'PROCESSING' ? 'Đã thanh toán' : 'Chờ ví phản hồi',
-                note: 'Giao dịch qua ví điện tử đã hoàn tất. Cảm ơn bạn đã lựa chọn hình thức thanh toán không tiền mặt!'
+                methodLabel: 'Vi dien tu',
+                statusLabel: status === 'PROCESSING' ? 'Da thanh toan' : 'Cho vi phan hoi',
+                note: 'Giao dich qua vi dien tu da hoan tat.'
             },
-            'COD': {
-                methodLabel: 'Thanh toán khi nhận hàng (COD)',
-                statusLabel: 'Chờ xử lý & Giao hàng',
-                note: 'Vui lòng chuẩn bị sẵn số tiền mặt tương ứng để thanh toán cho shipper khi đơn hàng được giao đến bạn.'
+            COD: {
+                methodLabel: 'Thanh toan khi nhan hang (COD)',
+                statusLabel: 'Cho xu ly va giao hang',
+                note: 'Vui long chuan bi so tien can thanh toan khi don hang duoc giao.'
             }
         };
 
         return configs[method] || {
-            methodLabel: 'Phương thức khác',
+            methodLabel: 'Phuong thuc khac',
             statusLabel: status,
-            note: 'Chúng tôi sẽ liên hệ lại qua số điện thoại để xác nhận đơn hàng trong thời gian sớm nhất.'
+            note: 'Chung toi se lien he lai de xac nhan don hang.'
         };
     };
 
-    // Lấy thông tin tương ứng với đơn hàng hiện tại
+    if (isLoading) {
+        return (
+            <div className="thankyou-page-container">
+                <h2>Dang tai thong tin don hang...</h2>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="thankyou-page-container">
+                <h2>Co loi xay ra: {error}</h2>
+            </div>
+        );
+    }
+
+    if (!orderData) return null;
+
     const paymentDetails = getPaymentDetails(orderData.paymentMethod, orderData.status);
 
     return (
         <div className="thankyou-page-container">
-
-            {/* THẺ CẢM ƠN CHÍNH */}
             <div className="thankyou-card">
                 <div className="success-icon-wrapper">
                     <FiCheckCircle className="success-icon" />
                 </div>
 
-                <h1 className="thankyou-title">Đặt hàng thành công!</h1>
+                <h1 className="thankyou-title">Dat hang thanh cong!</h1>
                 <p className="thankyou-subtitle">
-                    Cảm ơn bạn đã tin tưởng và mua sắm tại <strong>mysneaker</strong>.
+                    Cam on ban da tin tuong va mua sam tai <strong>mysneaker</strong>.
                 </p>
 
                 <div className="order-info-box">
-                    <h3 className="order-summary-title">Tóm tắt đơn hàng</h3>
+                    <h3 className="order-summary-title">Tom tat don hang</h3>
 
                     <div className="order-summary-row">
-                        <span>Mã đơn hàng:</span>
+                        <span>Ma don hang:</span>
                         <strong>#MS-{orderData.orderId}</strong>
                     </div>
                     <div className="order-summary-row">
-                        <span>Thời gian đặt:</span>
-                        <span>{orderData.createdAt ? new Date(orderData.createdAt).toLocaleString('vi-VN') : new Date().toLocaleString('vi-VN')}</span>
+                        <span>Thoi gian dat:</span>
+                        <span>
+                            {orderData.createdAt
+                                ? new Date(orderData.createdAt).toLocaleString('vi-VN')
+                                : new Date().toLocaleString('vi-VN')}
+                        </span>
                     </div>
                     <div className="order-summary-row">
-                        <span>Trạng thái:</span>
+                        <span>Trang thai:</span>
                         <span className="status-badge">{paymentDetails.statusLabel}</span>
                     </div>
                     <div className="order-summary-row">
-                        <span>Phương thức:</span>
+                        <span>Phuong thuc:</span>
                         <span>{paymentDetails.methodLabel}</span>
                     </div>
 
                     <div className="order-summary-divider"></div>
 
                     <div className="order-summary-row total-row">
-                        <span>Tổng thanh toán:</span>
+                        <span>Tong thanh toan:</span>
                         <span className="total-price">
-                            {orderData.totalAmount ? orderData.totalAmount.toLocaleString('vi-VN') : 0} ₫
+                            {(orderData.totalAmount || 0).toLocaleString('vi-VN')} VND
                         </span>
                     </div>
 
-                    <p className="note-text">
-                        {paymentDetails.note}
-                    </p>
+                    <p className="note-text">{paymentDetails.note}</p>
                 </div>
 
                 <div className="thankyou-actions">
@@ -167,24 +168,23 @@ function ThankYou() {
                         className="btn-action btn-secondary"
                         onClick={() => navigate('/products')}
                     >
-                        <FiHome /> Tiếp tục mua sắm
+                        <FiHome /> Tiep tuc mua sam
                     </button>
                     <button
                         className="btn-action btn-primary"
                         onClick={() => navigate('/orders')}
                     >
-                        <FiShoppingBag /> Xem đơn hàng của tôi
+                        <FiShoppingBag /> Xem don hang cua toi
                     </button>
                 </div>
             </div>
 
-            {/* DANH SÁCH SẢN PHẨM GỢI Ý */}
-            {recommendedProducts && recommendedProducts.length > 0 && (
+            {recommendedProducts.length > 0 && (
                 <div className="recommendation-section">
                     <div className="recommendation-header">
-                        <h2>Có thể bạn cũng thích (You may also like)</h2>
+                        <h2>Co the ban cung thich</h2>
                         <a href="/products" className="view-all-link">
-                            Xem tất cả <FiArrowRight />
+                            Xem tat ca <FiArrowRight />
                         </a>
                     </div>
 

@@ -25,6 +25,7 @@ function Auth() {
                         setIdentifier={auth.setIdentifier}
                         onContinue={auth.handleContinue}
                         error={auth.error}
+                        isSubmitting={auth.isSubmitting}
                     />
                 )}
 
@@ -42,15 +43,15 @@ function Auth() {
                 {auth.step === "register" && (
                     <RegisterStep
                         identifier={auth.identifier}
-                        identifierType={auth.identifierType}
                         password={auth.password}
                         setPassword={auth.setPassword}
                         rePassword={auth.rePassword}
                         setRePassword={auth.setRePassword}
-                        onVerify={() => {
-                            const err = auth.handleVerifyPassword();
-                            if (err) alert(err);
-                        }}
+                        fullName={auth.fullName}
+                        setFullName={auth.setFullName}
+                        error={auth.error}
+                        isSubmitting={auth.isSubmitting}
+                        onVerify={auth.handleRegister}
                         onBack={auth.goToEnter}
                     />
                 )}
@@ -72,6 +73,10 @@ function Auth() {
                         password={auth.password}
                         setPassword={auth.setPassword}
                         goToEnter={auth.goToEnter}
+                        onLogin={auth.handleLogin}
+                        onCreate={() => auth.setStep("register")}
+                        error={auth.error}
+                        isSubmitting={auth.isSubmitting}
                     />
                 )}
             </div>

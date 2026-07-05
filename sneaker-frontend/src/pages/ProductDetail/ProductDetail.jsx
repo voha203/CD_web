@@ -1,12 +1,18 @@
 import React, { useState } from "react";
-import { useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import './ProductDetail.css'
 
 import { useProductDetail } from "../../components/hooks/useProductDetail";
+import { useCart } from "../../context/CartContext";
+import { addToCart } from "../../services/cartService";
+import { isAuthenticated } from "../../components/utils/auth";
 
 function ProductDetail() {
     // Lấy id từ trên thanh URL xuống
     const { id } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { fetchCartCount } = useCart();
 
     const {
         product,
@@ -21,6 +27,9 @@ function ProductDetail() {
 
     // Quản lý xem đang xem màu (variant) thứ mấy
     const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+    const [selectedSize, setSelectedSize] = useState(null);
+    const [cartStatus, setCartStatus] = useState({ type: "", message: "" });
+    const [isAddingToCart, setIsAddingToCart] = useState(false);
     // State lưu vị trí ảnh đang được chọn (mặc định là 0 - ảnh đầu tiên)
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -79,10 +88,38 @@ function ProductDetail() {
     // Hàm đổi màu (đổi Variant)
     const handleVariantChange = (index) => {
         setSelectedVariantIndex(index);
+        setSelectedSize(null);
+        setCartStatus({ type: "", message: "" });
         setCurrentIndex(0); // Reset về ảnh đầu tiên của màu mới
     };
 
     // Hàm xử lí tô màu sao đánh giá
+    const handleAddToBag = async () => {
+        if (!isAuthenticated()) {
+            navigate("/login", { state: { from: location } });
+            return;
+        }
+
+        if (!selectedSize) {
+            setCartStatus({ type: "error", message: "Please select a size first." });
+            return;
+        }
+
+        setIsAddingToCart(true);
+        setCartStatus({ type: "", message: "" });
+
+        try {
+            await addToCart({ variantSizeId: selectedSize.id, quantity: 1 });
+            await fetchCartCount();
+            setCartStatus({ type: "success", message: "Added to bag." });
+        } catch (err) {
+            const message = err.response?.data || "Could not add this product to bag.";
+            setCartStatus({ type: "error", message });
+        } finally {
+            setIsAddingToCart(false);
+        }
+    };
+
     const renderStars = (rating) => {
         // Ép về số float an toàn, nếu null/undefined thì gán bằng 0
         const currentRating = parseFloat(rating || 0);
@@ -228,20 +265,52 @@ function ProductDetail() {
                             </div>
                         </div>
                         <div className="size-grid">
-                            {['38.5', '39', '40', '40.5', '41', '42', '42.5', '43', '44'].map(size => (
-                                <div key={size} className="size-box">EU {size}</div>
-                            ))}
+                            {currentVariant?.sizes?.length ? (
+                                currentVariant.sizes.map(size => {
+                                    const isOutOfStock = size.quantity <= 0;
+                                    const isSelected = selectedSize?.id === size.id;
+
+                                    return (
+                                        <button
+                                            key={size.id}
+                                            type="button"
+                                            className={`size-box ${isSelected ? "selected" : ""} ${isOutOfStock ? "disabled" : ""}`}
+                                            disabled={isOutOfStock}
+                                            onClick={() => {
+                                                setSelectedSize(size);
+                                                setCartStatus({ type: "", message: "" });
+                                            }}
+                                        >
+                                            EU {size.sizeValue}
+                                        </button>
+                                    );
+                                })
+                            ) : (
+                                <p className="size-empty">No sizes available</p>
+                            )}
                         </div>
                     </div>
 
                     <div className="action-buttons">
-                        <button className="btn btn-add">Add to Bag</button>
+                        <button
+                            className="btn btn-add"
+                            type="button"
+                            onClick={handleAddToBag}
+                            disabled={isAddingToCart}
+                        >
+                            {isAddingToCart ? "Adding..." : "Add to Bag"}
+                        </button>
                         <button className="btn btn-fav">Favourite
                             <span className="material-symbols-outlined">
                                 favorite
                             </span>
                         </button>
                     </div>
+                    {cartStatus.message && (
+                        <p className={`cart-status ${cartStatus.type}`}>
+                            {cartStatus.message}
+                        </p>
+                    )}
 
                     {/* ===================== Phần thông tin sản phẩm ================= */}
                     <div className="details-information">

@@ -2,13 +2,16 @@ import { useState } from "react";
 
 export default function RegisterStep({
     identifier,
-    identifierType,
     password,
     setPassword,
     rePassword,
     setRePassword,
+    fullName,
+    setFullName,
     onVerify,
-    onBack
+    onBack,
+    error,
+    isSubmitting
 }) {
     // Nút "show-btn" giúp ẩn/hiện mật khẩu
     const [showPassword, setShowPassword] = useState(false);
@@ -27,7 +30,11 @@ export default function RegisterStep({
 
             <div className="register-box-input">
                 <label>Your name</label>
-                <input placeholder="First and last name" />
+                <input
+                    placeholder="First and last name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                />
             </div>
 
             <div className="register-box-input password-wrapper">
@@ -83,8 +90,12 @@ export default function RegisterStep({
                 <span>By enrolling a mobile phone number, you consent to receive automated security notifications via text message from mysneaker. Your mobile phone number will not be shared with third parties or affiliates for marketing or promotional purposes without your permission. Remove your number in Login & Security to cancel. For more information, visit mysneaker.com/help or call +84 090 123 4567. Message and data rates may apply. Message frequency varies.</span>
             </div>
 
+            {error && <p className="auth-error">{error}</p>}
+
             <div className="register-box-btn">
-                <button onClick={onVerify}>Verify {identifierType === "phone" ? "mobile number" : "email"}</button>
+                <button onClick={onVerify} disabled={isSubmitting}>
+                    {isSubmitting ? "Creating account..." : "Create account"}
+                </button>
             </div>
 
             <div className="divider"></div>

@@ -5,9 +5,14 @@ import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import logo_flag_vn from '../../../assets/images/flag/vn.svg'
 import logo_flag_en from '../../../assets/images/flag/en.svg'
 
-import { isAuthenticated } from "../../utils/auth";
+import { getCurrentUser, isAuthenticated, logout } from "../../utils/auth";
 import { useCart } from "../../../context/CartContext"
 import { getProductSuggestions } from '../../../services/api';
+
+const normalizeRole = (role) => {
+    if (!role) return "";
+    return role.toUpperCase().replace("ROLE_", "");
+};
 
 function Header() {
     const navigate = useNavigate();
@@ -27,7 +32,7 @@ function Header() {
 
     const [language, setLanguage] = useState("VN");
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [authUser, setAuthUser] = useState(() => getCurrentUser());
 
     const { cartCount, fetchCartCount } = useCart();
 
@@ -82,18 +87,46 @@ function Header() {
     }, [location]);
 
     useEffect(() => {
-        if (isAuthenticated()) {
-            setIsLoggedIn(true);
-            fetchCartCount();
-        }
-    }, []);
+        const syncAuth = () => {
+            const user = getCurrentUser();
+            setAuthUser(user);
+
+            if (user && normalizeRole(user.role) === "USER") {
+                fetchCartCount();
+            }
+        };
+
+        syncAuth();
+        window.addEventListener("auth-changed", syncAuth);
+        return () => window.removeEventListener("auth-changed", syncAuth);
+    }, [location]);
 
     const handleCartClick = () => {
-        if (isLoggedIn) {
+        if (isAuthenticated()) {
             navigate("/cart");
         } else {
             navigate("/login");
         }
+    };
+
+    const handleOrdersClick = () => {
+        if (isAuthenticated()) {
+            navigate("/orders");
+        } else {
+            navigate("/login");
+        }
+    };
+
+    const handleAccountClick = () => {
+        if (!isAuthenticated()) {
+            navigate("/login");
+        }
+    };
+
+    const handleLogout = (event) => {
+        event.stopPropagation();
+        logout();
+        navigate("/");
     };
 
     // Hàm thực hiện tìm kiếm chính
@@ -264,14 +297,21 @@ function Header() {
                 </div>
 
                 {/* Account và Orders */}
-                <div className="nav-item">
+                <div className="nav-item account-nav-item" onClick={handleAccountClick}>
                     <div className="flex-col-text">
-                        <span className="nav-text-small">Hello, sign in</span>
-                        <span className="nav-text-bold">Account & Lists</span>
+                        <span className="nav-text-small">
+                            {authUser ? `Hello, ${authUser.fullName || authUser.username}` : "Hello, sign in"}
+                        </span>
+                        <span className="nav-text-bold">{authUser ? "Account" : "Account & Lists"}</span>
                     </div>
+                    {authUser && (
+                        <button className="logout-btn" onClick={handleLogout}>
+                            Logout
+                        </button>
+                    )}
                 </div>
 
-                <div className="nav-item hide-on-mobile">
+                <div className="nav-item hide-on-mobile" onClick={handleOrdersClick}>
                     <div className="flex-col-text">
                         <span className="nav-text-small">Returns</span>
                         <span className="nav-text-bold">& Orders</span>

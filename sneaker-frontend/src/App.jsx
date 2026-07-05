@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import ScrollToTop from "./components/layout/scrollToTop/ScrollToTop";
 import MainLayout from "./pages/MainLayout"
 
@@ -10,8 +10,33 @@ import Checkout from "./pages/Checkout/Checkout"
 import ThankYou from './pages/ThankYou/ThankYou';
 import Orders from './pages/Orders/Orders';
 import OrderDetail from './pages/OrderDetail/OrderDetail';
+import Auth from './pages/Auth/Auth';
 
 import { CartProvider } from './context/CartContext';
+import { getCurrentUser, isAuthenticated } from './components/utils/auth';
+
+function normalizeRole(role) {
+  if (!role) return "";
+  return role.toUpperCase().replace("ROLE_", "");
+}
+
+function ProtectedRoute({ children, roles }) {
+  const location = useLocation();
+
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  if (roles?.length) {
+    const userRole = normalizeRole(getCurrentUser()?.role);
+
+    if (!roles.includes(userRole)) {
+      return <Navigate to="/" replace />;
+    }
+  }
+
+  return children;
+}
 
 function App() {
   return (
@@ -32,16 +57,16 @@ function App() {
             <Route path="/products/:id" element={<ProductDetail />} />
 
             {/* Trang giỏ hàng */}
-            <Route path="/cart" element={<Cart />} />
+            <Route path="/cart" element={<ProtectedRoute roles={["USER"]}><Cart /></ProtectedRoute>} />
 
             {/* Trang cảm ơn */}
             <Route path="/thank-you" element={<ThankYou />} />
 
             {/* Trang lịch sử đơn hàng */}
-            <Route path="/orders" element={<Orders />} />
+            <Route path="/orders" element={<ProtectedRoute roles={["USER"]}><Orders /></ProtectedRoute>} />
 
             {/* Trang chi tiết đơn hàng */}
-            <Route path="/orders/:id" element={<OrderDetail />} />
+            <Route path="/orders/:id" element={<ProtectedRoute roles={["USER"]}><OrderDetail /></ProtectedRoute>} />
 
             {/* Trang 404: Không tải được giao diện */}
             <Route path="*" element={<h1>404 - Not Found</h1>} />
@@ -49,7 +74,10 @@ function App() {
 
           {/* Các trang không có Header và Footer */}
           {/* Trang thanh toán */}
-          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/login" element={<Auth />} />
+          <Route path="/register" element={<Auth />} />
+
+          <Route path="/checkout" element={<ProtectedRoute roles={["USER"]}><Checkout /></ProtectedRoute>} />
         </Routes>
       </Router>
     </CartProvider>

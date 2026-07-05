@@ -53,6 +53,24 @@ body {
     justify-content: center;
 }
 
+.account-nav-item {
+    gap: 8px;
+}
+
+.logout-btn {
+    border: 1px solid #8a8f98;
+    border-radius: 3px;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 3px 6px;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
 .logo-text {
     font-size: 24px;
     font-weight: bold;

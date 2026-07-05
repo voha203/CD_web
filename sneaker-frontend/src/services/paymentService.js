@@ -5,6 +5,8 @@ const API_URL = "http://localhost:8080/api/payment";
 
 const getAuthHeader = () => {
     const token = getToken();
+    if (!token) return {};
+
     return {
         headers: {
             Authorization: `Bearer ${token}`

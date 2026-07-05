@@ -1,23 +1,28 @@
 package com.sneaker.backend.security;
 
+import com.sneaker.backend.entity.User;
+import com.sneaker.backend.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import java.util.Collections;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
-@Component
+import java.util.Collections;
+
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
+    private final UserRepository userRepository;
+
+    public JwtFilter(JwtUtil jwtUtil, UserRepository userRepository) {
+        this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -27,15 +32,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // Chỉ bỏ qua Login và Register, các cái khác của /api/auth vẫn phải giải mã Token
-        if (path.equals("/api/auth/login") || path.equals("/api/auth/register")) {
+        if (isPublicEndpoint(request, path)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String authHeader = request.getHeader("Authorization");
 
-        // 🔥 FIX: KHÔNG chặn, cho đi tiếp
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -45,21 +48,61 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             String username = jwtUtil.extractUsername(token);
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+            String role = normalizeRole(user.getRole());
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             username,
                             null,
-                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"))
+                            Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role))
                     );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (Exception e) {
+            SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private String normalizeRole(String role) {
+        if (role == null || role.isBlank()) {
+            return "USER";
+        }
+
+        String normalized = role.trim().toUpperCase();
+        if (normalized.startsWith("ROLE_")) {
+            return normalized.substring(5);
+        }
+
+        return normalized;
+    }
+
+    private boolean isPublicEndpoint(HttpServletRequest request, String path) {
+        String method = request.getMethod();
+
+        if (path.equals("/api/auth/login") || path.equals("/api/auth/register")) {
+            return true;
+        }
+
+        if (!"GET".equalsIgnoreCase(method)) {
+            return false;
+        }
+
+        return path.startsWith("/api/products")
+                || path.startsWith("/api/categories")
+                || path.startsWith("/api/sizes")
+                || path.startsWith("/api/images")
+                || path.startsWith("/api/variants")
+                || path.startsWith("/api/variant-sizes")
+                || path.startsWith("/api/product-sizes")
+                || path.startsWith("/api/discounts")
+                || path.equals("/api/payment/vnpay-return")
+                || path.equals("/api/payment/vnpay-ipn");
     }
 }
