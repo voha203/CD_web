@@ -21,3 +21,7 @@ export const placeOrder = (checkoutData) => {
 export const getOrderById = (orderId) => {
     return axios.get(`${API_URL}/${orderId}`, getAuthHeader());
 };
+
+export const getMyOrders = () => {
+    return axios.get(API_URL, getAuthHeader());
+};

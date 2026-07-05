@@ -1,11 +1,12 @@
 package com.sneaker.backend.controller;
 
-import com.sneaker.backend.dto.order.OrderResponse;
 import com.sneaker.backend.dto.order.OrderRequest;
+import com.sneaker.backend.dto.order.OrderResponse;
 import com.sneaker.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -15,32 +16,41 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+    @GetMapping
+    public ResponseEntity<?> getMyOrders() {
+        try {
+            return ResponseEntity.ok(orderService.getMyOrders());
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Could not load orders: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/checkout")
     public ResponseEntity<?> checkout(@RequestBody OrderRequest request) {
         try {
             OrderResponse result = orderService.placeOrder(request);
             return ResponseEntity.ok(result);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         } catch (RuntimeException e) {
-            // Trả về HTTP 400 Bad Request nếu lỗi tồn kho hoặc giỏ hàng rỗng
-            return ResponseEntity.badRequest().body("Lỗi: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         } catch (Exception e) {
-            // Trả về HTTP 500 nếu lỗi server bất ngờ
-            return ResponseEntity.internalServerError().body("Lỗi hệ thống: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("System error: " + e.getMessage());
         }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getOrderById(@PathVariable Long id) {
         try {
-            OrderResponse result = orderService.getOrderById(id);
-
-            if (result != null) {
-                return ResponseEntity.ok(result);
-            } else {
-                return ResponseEntity.badRequest().body("Không tìm thấy đơn hàng này trên hệ thống.");
-            }
+            return ResponseEntity.ok(orderService.getOrderById(id));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Order not found: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Lỗi khi tra cứu đơn hàng: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("Could not load order: " + e.getMessage());
         }
     }
 }

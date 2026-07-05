@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -105,11 +107,29 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderResponse getOrderById(Long id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với mã số này."));
 
+        Long currentUserId = getCurrentUserId();
+
+        if (!order.getUser().getId().equals(currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
+        }
+
         return orderMapper.toDTO(order);
+    }
+
+    @Override
+    @Transactional
+    public List<OrderResponse> getMyOrders() {
+        Long currentUserId = getCurrentUserId();
+
+        return orderRepository.findByUserId(currentUserId).stream()
+                .sorted(Comparator.comparing(Order::getCreatedAt).reversed())
+                .map(orderMapper::toDTO)
+                .toList();
     }
 
     private String getCurrentUsername() {

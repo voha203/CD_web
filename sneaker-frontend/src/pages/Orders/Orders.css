@@ -12,6 +12,16 @@
     width: 100%;
 }
 
+.orders-empty-state {
+    background: #ffffff;
+    border: 1px solid #e6e6e6;
+    border-radius: 8px;
+    color: #555;
+    font-size: 15px;
+    padding: 28px;
+    text-align: center;
+}
+
 /* ==================== PHẦN HEADER VÀ TABS ==================== */
 .orders-main-title {
     font-size: 28px;
