@@ -4,7 +4,7 @@ import MainLayout from "./pages/MainLayout"
 
 import Home from "./pages/Home/Home";
 import ProductList from "./pages/ProductList/ProductList";
-import ProductDetail from "./pages/productDetail/ProductDetail";
+import ProductDetail from "./pages/ProductDetail/ProductDetail";
 import Cart from "./pages/Cart/Cart"
 import Checkout from "./pages/Checkout/Checkout"
 import ThankYou from './pages/ThankYou/ThankYou';
@@ -14,29 +14,6 @@ import Auth from './pages/Auth/Auth';
 
 import { CartProvider } from './context/CartContext';
 import { getCurrentUser, isAuthenticated } from './components/utils/auth';
-
-function normalizeRole(role) {
-  if (!role) return "";
-  return role.toUpperCase().replace("ROLE_", "");
-}
-
-function ProtectedRoute({ children, roles }) {
-  const location = useLocation();
-
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
-  }
-
-  if (roles?.length) {
-    const userRole = normalizeRole(getCurrentUser()?.role);
-
-    if (!roles.includes(userRole)) {
-      return <Navigate to="/" replace />;
-    }
-  }
-
-  return children;
-}
 
 function App() {
   return (
@@ -57,27 +34,30 @@ function App() {
             <Route path="/products/:id" element={<ProductDetail />} />
 
             {/* Trang giỏ hàng */}
-            <Route path="/cart" element={<ProtectedRoute roles={["USER"]}><Cart /></ProtectedRoute>} />
+            <Route path="/cart" element={<Cart />} />
 
             {/* Trang cảm ơn */}
             <Route path="/thank-you" element={<ThankYou />} />
 
             {/* Trang lịch sử đơn hàng */}
-            <Route path="/orders" element={<ProtectedRoute roles={["USER"]}><Orders /></ProtectedRoute>} />
+            <Route path="/orders" element={<Orders />} />
 
             {/* Trang chi tiết đơn hàng */}
-            <Route path="/orders/:id" element={<ProtectedRoute roles={["USER"]}><OrderDetail /></ProtectedRoute>} />
+            <Route path="/orders/:id" element={<OrderDetail />} />
 
             {/* Trang 404: Không tải được giao diện */}
             <Route path="*" element={<h1>404 - Not Found</h1>} />
           </Route>
 
           {/* Các trang không có Header và Footer */}
-          {/* Trang thanh toán */}
+          {/* Trang đăng nhập */}
           <Route path="/login" element={<Auth />} />
+
+          {/* Trang đăng kí */}
           <Route path="/register" element={<Auth />} />
 
-          <Route path="/checkout" element={<ProtectedRoute roles={["USER"]}><Checkout /></ProtectedRoute>} />
+          {/* Trang thanh toán */}
+          <Route path="/checkout" element={<Checkout />} />
         </Routes>
       </Router>
     </CartProvider>

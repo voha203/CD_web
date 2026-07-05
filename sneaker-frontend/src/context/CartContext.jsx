@@ -23,11 +23,16 @@ export const CartProvider = ({ children }) => {
         }
     };
 
+    const clearCartCount = () => {
+        setCartCount(0);
+    };
+
     return (
         <CartContext.Provider
             value={{
                 cartCount,
-                fetchCartCount
+                fetchCartCount,
+                clearCartCount
             }}
         >
             {children}

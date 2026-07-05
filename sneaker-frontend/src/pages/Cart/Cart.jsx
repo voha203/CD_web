@@ -26,7 +26,7 @@ function Cart() {
     const fetchCart = async () => {
         if (!isAuthenticated()) {
             setIsLoggedIn(false);
-            navigate("/login");
+            setIsLoading(false);
             return;
         }
 
@@ -41,7 +41,7 @@ function Cart() {
             if (err.response?.status === 401 || err.response?.status === 403) {
                 logout();
                 setIsLoggedIn(false);
-                navigate("/login");
+                setIsLoading(false);
             }
         } finally {
             setIsLoading(false);

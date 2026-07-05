@@ -93,10 +93,9 @@ function ProductDetail() {
         setCurrentIndex(0); // Reset về ảnh đầu tiên của màu mới
     };
 
-    // Hàm xử lí tô màu sao đánh giá
     const handleAddToBag = async () => {
         if (!isAuthenticated()) {
-            navigate("/login", { state: { from: location } });
+            navigate("/cart");
             return;
         }
 
@@ -112,6 +111,7 @@ function ProductDetail() {
             await addToCart({ variantSizeId: selectedSize.id, quantity: 1 });
             await fetchCartCount();
             setCartStatus({ type: "success", message: "Added to bag." });
+            navigate("/cart");
         } catch (err) {
             const message = err.response?.data || "Could not add this product to bag.";
             setCartStatus({ type: "error", message });
@@ -120,6 +120,7 @@ function ProductDetail() {
         }
     };
 
+    // Hàm xử lí tô màu sao đánh giá
     const renderStars = (rating) => {
         // Ép về số float an toàn, nếu null/undefined thì gán bằng 0
         const currentRating = parseFloat(rating || 0);

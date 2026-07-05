@@ -17,12 +17,12 @@ input[type="password"]::-ms-reveal {
 }
 
 /* ============ Logo ============ */
-.logo-container {
+.auth .logo-container {
     margin-top: 20px;
     margin-bottom: 10px;
 }
 
-.logo-text {
+.auth .logo-text {
     color: #232f3e;
     font-size: 30px;
     font-weight: bold;
@@ -30,7 +30,7 @@ input[type="password"]::-ms-reveal {
 }
 
 /* ===================================== Enter Box ================================== */
-.enter-box {
+.auth .enter-box {
     width: 300px;
     border: 1px solid #d5d9d9;
     border-radius: 8px;
@@ -41,25 +41,25 @@ input[type="password"]::-ms-reveal {
     margin-bottom: 226px;
 }
 
-.enter-box .enter-box-header h1 {
+.auth .enter-box .enter-box-header h1 {
     font-size: 22px;
     font-weight: 400;
     margin-bottom: 15px;
 }
 
-.enter-box .enter-box-input {
+.auth .enter-box .enter-box-input {
     position: relative;
     width: 100%;
 }
 
 /* ============ Label ============ */
-.enter-box .enter-box-input label {
+.auth .enter-box .enter-box-input label {
     font-size: 14px;
     font-weight: bold;
 }
 
 /* ============ Input ============ */
-.enter-box .enter-box-input input {
+.auth .enter-box .enter-box-input input {
     width: 284px;
     height: 31px;
     margin-top: 5px;
@@ -75,12 +75,12 @@ input[type="password"]::-ms-reveal {
     font-weight: 500;
 }
 
-.enter-box input:focus {
+.auth .enter-box input:focus {
     border-color: #007185;
     box-shadow: 0 0 3px 2px rgba(0, 118, 255, 0.2);
 }
 
-.enter-box .enter-box-input .clear-btn {
+.auth .enter-box .enter-box-input .clear-btn {
     position: absolute;
     right: 1px;
     top: 60%;
@@ -91,12 +91,12 @@ input[type="password"]::-ms-reveal {
     user-select: none;
 }
 
-.enter-box .enter-box-input .clear-btn:hover {
+.auth .enter-box .enter-box-input .clear-btn:hover {
     color: black;
 }
 
 /* ============ Button ============ */
-.enter-box button {
+.auth .enter-box button {
     width: 100%;
     height: 31px;
     background: #ffd814;
@@ -106,30 +106,30 @@ input[type="password"]::-ms-reveal {
     font-size: 14px;
 }
 
-.enter-box button:hover {
+.auth .enter-box button:hover {
     background: #f7ca00;
 }
 
 /* ============ Terms ============ */
-.terms {
+.auth .terms {
     font-size: 13px;
     margin-top: 15px;
     line-height: 1.5;
     font-weight: 500;
 }
 
-.terms span {
+.auth .terms span {
     color: #0066c0;
     cursor: pointer;
     text-decoration: underline;
 }
 
-.terms span:hover {
+.auth .terms span:hover {
     text-decoration: underline;
     color: #131921;
 }
 
-.auth-error {
+.auth .auth-error {
     color: #c40000;
     font-size: 13px;
     line-height: 1.4;
@@ -142,7 +142,7 @@ input[type="password"]::-ms-reveal {
 }
 
 /* ============ Help ============ */
-.help {
+.auth .help {
     margin-top: 10px;
     font-size: 14px;
     color: #0066c0;
@@ -151,32 +151,32 @@ input[type="password"]::-ms-reveal {
     font-weight: 500;
 }
 
-.help span:hover {
+.auth .help span:hover {
     text-decoration: underline;
     color: #131921;
 }
 
 /* ============ Divider ============ */
-.divider {
+.auth .divider {
     margin: 20px 0;
     border-top: 2px solid #e7e7e7;
 }
 
 /* ============ Business ============ */
-.business-title {
+.auth .business-title {
     font-size: 13px;
     font-weight: bold;
     margin-bottom: 8px;
 }
 
-.business-link {
+.auth .business-link {
     font-size: 14px;
     color: #0066c0;
     cursor: pointer;
     font-weight: 500;
 }
 
-.business-link:hover {
+.auth .business-link:hover {
     text-decoration: underline;
     color: #131921;
 }
@@ -184,7 +184,7 @@ input[type="password"]::-ms-reveal {
 
 
 /* ====================================== Confirm New Box ===================================== */
-.confirm-new-box {
+.auth .confirm-new-box {
     width: 300px;
     border: 1px solid #d5d9d9;
     border-radius: 8px;
@@ -196,18 +196,18 @@ input[type="password"]::-ms-reveal {
     margin-top: 10px;
 }
 
-.confirm-new-box .confirm-new-box-header h2 {
+.auth .confirm-new-box .confirm-new-box-header h2 {
     font-size: 18px;
     font-weight: 500;
     margin-bottom: 25px;
 }
 
-.confirm-new-box .information {
+.auth .confirm-new-box .information {
     font-size: 14px;
 }
 
 /* ============ Nút "Change" ============ */
-.change-btn span {
+.auth .change-btn span {
     margin-top: 10px;
     font-size: 15px;
     color: #0066c0;
@@ -216,19 +216,19 @@ input[type="password"]::-ms-reveal {
     margin-left: 10px;
 }
 
-.change-btn span:hover {
+.auth .change-btn span:hover {
     text-decoration: underline;
     color: #131921;
 }
 
-.confirm-new-box .text {
+.auth .confirm-new-box .text {
     font-size: 13px;
     line-height: 1.5;
     font-weight: 500;
 }
 
 /* ============ Button ============ */
-.confirm-new-box button {
+.auth .confirm-new-box button {
     width: 100%;
     height: 31px;
     background: #ffd814;
@@ -238,17 +238,17 @@ input[type="password"]::-ms-reveal {
     font-size: 14px;
 }
 
-.confirm-new-box button:hover {
+.auth .confirm-new-box button:hover {
     background: #f7ca00;
 }
 
-.confirm-new-box .confirm-new-box-footer p {
+.auth .confirm-new-box .confirm-new-box-footer p {
     font-weight: 600;
     font-size: 14px;
 }
 
 /* ============ Another sign button ============ */
-.confirm-new-box .confirm-new-box-footer span {
+.auth .confirm-new-box .confirm-new-box-footer span {
     margin-top: 10px;
     font-size: 14px;
     color: #0066c0;
@@ -257,7 +257,7 @@ input[type="password"]::-ms-reveal {
     font-weight: 500;
 }
 
-.confirm-new-box .confirm-new-box-footer span:hover {
+.auth .confirm-new-box .confirm-new-box-footer span:hover {
     text-decoration: underline;
     color: #131921;
 }
@@ -265,7 +265,7 @@ input[type="password"]::-ms-reveal {
 
 
 /* ===================================== Register ================================== */
-.register-box {
+.auth .register-box {
     width: 300px;
     border: 1px solid #d5d9d9;
     border-radius: 8px;
@@ -275,25 +275,25 @@ input[type="password"]::-ms-reveal {
     margin-bottom: 40px;
 }
 
-.register-box .register-box-header h1 {
+.auth .register-box .register-box-header h1 {
     font-size: 27px;
     font-weight: 500;
     margin-bottom: 15px;
 }
 
-.register-box .register-box-input {
+.auth .register-box .register-box-input {
     position: relative;
     width: 100%;
 }
 
 /* ============ Label ============ */
-.register-box .register-box-input label {
+.auth .register-box .register-box-input label {
     font-size: 14px;
     font-weight: bold;
 }
 
 /* ============ Input ============ */
-.register-box .register-box-input input {
+.auth .register-box .register-box-input input {
     width: 284px;
     height: 31px;
     margin-top: 5px;
@@ -309,21 +309,21 @@ input[type="password"]::-ms-reveal {
     font-weight: 500;
 }
 
-.register-box .register-box-input input:focus {
+.auth .register-box .register-box-input input:focus {
     border-color: #007185;
     box-shadow: 0 0 3px 2px rgba(0, 118, 255, 0.2);
 }
 
-.password-wrapper {
+.auth .password-wrapper {
     position: relative;
 }
 
-.password-wrapper input {
+.auth .password-wrapper input {
     width: 100%;
     padding-right: 35px;
 }
 
-.eye-btn {
+.auth .eye-btn {
     position: absolute;
     right: 0;
     top: 60%;
@@ -334,25 +334,25 @@ input[type="password"]::-ms-reveal {
     cursor: pointer;
 }
 
-.register-box .warning-text {
+.auth .register-box .warning-text {
     display: flex;
     align-items: center;
     margin-top: -5px;
     margin-bottom: 15px;
 }
 
-.register-box .warning-text svg {
+.auth .register-box .warning-text svg {
     color: #246fb6;
     margin-right: 5px;
 }
 
-.register-box .warning-text span {
+.auth .register-box .warning-text span {
     font-size: 13px;
     font-weight: 500;
     line-height: 1.5;
 }
 
-.register-box .register-box-btn button {
+.auth .register-box .register-box-btn button {
     width: 100%;
     height: 31px;
     background: #ffd814;
@@ -364,21 +364,21 @@ input[type="password"]::-ms-reveal {
     margin-bottom: 10px;
 }
 
-.register-box .register-box-btn button:hover {
+.auth .register-box .register-box-btn button:hover {
     background: #f7ca00;
 }
 
-.register-box .register-box-footer {
+.auth .register-box .register-box-footer {
     padding-bottom: 10px;
 }
 
-.register-box .register-box-footer p {
+.auth .register-box .register-box-footer p {
     font-weight: 600;
     font-size: 14px;
     margin-bottom: 5px;
 }
 
-.register-box .register-box-footer span {
+.auth .register-box .register-box-footer span {
     font-size: 14px;
     color: #0066c0;
     cursor: pointer;
@@ -386,7 +386,7 @@ input[type="password"]::-ms-reveal {
     font-weight: 500;
 }
 
-.register-box .register-box-footer span:hover {
+.auth .register-box .register-box-footer span:hover {
     text-decoration: underline;
     color: #131921;
 }
@@ -394,7 +394,7 @@ input[type="password"]::-ms-reveal {
 
 
 /* ===================================== Verify ================================== */
-.verify-box {
+.auth .verify-box {
     width: 300px;
     border: 1px solid #d5d9d9;
     border-radius: 8px;
@@ -406,29 +406,29 @@ input[type="password"]::-ms-reveal {
     margin-top: 10px;
 }
 
-.verify-box .verify-box-header h2 {
+.auth .verify-box .verify-box-header h2 {
     font-size: 24px;
     font-weight: 500;
     margin-bottom: 15px;
 }
 
-.verify-box .text {
+.auth .verify-box .text {
     font-size: 14px;
 }
 
-.verify-box .text p {
+.auth .verify-box .text p {
     margin-top: 0;
     margin-bottom: 2px;
     line-height: 1.5;
 }
 
-.verify-box .request {
+.auth .verify-box .request {
     font-size: 10px;
     padding-top: 2px;
     margin-bottom: -8px;
 }
 
-.verify-box .otp-container {
+.auth .verify-box .otp-container {
     width: 100%;
     height: 31px;
     display: flex;
@@ -437,7 +437,7 @@ input[type="password"]::-ms-reveal {
     padding-bottom: 18px;
 }
 
-.verify-box .otp-container input {
+.auth .verify-box .otp-container input {
     width: 40px;
     height: 45px;
     text-align: center;
@@ -447,12 +447,12 @@ input[type="password"]::-ms-reveal {
     outline: none;
 }
 
-.verify-box .otp-container input:focus {
+.auth .verify-box .otp-container input:focus {
     border-color: #007185;
     box-shadow: 0 0 3px 2px rgba(0, 118, 255, 0.2);
 }
 
-.verify-box .verify-btn {
+.auth .verify-box .verify-btn {
     width: 100%;
     height: 31px;
     background: #ffd814;
@@ -463,18 +463,18 @@ input[type="password"]::-ms-reveal {
     margin-bottom: 15px;
 }
 
-.verify-box .verify-btn:hover {
+.auth .verify-box .verify-btn:hover {
     background: #f7ca00;
 }
 
-.verify-box .resend {
+.auth .verify-box .resend {
     font-size: 14px;
     color: #0066c0;
     cursor: pointer;
     font-weight: 500;
 }
 
-.verify-box .resend:hover {
+.auth .verify-box .resend:hover {
     text-decoration: underline;
     color: #131921;
 }
@@ -482,7 +482,7 @@ input[type="password"]::-ms-reveal {
 
 
 /* ===================================== Login ================================== */
-.login-box {
+.auth .login-box {
     width: 300px;
     border: 1px solid #d5d9d9;
     border-radius: 8px;
@@ -494,14 +494,14 @@ input[type="password"]::-ms-reveal {
     margin-top: 10px;
 }
 
-.login-box .login-box-header h1 {
+.auth .login-box .login-box-header h1 {
     font-size: 27px;
     font-weight: 500;
     margin-bottom: 15px;
 }
 
 /* ============ Nút "Change" ============ */
-.change-btn span {
+.auth .change-btn span {
     margin-top: 10px;
     font-size: 15px;
     color: #0066c0;
@@ -510,24 +510,24 @@ input[type="password"]::-ms-reveal {
     margin-left: 10px;
 }
 
-.change-btn span:hover {
+.auth .change-btn span:hover {
     text-decoration: underline;
     color: #131921;
 }
 
-.login-box .login-box-input {
+.auth .login-box .login-box-input {
     position: relative;
     width: 100%;
 }
 
 /* ============ Label ============ */
-.login-box .login-box-input label {
+.auth .login-box .login-box-input label {
     font-size: 14px;
     font-weight: bold;
 }
 
 /* ============ Input ============ */
-.login-box .login-box-input input {
+.auth .login-box .login-box-input input {
     width: 284px;
     height: 31px;
     margin-top: 5px;
@@ -543,31 +543,31 @@ input[type="password"]::-ms-reveal {
     font-weight: 500;
 }
 
-.login-box .login-box-input input:focus {
+.auth .login-box .login-box-input input:focus {
     border-color: #007185;
     box-shadow: 0 0 3px 2px rgba(0, 118, 255, 0.2);
 }
 
-.password-header {
+.auth .password-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.forgot-password {
+.auth .forgot-password {
     font-size: 13px;
     color: #0066c0;
     cursor: pointer;
     font-weight: 500;
 }
 
-.forgot-password:hover {
+.auth .forgot-password:hover {
     text-decoration: underline;
     color: #131921;
 }
 
 /* ============ Button ============ */
-.login-box .login-btn {
+.auth .login-box .login-btn {
     width: 100%;
     height: 31px;
     background: #ffd814;
@@ -577,11 +577,11 @@ input[type="password"]::-ms-reveal {
     font-size: 14px;
 }
 
-.login-box .login-btn:hover {
+.auth .login-box .login-btn:hover {
     background: #f7ca00;
 }
 
-.login-box .other-login-btn {
+.auth .login-box .other-login-btn {
     width: 100%;
     height: 31px;
     border: 1px solid rgba(151, 132, 132, 0.782);
@@ -592,18 +592,18 @@ input[type="password"]::-ms-reveal {
     margin-bottom: 18px;
 }
 
-.login-box .other-login-btn:hover {
+.auth .login-box .other-login-btn:hover {
     background: #f1f1f1;
 }
 
-.or-divider {
+.auth .or-divider {
     position: relative;
     text-align: center;
     margin-top: 10px;
     margin-bottom: 20px;
 }
 
-.or-divider span {
+.auth .or-divider span {
     background: white;
     padding: 0 10px;
     font-size: 12px;
@@ -612,7 +612,7 @@ input[type="password"]::-ms-reveal {
     z-index: 1;
 }
 
-.or-divider::before {
+.auth .or-divider::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -626,7 +626,7 @@ input[type="password"]::-ms-reveal {
 
 
 /* ============ Footer ============ */
-.footer {
+.auth .footer {
     height: 70px;
     padding-top: 20px;
     width: 100%;
@@ -636,17 +636,17 @@ input[type="password"]::-ms-reveal {
     border-top: 1px solid #d5d9d9;
 }
 
-.footer-links {
+.auth .footer-links {
     margin-bottom: 10px;
 }
 
-.footer-links span {
+.auth .footer-links span {
     margin: 0 10px;
     color: #0066c0;
     cursor: pointer;
 }
 
-.footer-links span:hover {
+.auth .footer-links span:hover {
     text-decoration: underline;
     color: #131921;
 }

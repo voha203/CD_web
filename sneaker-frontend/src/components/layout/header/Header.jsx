@@ -34,7 +34,7 @@ function Header() {
 
     const [authUser, setAuthUser] = useState(() => getCurrentUser());
 
-    const { cartCount, fetchCartCount } = useCart();
+    const { cartCount, fetchCartCount, clearCartCount } = useCart();
 
     // Đồng bộ URL vào state khi Component được load
     useEffect(() => {
@@ -102,19 +102,11 @@ function Header() {
     }, [location]);
 
     const handleCartClick = () => {
-        if (isAuthenticated()) {
-            navigate("/cart");
-        } else {
-            navigate("/login");
-        }
+        navigate("/cart");
     };
 
     const handleOrdersClick = () => {
-        if (isAuthenticated()) {
-            navigate("/orders");
-        } else {
-            navigate("/login");
-        }
+        navigate("/orders");
     };
 
     const handleAccountClick = () => {
@@ -126,6 +118,7 @@ function Header() {
     const handleLogout = (event) => {
         event.stopPropagation();
         logout();
+        clearCartCount();
         navigate("/");
     };
 
@@ -212,7 +205,7 @@ function Header() {
                         placeholder="Search mysneaker"
                         className="search-input"
                         value={keyword}
-                        onChange={(e) => { isSearching.current = false; setKeyword(e.target.value);}}
+                        onChange={(e) => { isSearching.current = false; setKeyword(e.target.value); }}
                         onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
                     />
 
