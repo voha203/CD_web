@@ -11,7 +11,11 @@ import com.sneaker.backend.repository.UserRepository;
 import com.sneaker.backend.service.OrderService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 
@@ -109,14 +113,13 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private String getCurrentUsername() {
-//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-//
-//        if (auth == null || auth.getPrincipal() == null) {
-//            throw new RuntimeException("Unauthenticated");
-//        }
-//
-//        return auth.getPrincipal().toString();
-        return "admin";
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || auth.getPrincipal() == null || !auth.isAuthenticated()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
+        }
+
+        return auth.getName();
     }
 
     private Long getCurrentUserId() {

@@ -15,8 +15,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -77,10 +81,13 @@ public class ReviewServiceImpl implements ReviewService {
     // CÁC PHƯƠNG THỨC HỖ TRỢ LẤY USER
     // =========================
     private String getCurrentUsername() {
-        // Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        // if (auth == null || auth.getPrincipal() == null) throw new RuntimeException("Unauthenticated");
-        // return auth.getPrincipal().toString();
-        return "admin";
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || auth.getPrincipal() == null || !auth.isAuthenticated()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
+        }
+
+        return auth.getName();
     }
 
     private Long getCurrentUserId() {
