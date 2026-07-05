@@ -1,7 +1,23 @@
 export const getToken = () => {
-    // return localStorage.getItem("token");
-    // Sử dụng token được tạo sẵn
-    return "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc3ODUwOTUyNCwiZXhwIjoxNzc4NTk1OTI0fQ.c3vs0tcv01AVftXy8UE5970VDWN5xbd5VtUVprUrRyg";
+    return localStorage.getItem("token");
+};
+
+export const getCurrentUser = () => {
+    const rawUser = localStorage.getItem("user");
+
+    if (!rawUser) return null;
+
+    try {
+        return JSON.parse(rawUser);
+    } catch {
+        return null;
+    }
+};
+
+export const saveAuth = ({ token, user }) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    window.dispatchEvent(new Event("auth-changed"));
 };
 
 export const isAuthenticated = () => {
@@ -10,4 +26,6 @@ export const isAuthenticated = () => {
 
 export const logout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.dispatchEvent(new Event("auth-changed"));
 };

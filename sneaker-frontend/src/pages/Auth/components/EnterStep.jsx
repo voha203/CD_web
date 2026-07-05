@@ -1,4 +1,4 @@
-export default function EnterStep({ identifier, setIdentifier, onContinue, error }) {
+export default function EnterStep({ identifier, setIdentifier, onContinue, error, isSubmitting }) {
     return (
         <div className="enter-box">
             <div className="enter-box-header">
@@ -21,11 +21,11 @@ export default function EnterStep({ identifier, setIdentifier, onContinue, error
                     </span>
                 )}
 
-                {/* {error && <p className="error">{error}</p>} */}
+                {error && <p className="auth-error">{error}</p>}
             </div>
 
             <div className="enter-box-btn">
-                <button onClick={onContinue}>Continue</button>
+                <button onClick={onContinue} disabled={isSubmitting}>Continue</button>
             </div>
 
             <p className="terms">

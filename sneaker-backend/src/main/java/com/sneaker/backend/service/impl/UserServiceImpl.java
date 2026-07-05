@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User login(String username, String password) {
 
-        User user = userRepository.findByUsername(username)
+        User user = findByUsernameEmailOrPhone(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -58,5 +58,11 @@ public class UserServiceImpl implements UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    private java.util.Optional<User> findByUsernameEmailOrPhone(String identifier) {
+        return userRepository.findByUsername(identifier)
+                .or(() -> userRepository.findByEmail(identifier))
+                .or(() -> userRepository.findByPhone(identifier));
     }
 }

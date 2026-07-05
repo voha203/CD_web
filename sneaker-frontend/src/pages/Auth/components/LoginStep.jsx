@@ -4,15 +4,21 @@ export default function LoginStep({
     identifier,
     password,
     setPassword,
-    goToEnter
+    goToEnter,
+    onLogin,
+    onCreate,
+    error,
+    isSubmitting
 }) {
     // Nút "show-btn" giúp ẩn/hiện mật khẩu
     const [showPassword, setShowPassword] = useState(false);
-    const [showRePassword, setShowRePassword] = useState(false);
-
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onLogin();
+    };
 
     return (
-        <div className="login-box">
+        <form className="login-box" onSubmit={handleSubmit}>
             <div className="login-box-header">
                 <h1>Sign in</h1>
             </div>
@@ -49,9 +55,11 @@ export default function LoginStep({
                 )}
             </div>
 
+            {error && <p className="auth-error">{error}</p>}
+
             <div className="login-box-btn">
-                <button className="login-btn">
-                    Sign in
+                <button className="login-btn" type="submit" disabled={isSubmitting}>
+                    {isSubmitting ? "Signing in..." : "Sign in"}
                 </button>
             </div>
 
@@ -60,16 +68,16 @@ export default function LoginStep({
             </div>
 
             <div className="login-box-btn">
-                <button className="other-login-btn" onClick={() => setStep("register")}>
-                    Sign in with a passkey
+                <button className="other-login-btn" type="button" onClick={onCreate}>
+                    Create a new account
                 </button>
             </div>
 
             <div className="login-box-btn">
-                <button className="other-login-btn" onClick={() => setStep("register")}>
-                    Sign in with a code
+                <button className="other-login-btn" type="button" onClick={onCreate}>
+                    Continue to registration
                 </button>
             </div>
-        </div>
+        </form>
     );
 }

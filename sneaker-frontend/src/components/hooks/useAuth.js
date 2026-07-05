@@ -1,22 +1,30 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { detectIdentifier } from "../utils/validate";
+import { saveAuth } from "../utils/auth";
+import { login, register } from "../../services/authService";
 
 export const useAuth = () => {
-    const [step, setStep] = useState("enter");  // Lưu trang giao diện hiện tại
-    const [identifier, setIdentifier] = useState("");  // Lưu email dùng để đăng nhập hoặc đăng kí
-    const [identifierType, setIdentifierType] = useState("");  // "email" | "phone"
-    const [error, setError] = useState("");
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    // Lưu mật khẩu đang tạo
+    const [step, setStep] = useState("enter");
+    const [identifier, setIdentifier] = useState("");
+    const [identifierType, setIdentifierType] = useState("");
+    const [error, setError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const [password, setPassword] = useState("");
     const [rePassword, setRePassword] = useState("");
+    const [fullName, setFullName] = useState("");
 
-    // Dữ liệu mẫu để đăng nhập
-    const fakeUsers = ["admin@gmail.com", "user@gmail.com", "0906407013"];
+    const redirectTo = location.state?.from?.pathname || "/";
 
     const resetForm = () => {
         setPassword("");
         setRePassword("");
+        setFullName("");
+        setError("");
     };
 
     const goToEnter = () => {
@@ -36,24 +44,82 @@ export const useAuth = () => {
 
         setIdentifierType(type);
         setError("");
+        setStep("login");
+    };
 
-        if (fakeUsers.includes(identifier)) {
-            setStep("login");
-        } else {
-            setStep("confirm-new");
+    const handleLogin = async () => {
+        if (!password) {
+            setError("Please enter your password");
+            return;
+        }
+
+        setIsSubmitting(true);
+        setError("");
+
+        try {
+            const res = await login({
+                username: identifier,
+                password
+            });
+
+            saveAuth({
+                token: res.data.token,
+                user: res.data.user
+            });
+
+            navigate(redirectTo, { replace: true });
+        } catch (err) {
+            setError(err.response?.data?.error || "Sign in failed. Please check your account and password.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    // Kiểm tra độ dài của mật khẩu
-    const handleVerifyPassword = () => {
+    const handleRegister = async () => {
+        if (!fullName.trim()) {
+            setError("Please enter your name");
+            return;
+        }
         if (password.length < 6) {
-            return "Password must be at least 6 characters";
+            setError("Password must be at least 6 characters");
+            return;
         }
         if (password !== rePassword) {
-            return "Passwords do not match";
+            setError("Passwords do not match");
+            return;
         }
-        setStep("verify");
-        return null;
+
+        setIsSubmitting(true);
+        setError("");
+
+        const isEmail = identifierType === "email";
+
+        try {
+            await register({
+                username: identifier,
+                password,
+                email: isEmail ? identifier : null,
+                fullName,
+                phone: isEmail ? null : identifier,
+                address: ""
+            });
+
+            const res = await login({
+                username: identifier,
+                password
+            });
+
+            saveAuth({
+                token: res.data.token,
+                user: res.data.user
+            });
+
+            navigate(redirectTo, { replace: true });
+        } catch (err) {
+            setError(err.response?.data?.error || "Could not create account. Please try another email or phone.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return {
@@ -63,12 +129,16 @@ export const useAuth = () => {
         setIdentifier,
         identifierType,
         error,
+        isSubmitting,
         password,
         setPassword,
         rePassword,
         setRePassword,
+        fullName,
+        setFullName,
         handleContinue,
-        handleVerifyPassword,
+        handleLogin,
+        handleRegister,
         goToEnter,
     };
 };
