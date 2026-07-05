@@ -71,6 +71,50 @@
     border-color: #111;
 }
 
+.invoice-header-card {
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding: 24px;
+}
+
+.invoice-logo {
+    color: #111;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0;
+    margin-bottom: 10px;
+    text-transform: lowercase;
+}
+
+.invoice-brand-block p,
+.invoice-meta-block p {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.45;
+    margin: 0 0 5px;
+}
+
+.invoice-meta-block {
+    min-width: 280px;
+    text-align: right;
+}
+
+.invoice-meta-block h2 {
+    color: #111;
+    font-size: 22px;
+    margin: 0 0 12px;
+}
+
+.invoice-meta-block span {
+    color: #111;
+    font-weight: 700;
+}
+
 /* ==================== TIMELINE ==================== */
 .timeline-card {
     background: #fff;
@@ -207,6 +251,37 @@
     margin: 0 0 20px 0;
 }
 
+.invoice-items-table {
+    border-collapse: collapse;
+    display: none;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.invoice-items-table th,
+.invoice-items-table td {
+    border-bottom: 1px solid #e6e6e6;
+    font-size: 13px;
+    padding: 10px 8px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.invoice-items-table th {
+    background: #f6f6f6;
+    color: #111;
+    font-weight: 700;
+}
+
+.invoice-items-table th:nth-child(4),
+.invoice-items-table th:nth-child(5),
+.invoice-items-table th:nth-child(6),
+.invoice-items-table td:nth-child(4),
+.invoice-items-table td:nth-child(5),
+.invoice-items-table td:nth-child(6) {
+    text-align: right;
+}
+
 .products-list-wrapper {
     border-bottom: 1px solid #f0f0f0;
     padding-bottom: 10px;
@@ -284,6 +359,15 @@
 
 /* ==================== RESPONSIVE ==================== */
 @media (max-width: 768px) {
+    .invoice-header-card {
+        flex-direction: column;
+    }
+
+    .invoice-meta-block {
+        min-width: 0;
+        text-align: left;
+    }
+
     .info-grid {
         grid-template-columns: 1fr;
     }
@@ -316,7 +400,28 @@
 
 /* Định dạng khi bấm In (ẩn nút quay lại, nút in) */
 @media print {
+    body {
+        background: #fff !important;
+    }
 
+    body * {
+        visibility: hidden;
+    }
+
+    .order-detail-container,
+    .order-detail-container * {
+        visibility: visible;
+    }
+
+    .order-detail-container {
+        position: absolute;
+        inset: 0 auto auto 0;
+        width: 100%;
+    }
+
+    .header,
+    .footer-container,
+    .chatbot-wrapper,
     .back-to-orders-btn,
     .btn-print,
     .timeline-card {
@@ -326,5 +431,67 @@
     .order-detail-container {
         padding: 0;
         background: #fff;
+        min-height: auto;
+        display: block;
+    }
+
+    .detail-layout {
+        max-width: none;
+        width: 100%;
+    }
+
+    .detail-header,
+    .invoice-header-card,
+    .info-grid,
+    .detail-products-card {
+        break-inside: avoid;
+    }
+
+    .invoice-header-card,
+    .info-block,
+    .detail-products-card {
+        border-color: #d9d9d9;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .detail-header {
+        border-bottom: 2px solid #111;
+        margin-bottom: 20px;
+        padding-bottom: 14px;
+    }
+
+    .detail-header h1 {
+        font-size: 24px;
+    }
+
+    .invoice-header-card {
+        margin-bottom: 16px;
+        padding: 14px 0;
+    }
+
+    .invoice-logo {
+        font-size: 22px;
+    }
+
+    .invoice-meta-block h2 {
+        font-size: 20px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .invoice-items-table {
+        display: table;
+    }
+
+    .products-list-wrapper {
+        display: none;
+    }
+
+    .cost-summary-wrapper {
+        max-width: 360px;
     }
 }
