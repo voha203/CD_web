@@ -5,6 +5,8 @@ const API_URL = "http://localhost:8080/api/cart";
 
 const getAuthHeader = () => {
     const token = getToken();
+    if (!token) return {};
+
     return {
         headers: {
             Authorization: `Bearer ${token}`
@@ -14,6 +16,10 @@ const getAuthHeader = () => {
 
 export const getCart = () => {
     return axios.get(`${API_URL}`, getAuthHeader());
+};
+
+export const addToCart = ({ variantSizeId, quantity = 1 }) => {
+    return axios.post(`${API_URL}/add`, { variantSizeId, quantity }, getAuthHeader());
 };
 
 export const updateQuantity = (itemId, quantity) => {

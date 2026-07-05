@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './Cart.css';
+import { useNavigate } from 'react-router-dom';
 
 import { useCart } from "../../context/CartContext";
+import { isAuthenticated, logout } from "../../components/utils/auth";
 
 import {
     getCart,
@@ -11,16 +13,23 @@ import {
 
 
 function Cart() {
+    const navigate = useNavigate();
 
     const [cartData, setCartData] = useState(null);
     const [cartItems, setCartItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
 
     const { fetchCartCount } = useCart();
 
     // Lấy dữ liệu giỏ hàng từ cơ sở dữ liệu
     const fetchCart = async () => {
+        if (!isAuthenticated()) {
+            setIsLoggedIn(false);
+            navigate("/login");
+            return;
+        }
+
         try {
             setIsLoading(true);
             const res = await getCart();
@@ -28,6 +37,12 @@ function Cart() {
             setCartItems(res.data.items || []);
         } catch (err) {
             console.error("Fetch cart error:", err);
+
+            if (err.response?.status === 401 || err.response?.status === 403) {
+                logout();
+                setIsLoggedIn(false);
+                navigate("/login");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -116,6 +131,10 @@ function Cart() {
     }
 
     // Xử lí trạng thái giỏ hàng trống
+    if (isLoading) {
+        return <div className="cart-page-container">Loading cart...</div>;
+    }
+
     if (cartItems.length === 0) {
         return (
             <div className="cart-page-container">
