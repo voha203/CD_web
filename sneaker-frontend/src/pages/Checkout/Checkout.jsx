@@ -565,6 +565,11 @@ function Checkout() {
                                                 <h4>{item.productName}</h4>
                                                 <p className="product-meta">Size: <span>{item.sizeValue}</span> | Màu: <span>{item.color}</span></p>
                                                 <p className="product-quantity">Số lượng: {item.quantity}</p>
+                                                {item.onSale && item.originalPrice > item.price && (
+                                                    <span className="product-original-price">
+                                                        {(item.originalPrice * item.quantity).toLocaleString('vi-VN')}₫
+                                                    </span>
+                                                )}
                                                 <span className="product-item-price">
                                                     {(item.price * item.quantity).toLocaleString('vi-VN')}₫
                                                 </span>

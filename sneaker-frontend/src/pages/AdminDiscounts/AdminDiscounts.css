@@ -1,0 +1,291 @@
+.admin-discounts-page {
+    background: #f6f7f9;
+    min-height: 100vh;
+    padding: 32px 24px;
+}
+
+.admin-discounts-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 auto 24px;
+    max-width: 1220px;
+}
+
+.admin-discounts-header h1 {
+    color: #111827;
+    font-size: 28px;
+    margin: 0 0 6px;
+}
+
+.admin-discounts-header p {
+    color: #667085;
+    margin: 0;
+}
+
+.discount-count {
+    background: #111827;
+    border-radius: 999px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 14px;
+    white-space: nowrap;
+}
+
+.admin-discounts-grid {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: minmax(320px, 430px) minmax(0, 1fr);
+    margin: 0 auto;
+    max-width: 1220px;
+}
+
+.discount-form,
+.discount-list-panel {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 22px;
+}
+
+.discount-form,
+.discount-form * {
+    box-sizing: border-box;
+}
+
+.discount-form {
+    align-self: start;
+    max-width: 760px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.discount-form h2,
+.discount-list-panel h2 {
+    color: #111827;
+    font-size: 18px;
+    margin: 0 0 18px;
+}
+
+.discount-form label {
+    display: block;
+    margin-bottom: 14px;
+    min-width: 0;
+}
+
+.discount-form label span {
+    color: #374151;
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.discount-form input,
+.discount-form select {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    color: #111827;
+    font: inherit;
+    max-width: 100%;
+    min-width: 0;
+    padding: 10px 11px;
+    width: 100%;
+}
+
+.discount-form input:focus,
+.discount-form select:focus {
+    border-color: #111827;
+    outline: none;
+}
+
+.discount-form-row {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    width: 100%;
+}
+
+.discount-checkbox {
+    align-items: center;
+    display: flex !important;
+    gap: 8px;
+}
+
+.discount-checkbox input {
+    width: auto;
+}
+
+.discount-checkbox span {
+    margin: 0 !important;
+}
+
+.discount-form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.discount-form-actions button,
+.discount-actions button {
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    padding: 9px 13px;
+}
+
+.discount-form-actions button {
+    background: #111827;
+    color: #fff;
+}
+
+.discount-form-actions button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.discount-form-actions .secondary {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.discount-error,
+.discount-success {
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 10px;
+}
+
+.discount-error {
+    background: #fff5f5;
+    color: #b42318;
+}
+
+.discount-success {
+    background: #ecfdf3;
+    color: #047857;
+}
+
+.discount-empty {
+    color: #667085;
+    padding: 24px 0;
+}
+
+.discount-table-wrapper {
+    overflow-x: auto;
+}
+
+.discount-table {
+    border-collapse: collapse;
+    min-width: 940px;
+    width: 100%;
+}
+
+.discount-table th,
+.discount-table td {
+    border-bottom: 1px solid #eef0f3;
+    padding: 12px 10px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.discount-table th {
+    color: #667085;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.discount-table td {
+    color: #111827;
+    font-size: 14px;
+}
+
+.discount-table td strong,
+.discount-table td span {
+    display: block;
+}
+
+.discount-table td span {
+    color: #667085;
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+.discount-old-price {
+    color: #8a8a8a !important;
+    text-decoration: line-through;
+}
+
+.discount-sale-price {
+    color: #d92d20;
+    margin-top: 3px;
+}
+
+.discount-status {
+    border-radius: 999px;
+    display: inline-block !important;
+    font-size: 12px !important;
+    font-weight: 700;
+    padding: 4px 9px;
+}
+
+.discount-status.active {
+    background: #ecfdf3;
+    color: #047857 !important;
+}
+
+.discount-status.inactive {
+    background: #f3f4f6;
+    color: #667085 !important;
+}
+
+.discount-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    white-space: nowrap;
+}
+
+.discount-actions button {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.discount-actions .danger {
+    background: #fee2e2;
+    color: #b42318;
+}
+
+@media (max-width: 1000px) {
+    .admin-discounts-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .admin-discounts-page {
+        padding: 24px 14px;
+    }
+
+    .admin-discounts-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-discounts-header h1 {
+        font-size: 24px;
+    }
+
+    .discount-form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .discount-form,
+    .discount-list-panel {
+        padding: 18px;
+    }
+}

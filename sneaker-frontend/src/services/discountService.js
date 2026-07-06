@@ -4,6 +4,10 @@ export const getActiveDiscounts = () => {
     return apiClient.get("/discounts/active");
 };
 
+export const getProductDiscounts = (productId) => {
+    return apiClient.get(`/discounts/product/${productId}`);
+};
+
 export const getSaleProducts = () => {
     return apiClient.get("/products/sale");
 };
@@ -31,14 +35,3 @@ export const toggleAdminDiscount = (id) => {
 export const deleteAdminDiscount = (id) => {
     return apiClient.delete(`/admin/discounts/${id}`);
 };
-import api from './api';
-
-export const getAdminDiscounts = () => api.get('/admin/discounts');
-export const getAdminDiscountById = (id) => api.get(`/admin/discounts/${id}`);
-export const createAdminDiscount = (data) => api.post('/admin/discounts', data);
-export const updateAdminDiscount = (id, data) => api.put(`/admin/discounts/${id}`, data);
-export const toggleAdminDiscount = (id) => api.patch(`/admin/discounts/${id}/toggle`);
-export const deleteAdminDiscount = (id) => api.delete(`/admin/discounts/${id}`);
-
-export const getActiveDiscounts = () => api.get('/discounts/active');
-export const getProductDiscounts = (productId) => api.get(`/discounts/product/${productId}`);

@@ -541,6 +541,14 @@
     color: #131921;
 }
 
+.review-item-info .product-original-price {
+    color: #8a8a8a;
+    display: block;
+    font-size: 13px;
+    margin-top: 6px;
+    text-decoration: line-through;
+}
+
 /* ================== CỘT PHẢI: PHƯƠNG THỨC THANH TOÁN ============== --- */
 .checkout-summary-column {
     flex: 3;
