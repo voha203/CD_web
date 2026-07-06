@@ -9,8 +9,12 @@
 .admin-sidebar {
     background: #111827;
     color: #ffffff;
+    height: 100vh;
     min-width: 0;
+    overflow-y: auto;
     padding: 20px 16px;
+    position: sticky;
+    top: 0;
 }
 
 .admin-brand {
@@ -96,6 +100,10 @@
     padding: 9px 13px;
 }
 
+.admin-nav-toggle {
+    display: none !important;
+}
+
 .admin-content {
     min-width: 0;
     padding: 24px;
@@ -147,13 +155,26 @@
     color: #b42318;
 }
 
+.admin-alert.success {
+    background: #ecfdf3;
+    border-color: #bbf7d0;
+    color: #047857;
+}
+
 @media (max-width: 860px) {
     .admin-shell {
         grid-template-columns: 1fr;
     }
 
     .admin-sidebar {
+        display: none;
+        height: auto;
         padding: 14px;
+        position: static;
+    }
+
+    .admin-sidebar.open {
+        display: block;
     }
 
     .admin-brand {
@@ -174,6 +195,16 @@
 
     .admin-content {
         padding: 16px;
+    }
+
+    .admin-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+
+    .admin-nav-toggle {
+        display: flex !important;
     }
 }
 

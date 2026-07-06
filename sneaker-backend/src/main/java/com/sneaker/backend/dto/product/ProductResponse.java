@@ -14,6 +14,7 @@ public class ProductResponse {
     private Double price;
     private String description;
     private Long categoryId;
+    private Boolean active;
     private Double finalPrice;
     private Boolean onSale;
     private Integer discountPercent;

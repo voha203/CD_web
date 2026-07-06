@@ -25,6 +25,8 @@ function ProductCard({ product }) {
     const finalPrice = product.finalPrice ?? originalPrice;
     const onSale = product.onSale || finalPrice < originalPrice;
     const discountPercent = product.discountPercent || 0;
+    const rating = product.averageRating || product.rating;
+    const reviewCount = product.reviewCount || product.totalReviews;
 
     return (
         <Link to={`/products/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -52,12 +54,23 @@ function ProductCard({ product }) {
                 {/* 2. KHỐI THÔNG TIN SẢN PHẨM (Nằm dưới ảnh) */}
                 <div className="card-details">
                     {/* Hiển thị thương hiệu nếu có */}
-                    {product.brand && <span className="product-brand">{product.brand}</span>}
+                    <div className="product-meta-row">
+                        {product.brand && <span className="product-brand">{product.brand}</span>}
+                        {product.categoryName && <span className="product-category">{product.categoryName}</span>}
+                    </div>
 
                     {/* Tên giày */}
                     <h3 className="product-name" title={product.name}>
                         {product.name}
                     </h3>
+
+                    {rating && (
+                        <div className="product-rating" aria-label={`Đánh giá ${rating} sao`}>
+                            <span>★</span>
+                            <strong>{Number(rating).toFixed(1)}</strong>
+                            {reviewCount ? <small>({reviewCount})</small> : null}
+                        </div>
+                    )}
 
                     {/* Khối hiển thị giá */}
                     <div className={`price-row ${onSale ? 'sale' : ''}`}>

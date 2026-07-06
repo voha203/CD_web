@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
+    long countByCategoryId(Long categoryId);
+
     // Tìm giày CÙNG BRAND nhưng KHÁC ID với những đôi đã mua
     Page<Product> findByBrandInAndIdNotIn(List<String> brands, List<Long> ids, Pageable pageable);
 

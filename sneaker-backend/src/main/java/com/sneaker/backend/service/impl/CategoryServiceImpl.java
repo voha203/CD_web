@@ -16,7 +16,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> getAll() {
-        return categoryRepository.findAll();
+        return categoryRepository.findAll().stream()
+                .filter(category -> !Boolean.FALSE.equals(category.getActive()))
+                .toList();
     }
 
     @Override

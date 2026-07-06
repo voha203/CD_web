@@ -50,6 +50,11 @@ public class JwtFilter extends OncePerRequestFilter {
             String username = jwtUtil.extractUsername(token);
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new RuntimeException("User not found"));
+            if (Boolean.FALSE.equals(user.getActive())) {
+                SecurityContextHolder.clearContext();
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
             String role = normalizeRole(user.getRole());
 
             UsernamePasswordAuthenticationToken authentication =

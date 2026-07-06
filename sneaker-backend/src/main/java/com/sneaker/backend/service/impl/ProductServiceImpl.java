@@ -50,7 +50,8 @@ public class ProductServiceImpl implements ProductService {
         Sort sort = Sort.by(direction, sortBy);
 
         // Gom các điều kiện lọc động lại (Nếu param truyền vào là null, JPA tự động bỏ qua điều kiện đó)
-        Specification<Product> spec = Specification.where(ProductSpecification.hasBrands(brands))
+        Specification<Product> spec = Specification.where(ProductSpecification.isActive())
+                .and(ProductSpecification.hasBrands(brands))
                 .and(ProductSpecification.priceGreaterThanOrEqual(minPrice))
                 .and(ProductSpecification.priceLessThanOrEqual(maxPrice))
                 .and(ProductSpecification.hasCategory(categoryId))
@@ -75,7 +76,8 @@ public class ProductServiceImpl implements ProductService {
         }
 
         // Tạo điều kiện lọc chỉ theo từ khóa
-        Specification<Product> spec = Specification.where(ProductSpecification.hasKeyword(keyword));
+        Specification<Product> spec = Specification.where(ProductSpecification.isActive())
+                .and(ProductSpecification.hasKeyword(keyword));
 
         // Giới hạn chỉ lấy tối đa 5 sản phẩm khớp nhất (PageRequest.of(trang_số_0, kích_thước_5))
         List<Product> products = productRepository.findAll(spec, PageRequest.of(0, 5)).getContent();
@@ -95,7 +97,7 @@ public class ProductServiceImpl implements ProductService {
 
         // Nếu đơn hàng trống (chống lỗi), lấy đại 7 sản phẩm bất kỳ
         if (purchasedProductIds == null || purchasedProductIds.isEmpty()) {
-            return productRepository.findAll(PageRequest.of(0, 7)).getContent()
+            return productRepository.findAll(Specification.where(ProductSpecification.isActive()), PageRequest.of(0, 7)).getContent()
                     .stream().map(this::enrichProductDTO).collect(Collectors.toList());
         }
 
@@ -142,6 +144,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<ProductResponse> getSaleProducts() {
         return productRepository.findAll().stream()
+                .filter(product -> !Boolean.FALSE.equals(product.getActive()))
                 .filter(product -> product.getPrice() != null)
                 .filter(product -> discountService.getFinalPrice(product) < product.getPrice())
                 .map(this::enrichProductDTO)
@@ -154,6 +157,9 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse getById(Long id) {
         Product p = findProductById(id);
+        if (Boolean.FALSE.equals(p.getActive())) {
+            throw new RuntimeException("Không tìm thấy sản phẩm id: " + id);
+        }
 
         return enrichProductDTO(p);
     }

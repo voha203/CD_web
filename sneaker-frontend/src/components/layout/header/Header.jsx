@@ -31,6 +31,7 @@ function Header() {
     const searchRef = useRef(null);
 
     const [language, setLanguage] = useState("VN");
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const [authUser, setAuthUser] = useState(() => getCurrentUser());
     const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
@@ -91,6 +92,7 @@ function Header() {
         setShowDropdown(false);
         setSuggestions([]);
         setIsAccountMenuOpen(false);
+        setIsMobileMenuOpen(false);
     }, [location]);
 
     useEffect(() => {
@@ -368,18 +370,25 @@ function Header() {
 
             {/* NavBar dưới */}
             <div className="nav-sub">
-                <button className="nav-item" style={{ fontWeight: 'bold', marginRight: '8px' }}>
+                <button
+                    className={`nav-item mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
+                    type="button"
+                    aria-label="Mở menu danh mục"
+                    aria-expanded={isMobileMenuOpen}
+                    onClick={() => setIsMobileMenuOpen(prev => !prev)}
+                    style={{ fontWeight: 'bold', marginRight: '8px' }}
+                >
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ marginRight: '4px' }}>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                     All
                 </button>
 
-                <div className="nav-sub-links hide-on-mobile">
-                    <a href="/" className="nav-item">Today's Deals</a>
-                    <a href="/" className="nav-item">Customer Service</a>
-                    <a href="/" className="nav-item">Registry</a>
-                    <a href="/" className="nav-item">Gift Cards</a>
+                <div className={`nav-sub-links ${isMobileMenuOpen ? 'open' : ''}`}>
+                    <a href="/products" className="nav-item">Sản phẩm</a>
+                    <a href="/products?sort=sale" className="nav-item">Khuyến mãi</a>
+                    <a href="/orders" className="nav-item">Đơn hàng</a>
+                    <a href="/profile" className="nav-item">Tài khoản</a>
                 </div>
             </div>
 

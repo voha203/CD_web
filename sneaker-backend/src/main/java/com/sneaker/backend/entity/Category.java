@@ -18,4 +18,6 @@ public class Category {
 
     @Column(nullable = false, unique = true)
     private String code;
+
+    private Boolean active = true;
 }

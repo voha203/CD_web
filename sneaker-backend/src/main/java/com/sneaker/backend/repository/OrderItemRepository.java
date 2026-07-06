@@ -12,4 +12,8 @@ import java.util.List;
 public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
     @Query("SELECT oi.variantSize.variant.product.id FROM OrderItem oi WHERE oi.order.id = :orderId")
     List<Long> findProductIdsByOrderId(@Param("orderId") Long orderId);
+
+    boolean existsByVariantSizeVariantProductId(Long productId);
+
+    boolean existsByVariantSizeVariantId(Long variantId);
 }

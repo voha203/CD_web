@@ -1,0 +1,337 @@
+.admin-products-page {
+    display: grid;
+    gap: 18px;
+}
+
+.admin-product-toolbar {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: minmax(280px, 1fr) 180px auto;
+    padding: 16px;
+}
+
+.admin-product-search {
+    align-items: center;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    display: flex;
+    gap: 8px;
+    min-width: 0;
+    padding: 0 10px;
+}
+
+.admin-product-search input {
+    border: 0;
+    flex: 1;
+    font: inherit;
+    min-width: 0;
+    outline: none;
+    padding: 11px 0;
+}
+
+.admin-product-toolbar select,
+.product-form-modal input,
+.product-form-modal select,
+.product-form-modal textarea,
+.variant-modal input {
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    font: inherit;
+    max-width: 100%;
+    min-width: 0;
+    padding: 10px;
+    width: 100%;
+}
+
+.admin-product-toolbar button,
+.table-actions button,
+.modal-actions button,
+.image-manager-input button,
+.image-url-item button,
+.section-toolbar button,
+.secondary-refresh {
+    align-items: center;
+    background: #111827;
+    border: 0;
+    border-radius: 7px;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-flex;
+    font-weight: 700;
+    gap: 7px;
+    justify-content: center;
+    padding: 9px 13px;
+}
+
+.secondary-refresh,
+.modal-actions .secondary {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.table-actions .danger,
+.image-url-item .danger {
+    background: #fee2e2;
+    color: #b42318;
+}
+
+.admin-products-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.admin-products-table-wrap {
+    overflow-x: auto;
+}
+
+.admin-products-table {
+    border-collapse: collapse;
+    min-width: 980px;
+    width: 100%;
+}
+
+.admin-products-table th,
+.admin-products-table td {
+    border-bottom: 1px solid #eef0f3;
+    padding: 13px 12px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.admin-products-table th {
+    color: #667085;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.admin-products-table td span {
+    color: #667085;
+    display: block;
+    font-size: 13px;
+    margin-top: 3px;
+}
+
+.old-price {
+    color: #8a8a8a !important;
+    text-decoration: line-through;
+}
+
+.stock-empty {
+    color: #b42318 !important;
+    font-weight: 800;
+}
+
+.stock-ok {
+    color: #047857 !important;
+    font-weight: 800;
+}
+
+.table-actions {
+    text-align: right !important;
+    vertical-align: middle !important;
+    white-space: nowrap;
+}
+
+.table-actions button {
+    line-height: 1;
+    margin-left: 8px;
+    min-height: 40px;
+}
+
+.admin-pagination {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    padding: 14px;
+}
+
+.admin-pagination button {
+    background: #f3f4f6;
+    border: 0;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 700;
+    padding: 8px 12px;
+}
+
+.admin-modal-overlay {
+    background: rgba(17, 24, 39, 0.58);
+    inset: 0;
+    overflow-y: auto;
+    padding: 24px;
+    position: fixed;
+    z-index: 70;
+}
+
+.product-form-modal,
+.variant-modal {
+    background: #ffffff;
+    border-radius: 8px;
+    box-sizing: border-box;
+    display: grid;
+    gap: 16px;
+    margin: 0 auto;
+    max-width: 920px;
+    padding: 20px;
+    width: 100%;
+}
+
+.product-form-modal *,
+.variant-modal * {
+    box-sizing: border-box;
+}
+
+.modal-heading,
+.section-toolbar,
+.modal-actions {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.modal-heading h2,
+.variant-section h3,
+.variant-modal h3 {
+    margin: 0;
+}
+
+.modal-heading button {
+    background: #f3f4f6;
+    border: 0;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 700;
+    padding: 8px 12px;
+}
+
+.form-row {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.product-form-modal label,
+.variant-modal label {
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+.product-form-modal label span,
+.variant-modal label span {
+    color: #374151;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.inline-check {
+    align-items: center;
+    display: flex !important;
+    gap: 8px;
+}
+
+.inline-check input {
+    width: auto;
+}
+
+.variant-list {
+    display: grid;
+    gap: 10px;
+}
+
+.variant-row {
+    align-items: center;
+    border: 1px solid #eef0f3;
+    border-radius: 8px;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    padding: 12px;
+}
+
+.variant-row span,
+.muted-text {
+    color: #667085;
+    font-size: 13px;
+}
+
+.size-stock-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.image-manager {
+    display: grid;
+    gap: 10px;
+}
+
+.image-manager-input {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.image-url-list {
+    display: grid;
+    gap: 8px;
+}
+
+.image-url-item {
+    align-items: center;
+    border: 1px solid #eef0f3;
+    border-radius: 8px;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 48px minmax(0, 1fr) auto auto;
+    padding: 8px;
+}
+
+.image-url-item img {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    object-fit: cover;
+    width: 48px;
+}
+
+.image-url-item span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+    .admin-product-toolbar,
+    .form-row,
+    .variant-row,
+    .image-manager-input,
+    .image-url-item {
+        grid-template-columns: 1fr;
+    }
+
+    .size-stock-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 520px) {
+    .admin-modal-overlay {
+        padding: 12px;
+    }
+
+    .modal-heading,
+    .section-toolbar,
+    .modal-actions,
+    .table-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}

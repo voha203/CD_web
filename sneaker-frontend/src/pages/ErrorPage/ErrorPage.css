@@ -1,0 +1,82 @@
+.error-page {
+    align-items: center;
+    background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+    display: flex;
+    justify-content: center;
+    min-height: 70vh;
+    padding: 40px 16px;
+}
+
+.error-panel {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: var(--ui-shadow, 0 14px 40px rgba(15, 23, 42, 0.08));
+    max-width: 560px;
+    padding: 40px;
+    text-align: center;
+    width: 100%;
+}
+
+.error-code {
+    color: #d92d20;
+    display: block;
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 14px;
+}
+
+.error-panel h1 {
+    color: #111827;
+    font-size: 32px;
+    letter-spacing: 0;
+    margin: 0 0 10px;
+}
+
+.error-panel p {
+    color: #667085;
+    margin: 0 auto 24px;
+    max-width: 420px;
+}
+
+.error-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+.error-primary,
+.error-secondary {
+    border-radius: 7px;
+    font-weight: 800;
+    min-width: 140px;
+    padding: 11px 16px;
+    text-decoration: none;
+}
+
+.error-primary {
+    background: #111827;
+    color: #ffffff;
+}
+
+.error-secondary {
+    background: #ffffff;
+    border: 1px solid #d0d5dd;
+    color: #111827;
+}
+
+@media (max-width: 576px) {
+    .error-panel {
+        padding: 28px 18px;
+    }
+
+    .error-panel h1 {
+        font-size: 25px;
+    }
+
+    .error-actions a {
+        width: 100%;
+    }
+}

@@ -70,6 +70,7 @@ public class CategoryController {
         dto.setId(c.getId());
         dto.setName(c.getName());
         dto.setCode(c.getCode());
+        dto.setActive(!Boolean.FALSE.equals(c.getActive()));
         return dto;
     }
 }

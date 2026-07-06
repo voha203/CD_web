@@ -62,6 +62,10 @@ public class UserServiceImpl implements UserService {
         User user = findByUsernameEmailOrPhone(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        if (Boolean.FALSE.equals(user.getActive())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tài khoản đã bị khóa");
+        }
+
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new RuntimeException("Wrong password");
         }

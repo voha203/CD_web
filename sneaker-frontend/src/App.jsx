@@ -16,8 +16,12 @@ import AdminCoupons from './pages/AdminCoupons/AdminCoupons';
 import AdminDiscounts from './pages/AdminDiscounts/AdminDiscounts';
 import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
 import AdminOrders from './pages/AdminOrders/AdminOrders';
+import AdminProducts from './pages/AdminProducts/AdminProducts';
+import AdminCategories from './pages/AdminCategories/AdminCategories';
+import AdminUsers from './pages/AdminUsers/AdminUsers';
 import Profile from './pages/Profile/Profile';
 import AdminLayout from './components/layout/adminLayout/AdminLayout';
+import ErrorPage from './pages/ErrorPage/ErrorPage';
 
 import { CartProvider } from './context/CartContext';
 import { getCurrentUser, isAuthenticated } from './components/utils/auth';
@@ -38,7 +42,7 @@ function ProtectedRoute({ children, roles }) {
     const userRole = normalizeRole(getCurrentUser()?.role);
 
     if (!roles.includes(userRole)) {
-      return <Navigate to="/" replace />;
+      return <Navigate to="/403" replace />;
     }
   }
 
@@ -77,7 +81,9 @@ function App() {
             <Route path="/profile" element={<ProtectedRoute roles={["USER"]}><Profile /></ProtectedRoute>} />
             <Route path="/change-password" element={<ProtectedRoute roles={["USER"]}><ChangePassword /></ProtectedRoute>} />
             {/* Trang 404: Không tải được giao diện */}
-            <Route path="*" element={<h1>404 - Not Found</h1>} />
+            <Route path="/403" element={<ErrorPage code={403} />} />
+            <Route path="/500" element={<ErrorPage code={500} />} />
+            <Route path="*" element={<ErrorPage code={404} />} />
           </Route>
 
           {/* Các trang không có Header và Footer */}
@@ -86,8 +92,11 @@ function App() {
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="categories" element={<AdminCategories />} />
             <Route path="coupons" element={<AdminCoupons />} />
             <Route path="discounts" element={<AdminDiscounts />} />
+            <Route path="users" element={<AdminUsers />} />
           </Route>
 
           <Route path="/login" element={<Auth />} />
