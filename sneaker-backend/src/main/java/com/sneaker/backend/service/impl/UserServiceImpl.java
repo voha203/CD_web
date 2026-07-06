@@ -9,9 +9,13 @@ import com.sneaker.backend.service.UserService;
 import com.sneaker.backend.dto.auth.ChangePasswordRequest;
 import com.sneaker.backend.dto.auth.ForgotPasswordRequest;
 import com.sneaker.backend.dto.auth.ResetPasswordRequest;
+import com.sneaker.backend.dto.user.ProfileResponse;
+import com.sneaker.backend.dto.user.UpdateProfileRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Random;
@@ -70,6 +74,43 @@ public class UserServiceImpl implements UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public ProfileResponse getProfile(String username) {
+        return toProfileResponse(findByUsername(username));
+    }
+
+    @Override
+    public ProfileResponse updateProfile(String username, UpdateProfileRequest request) {
+        User user = findByUsername(username);
+
+        String email = normalizeNullable(request.getEmail());
+        String phone = normalizeNullable(request.getPhone());
+
+        if (email != null) {
+            userRepository.findByEmail(email).ifPresent(existing -> {
+                if (!existing.getId().equals(user.getId())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email đã được sử dụng");
+                }
+            });
+        }
+
+        if (phone != null) {
+            userRepository.findByPhone(phone).ifPresent(existing -> {
+                if (!existing.getId().equals(user.getId())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Số điện thoại đã được sử dụng");
+                }
+            });
+        }
+
+        user.setFullName(normalizeNullable(request.getFullName()));
+        user.setEmail(email);
+        user.setPhone(phone);
+        user.setAddress(normalizeNullable(request.getAddress()));
+        user.setAvatarUrl(normalizeNullable(request.getAvatarUrl()));
+
+        return toProfileResponse(userRepository.save(user));
     }
 
     private java.util.Optional<User> findByUsernameEmailOrPhone(String identifier) {
@@ -135,5 +176,27 @@ public class UserServiceImpl implements UserService {
 
         resetOtp.setUsed(true);
         passwordResetOtpRepository.save(resetOtp);
+    }
+
+    private ProfileResponse toProfileResponse(User user) {
+        ProfileResponse response = new ProfileResponse();
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setEmail(user.getEmail());
+        response.setFullName(user.getFullName());
+        response.setPhone(user.getPhone());
+        response.setAddress(user.getAddress());
+        response.setAvatarUrl(user.getAvatarUrl());
+        response.setRole(user.getRole());
+        return response;
+    }
+
+    private String normalizeNullable(String value) {
+        if (value == null) {
+            return null;
+        }
+
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

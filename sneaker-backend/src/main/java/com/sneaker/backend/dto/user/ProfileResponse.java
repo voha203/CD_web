@@ -3,8 +3,7 @@ package com.sneaker.backend.dto.user;
 import lombok.Data;
 
 @Data
-public class UserResponse {
-
+public class ProfileResponse {
     private Long id;
     private String username;
     private String email;

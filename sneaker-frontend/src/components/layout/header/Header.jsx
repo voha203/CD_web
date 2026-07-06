@@ -33,6 +33,8 @@ function Header() {
     const [language, setLanguage] = useState("VN");
 
     const [authUser, setAuthUser] = useState(() => getCurrentUser());
+    const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+    const accountRef = useRef(null);
 
     const { cartCount, fetchCartCount } = useCart();
 
@@ -68,11 +70,15 @@ function Header() {
         return () => clearTimeout(delayDebounceFn);
     }, [keyword]);
 
-    // Click ra ngoài để ẩm dropdown
+    // Click ra ngoài để ẩn dropdown
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
                 setShowDropdown(false);
+            }
+
+            if (accountRef.current && !accountRef.current.contains(event.target)) {
+                setIsAccountMenuOpen(false);
             }
         };
 
@@ -84,6 +90,7 @@ function Header() {
     useEffect(() => {
         setShowDropdown(false);
         setSuggestions([]);
+        setIsAccountMenuOpen(false);
     }, [location]);
 
     useEffect(() => {
@@ -120,7 +127,10 @@ function Header() {
     const handleAccountClick = () => {
         if (!isAuthenticated()) {
             navigate("/login");
+            return;
         }
+
+        setIsAccountMenuOpen(prev => !prev);
     };
 
     const handleLogout = (event) => {
@@ -129,9 +139,22 @@ function Header() {
         navigate("/");
     };
 
+    const handleProfileClick = (event) => {
+        event.stopPropagation();
+        setIsAccountMenuOpen(false);
+        navigate("/profile");
+    };
+
+    const handleAccountOrdersClick = (event) => {
+        event.stopPropagation();
+        setIsAccountMenuOpen(false);
+        navigate("/orders");
+    };
+
     const handleChangePassword = (event) => {
         event.stopPropagation();
-        navigate("/change-password");
+        setIsAccountMenuOpen(false);
+        navigate("/profile", { state: { tab: "security" } });
     };
 
     // Hàm thực hiện tìm kiếm chính
@@ -302,21 +325,23 @@ function Header() {
                 </div>
 
                 {/* Account và Orders */}
-                <div className="nav-item account-nav-item" onClick={handleAccountClick}>
+                <div className="nav-item account-nav-item" ref={accountRef} onClick={handleAccountClick}>
                     <div className="flex-col-text">
                         <span className="nav-text-small">
                             {authUser ? `Hello, ${authUser.fullName || authUser.username}` : "Hello, sign in"}
                         </span>
                         <span className="nav-text-bold">{authUser ? "Account" : "Account & Lists"}</span>
                     </div>
-                    {authUser && (
-                        <div className="account-actions">
-                            <button className="account-action-btn" onClick={handleChangePassword}>
-                                Change password
-                            </button>
-                            <button className="logout-btn" onClick={handleLogout}>
-                                Logout
-                            </button>
+                    <svg className="account-caret" width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M7 10l5 5 5-5z"></path>
+                    </svg>
+                    {authUser && isAccountMenuOpen && (
+                        <div className="account-dropdown-menu">
+                            <button type="button" onClick={handleProfileClick}>Hồ sơ của tôi</button>
+                            <button type="button" onClick={handleAccountOrdersClick}>Đơn hàng của tôi</button>
+                            <button type="button" onClick={handleChangePassword}>Đổi mật khẩu</button>
+                            <div className="account-dropdown-divider"></div>
+                            <button type="button" className="danger" onClick={handleLogout}>Đăng xuất</button>
                         </div>
                     )}
                 </div>

@@ -20,6 +20,16 @@ export const saveAuth = ({ token, user }) => {
     window.dispatchEvent(new Event("auth-changed"));
 };
 
+export const updateStoredUser = (userPatch) => {
+    const currentUser = getCurrentUser();
+    const nextUser = { ...(currentUser || {}), ...(userPatch || {}) };
+
+    localStorage.setItem("user", JSON.stringify(nextUser));
+    window.dispatchEvent(new Event("auth-changed"));
+
+    return nextUser;
+};
+
 export const isAuthenticated = () => {
     return !!getToken();
 };

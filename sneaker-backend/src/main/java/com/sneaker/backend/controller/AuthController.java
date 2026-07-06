@@ -1,6 +1,8 @@
 package com.sneaker.backend.controller;
 
 import com.sneaker.backend.dto.auth.*;
+import com.sneaker.backend.dto.user.ProfileResponse;
+import com.sneaker.backend.dto.user.UpdateProfileRequest;
 import com.sneaker.backend.dto.user.UserResponse;
 import com.sneaker.backend.entity.User;
 import com.sneaker.backend.security.JwtUtil;
@@ -12,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -59,15 +59,16 @@ public class AuthController {
 
     // PROFILE
     @GetMapping("/profile")
-    public ResponseEntity<?> getUserProfile(Principal principal) {
-        User user = userService.findByUsername(principal.getName());
+    public ResponseEntity<ProfileResponse> getUserProfile(Principal principal) {
+        return ResponseEntity.ok(userService.getProfile(principal.getName()));
+    }
 
-        Map<String, String> profile = new HashMap<>();
-        profile.put("fullName", user.getFullName());
-        profile.put("phone", user.getPhone());
-        profile.put("address", user.getAddress());
-
-        return ResponseEntity.ok(profile);
+    @PutMapping("/profile")
+    public ResponseEntity<ProfileResponse> updateUserProfile(
+            Principal principal,
+            @Valid @RequestBody UpdateProfileRequest request
+    ) {
+        return ResponseEntity.ok(userService.updateProfile(principal.getName(), request));
     }
 
     // convert User → DTO (RẤT QUAN TRỌNG)
@@ -79,6 +80,7 @@ public class AuthController {
         dto.setFullName(u.getFullName());
         dto.setPhone(u.getPhone());
         dto.setAddress(u.getAddress());
+        dto.setAvatarUrl(u.getAvatarUrl());
         dto.setRole(u.getRole());
         return dto;
     }

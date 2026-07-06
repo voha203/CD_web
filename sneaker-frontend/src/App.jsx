@@ -13,6 +13,7 @@ import OrderDetail from './pages/OrderDetail/OrderDetail';
 import Auth from './pages/Auth/Auth';
 import ChangePassword from './pages/ChangePassword/ChangePassword';
 import AdminCoupons from './pages/AdminCoupons/AdminCoupons';
+import Profile from './pages/Profile/Profile';
 
 import { CartProvider } from './context/CartContext';
 import { getCurrentUser, isAuthenticated } from './components/utils/auth';
@@ -69,6 +70,7 @@ function App() {
 
             {/* Trang chi tiết đơn hàng */}
             <Route path="/orders/:id" element={<ProtectedRoute roles={["USER"]}><OrderDetail /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute roles={["USER"]}><Profile /></ProtectedRoute>} />
             <Route path="/change-password" element={<ProtectedRoute roles={["USER"]}><ChangePassword /></ProtectedRoute>} />
             <Route path="/admin/coupons" element={<ProtectedRoute roles={["ADMIN"]}><AdminCoupons /></ProtectedRoute>} />
 
