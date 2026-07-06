@@ -11,6 +11,7 @@ import {
 
 import ProductCard from '../../components/layout/productCard/ProductCard';
 import { getOrderById } from '../../services/orderService';
+import { getApiErrorMessage } from '../../services/apiError';
 import './ThankYou.css';
 
 function ThankYou() {
@@ -39,7 +40,7 @@ function ThankYou() {
                 setOrderData(res.data);
             })
             .catch((err) => {
-                setError(err.response?.data || err.message || 'Không thể tải thông tin đơn hàng.');
+                setError(getApiErrorMessage(err, 'Không thể tải thông tin đơn hàng.'));
             })
             .finally(() => {
                 setIsLoading(false);

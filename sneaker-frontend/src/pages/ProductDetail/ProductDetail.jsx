@@ -6,6 +6,7 @@ import { useProductDetail } from "../../components/hooks/useProductDetail";
 import { useCart } from "../../context/CartContext";
 import { addToCart } from "../../services/cartService";
 import { isAuthenticated } from "../../components/utils/auth";
+import { getApiErrorMessage } from "../../services/apiError";
 
 function ProductDetail() {
     // Lấy id từ trên thanh URL xuống
@@ -17,6 +18,7 @@ function ProductDetail() {
     const {
         product,
         loading,
+        error,
         reviews,
         reviewStats,
         currentPage,
@@ -52,6 +54,10 @@ function ProductDetail() {
     // Hiển thị trong lúc chờ gọi API
     if (loading) {
         return <h2>Đang tải thông tin sản phẩm...</h2>;
+    }
+
+    if (error) {
+        return <h2>{error}</h2>;
     }
 
     // Nếu không tìm thấy sản phẩm
@@ -113,7 +119,7 @@ function ProductDetail() {
             await fetchCartCount();
             setCartStatus({ type: "success", message: "Added to bag." });
         } catch (err) {
-            const message = err.response?.data || "Could not add this product to bag.";
+            const message = getApiErrorMessage(err, "Could not add this product to bag.");
             setCartStatus({ type: "error", message });
         } finally {
             setIsAddingToCart(false);

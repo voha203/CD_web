@@ -6,6 +6,7 @@ import com.sneaker.backend.entity.User;
 import com.sneaker.backend.security.JwtUtil;
 import com.sneaker.backend.service.UserService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class AuthController {
 
     // REGISTER
     @PostMapping("/register")
-    public UserResponse register(@RequestBody RegisterRequest request) {
+    public UserResponse register(@Valid @RequestBody RegisterRequest request) {
 
         User user = new User();
         user.setUsername(request.getUsername());
@@ -44,7 +45,7 @@ public class AuthController {
 
     // LOGIN
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest request) {
+    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
 
         User user = userService.login(
                 request.getUsername(),
@@ -84,20 +85,20 @@ public class AuthController {
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(
             Principal principal,
-            @RequestBody ChangePasswordRequest request
+            @Valid @RequestBody ChangePasswordRequest request
     ) {
         userService.changePassword(principal.getName(), request);
         return ResponseEntity.ok("Đổi mật khẩu thành công");
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         userService.sendForgotPasswordOtp(request);
         return ResponseEntity.ok("OTP đã được gửi về email");
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         userService.resetPassword(request);
         return ResponseEntity.ok("Đặt lại mật khẩu thành công");
     }

@@ -10,6 +10,7 @@ import {
     updateQuantity,
     deleteItem
 } from "../../services/cartService"
+import { getApiErrorMessage } from "../../services/apiError";
 
 
 function Cart() {
@@ -19,6 +20,8 @@ function Cart() {
     const [cartItems, setCartItems] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated());
+    const [error, setError] = useState("");
+    const [isUpdating, setIsUpdating] = useState(false);
 
     const { fetchCartCount } = useCart();
 
@@ -32,6 +35,7 @@ function Cart() {
 
         try {
             setIsLoading(true);
+            setError("");
             const res = await getCart();
             setCartData(res.data);
             setCartItems(res.data.items || []);
@@ -42,6 +46,8 @@ function Cart() {
                 logout();
                 setIsLoggedIn(false);
                 navigate("/login");
+            } else {
+                setError(getApiErrorMessage(err, "Không thể tải giỏ hàng."));
             }
         } finally {
             setIsLoading(false);
@@ -52,33 +58,40 @@ function Cart() {
         fetchCart();
     }, []);
 
+    const runCartAction = async (action) => {
+        setIsUpdating(true);
+        setError("");
+
+        try {
+            await action();
+            await fetchCart();
+            fetchCartCount();
+        } catch (err) {
+            setError(getApiErrorMessage(err, "Không thể cập nhật giỏ hàng."));
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
     const handleIncrease = async (id, qty) => {
-        await updateQuantity(id, qty + 1);
-        await fetchCart();
-        fetchCartCount();
+        await runCartAction(() => updateQuantity(id, qty + 1));
     };
 
     const handleDecrease = async (id, qty) => {
         if (qty <= 1) return;
-        await updateQuantity(id, qty - 1);
-        await fetchCart();
-        fetchCartCount();
+        await runCartAction(() => updateQuantity(id, qty - 1));
     };
 
     const handleDelete = async (id) => {
         if (!window.confirm("Xóa sản phẩm?")) return;
-        await deleteItem(id);
-        await fetchCart();
-        fetchCartCount();
+        await runCartAction(() => deleteItem(id));
     };
 
     const handleInputBlur = async (id, value) => {
         let qty = parseInt(value);
         if (!qty || qty < 1) qty = 1;
 
-        await updateQuantity(id, qty);
-        await fetchCart();
-        fetchCartCount();
+        await runCartAction(() => updateQuantity(id, qty));
     };
 
     const handleInputChange = (id, value) => {
@@ -135,6 +148,10 @@ function Cart() {
         return <div className="cart-page-container">Loading cart...</div>;
     }
 
+    if (error) {
+        return <div className="cart-page-container">{error}</div>;
+    }
+
     if (cartItems.length === 0) {
         return (
             <div className="cart-page-container">
@@ -180,7 +197,7 @@ function Cart() {
                                             <button
                                                 className="qty-btn"
                                                 onClick={() => handleDecrease(item.id, item.quantity)}
-                                                disabled={item.quantity <= 1}
+                                                disabled={item.quantity <= 1 || isUpdating}
                                             >
                                                 -
                                             </button>
@@ -195,6 +212,7 @@ function Cart() {
                                             <button
                                                 className="qty-btn"
                                                 onClick={() => handleIncrease(item.id, item.quantity)}
+                                                disabled={isUpdating}
                                             >
                                                 +
                                             </button>
@@ -202,7 +220,7 @@ function Cart() {
 
                                         {/* Nút bấm được làm lại rõ ràng hơn, có icon */}
                                         <div className="action-buttons-group">
-                                            <button className="action-btn delete-btn" onClick={() => handleDelete(item.id)}>
+                                            <button className="action-btn delete-btn" onClick={() => handleDelete(item.id)} disabled={isUpdating}>
                                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                     <polyline points="3 6 5 6 21 6"></polyline>
                                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>

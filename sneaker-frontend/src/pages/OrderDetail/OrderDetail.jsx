@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { FiCheckCircle, FiChevronLeft, FiCreditCard, FiMapPin, FiPackage, FiTruck, FiXCircle } from 'react-icons/fi';
 import { cancelOrder, getOrderById } from '../../services/orderService';
 import { createPaymentUrl } from '../../services/paymentService';
+import { getApiErrorMessage } from '../../services/apiError';
 import './OrderDetail.css';
 
 const getImageUrl = (images = []) => {
@@ -86,7 +87,7 @@ function OrderDetail() {
                 setOrder(res.data);
             })
             .catch((err) => {
-                setError(err.response?.data || err.message || 'Không thể tải chi tiết đơn hàng.');
+                setError(getApiErrorMessage(err, 'Không thể tải chi tiết đơn hàng.'));
             })
             .finally(() => {
                 setIsLoading(false);
@@ -125,7 +126,7 @@ function OrderDetail() {
 
             window.location.href = paymentUrl;
         } catch (err) {
-            setActionError(err.response?.data || err.message || 'Không thể tạo liên kết thanh toán.');
+            setActionError(getApiErrorMessage(err, 'Không thể tạo liên kết thanh toán.'));
         } finally {
             setIsActionLoading(false);
         }
@@ -153,7 +154,7 @@ function OrderDetail() {
             setIsCancelModalOpen(false);
             setCancelReason('');
         } catch (err) {
-            setActionError(err.response?.data || err.message || 'Không thể hủy đơn hàng.');
+            setActionError(getApiErrorMessage(err, 'Không thể hủy đơn hàng.'));
         } finally {
             setIsActionLoading(false);
         }

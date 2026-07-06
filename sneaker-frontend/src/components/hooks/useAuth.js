@@ -3,16 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { detectIdentifier } from "../utils/validate";
 import { saveAuth } from "../utils/auth";
 import { forgotPassword, login, register, resetPassword } from "../../services/authService";
-
-const getApiErrorMessage = (err, fallback) => {
-    const data = err.response?.data;
-
-    if (typeof data === "string") return data;
-    if (data?.error) return data.error;
-    if (data?.message) return data.message;
-
-    return fallback;
-};
+import { getApiErrorMessage } from "../../services/apiError";
 
 export const useAuth = () => {
     const navigate = useNavigate();
@@ -93,7 +84,7 @@ export const useAuth = () => {
 
             navigate(redirectTo, { replace: true });
         } catch (err) {
-            setError(err.response?.data?.error || "Sign in failed. Please check your account and password.");
+            setError(getApiErrorMessage(err, "Sign in failed. Please check your account and password."));
         } finally {
             setIsSubmitting(false);
         }
@@ -140,7 +131,7 @@ export const useAuth = () => {
 
             navigate(redirectTo, { replace: true });
         } catch (err) {
-            setError(err.response?.data?.error || "Could not create account. Please try another email or phone.");
+            setError(getApiErrorMessage(err, "Could not create account. Please try another email or phone."));
         } finally {
             setIsSubmitting(false);
         }

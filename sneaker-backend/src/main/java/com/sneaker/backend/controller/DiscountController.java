@@ -5,6 +5,7 @@ import com.sneaker.backend.entity.Discount;
 import com.sneaker.backend.entity.Product;
 import com.sneaker.backend.service.DiscountService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,19 +31,7 @@ public class DiscountController {
 
     // CREATE
     @PostMapping
-    public DiscountResponse create(@RequestBody DiscountRequest request) {
-
-        // check productId
-        if (request.getProductId() == null) {
-            throw new RuntimeException("ProductId is required");
-        }
-
-        // validate type
-        if (!"PERCENT".equalsIgnoreCase(request.getType()) &&
-                !"FIXED".equalsIgnoreCase(request.getType())) {
-            throw new RuntimeException("Invalid discount type (PERCENT / FIXED)");
-        }
-
+    public DiscountResponse create(@Valid @RequestBody DiscountRequest request) {
         Discount d = new Discount();
         d.setName(request.getName());
         d.setType(request.getType());

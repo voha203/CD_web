@@ -6,6 +6,7 @@ import './Checkout.css';
 import { placeOrder } from "../../services/orderService";
 import { useCart } from "../../context/CartContext";
 import { createPaymentUrl } from "../../services/paymentService"
+import { getApiErrorMessage } from "../../services/apiError";
 
 import { FiMapPin, FiLoader } from "react-icons/fi";
 import MapPicker from '../../components/layout/mapPicker/MapPicker';
@@ -181,7 +182,7 @@ function Checkout() {
                 navigate(`/thank-you?orderId=${orderId}`);
             }
         } catch (err) {
-            const errorMsg = err.response?.data?.message || err.response?.data || err.message || "Không thể đặt hàng";
+            const errorMsg = getApiErrorMessage(err, "Không thể đặt hàng");
             showError("Lỗi: " + errorMsg);
         } finally {
             setIsSubmitting(false);

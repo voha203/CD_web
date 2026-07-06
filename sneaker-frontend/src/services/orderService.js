@@ -1,31 +1,17 @@
-import axios from "axios";
-import { getToken } from "../components/utils/auth";
-
-const API_URL = "http://localhost:8080/api/orders";
-
-const getAuthHeader = () => {
-    const token = getToken();
-    if (!token) return {};
-
-    return {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    };
-};
+import apiClient from "./apiClient";
 
 export const placeOrder = (checkoutData) => {
-    return axios.post(`${API_URL}/checkout`, checkoutData, getAuthHeader());
+    return apiClient.post("/orders/checkout", checkoutData);
 };
 
 export const getOrderById = (orderId) => {
-    return axios.get(`${API_URL}/${orderId}`, getAuthHeader());
+    return apiClient.get(`/orders/${orderId}`);
 };
 
 export const getMyOrders = () => {
-    return axios.get(API_URL, getAuthHeader());
+    return apiClient.get("/orders");
 };
 
 export const cancelOrder = (orderId, reason) => {
-    return axios.post(`${API_URL}/${orderId}/cancel`, { reason }, getAuthHeader());
+    return apiClient.post(`/orders/${orderId}/cancel`, { reason });
 };

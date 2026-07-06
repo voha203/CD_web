@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiBox, FiCheck, FiChevronRight, FiTruck } from 'react-icons/fi';
 import { getMyOrders } from '../../services/orderService';
+import { getApiErrorMessage } from '../../services/apiError';
 import './Orders.css';
 
 const getImageUrl = (images = []) => {
@@ -65,7 +66,7 @@ function Orders() {
                 setOrders(res.data || []);
             })
             .catch((err) => {
-                setError(err.response?.data || err.message || 'Không thể tải danh sách đơn hàng.');
+                setError(getApiErrorMessage(err, 'Không thể tải danh sách đơn hàng.'));
             })
             .finally(() => {
                 setIsLoading(false);

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getProductById, getProductReviews, submitProductReview } from "../../services/api";
+import { getApiErrorMessage } from "../../services/apiError";
 
 export function useProductDetail(id) {
     // State để lưu dữ liệu chi tiết sản phẩm
@@ -10,6 +11,7 @@ export function useProductDetail(id) {
     const [reviews, setReviews] = useState([]);
     const [reviewStats, setReviewStats] = useState({ totalElements: 0, totalPages: 0 });
     const [currentPage, setCurrentPage] = useState(0);
+    const [error, setError] = useState("");
 
     // State cho Form gửi đánh giá
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +26,7 @@ export function useProductDetail(id) {
                     totalPages: data.totalPages,
                 });
             })
-            .catch(err => console.error("Lỗi lấy bình luận:", err.message));
+            .catch(err => console.error("Lỗi lấy bình luận:", getApiErrorMessage(err)));
     }, [id, product?.averageRating]);
 
     // Tự động gọi API Reviews (fetchReviews) khi mở tab Reviews, đổi ID sản phẩm hoặc chuyển trang
@@ -35,13 +37,14 @@ export function useProductDetail(id) {
     // Gọi API lấy chi tiết sản phẩm khi ID thay đổi hoặc khi component vừa load
     useEffect(() => {
         setLoading(true);   // Reset loading mỗi khi id thay đổi
+        setError("");
         getProductById(id)
             .then(data => {
                 setProduct(data);
                 setLoading(false);
             })
             .catch(err => {
-                console.error("Lỗi lấy chi tiết sản phẩm:", err.message);
+                setError(getApiErrorMessage(err, "Không thể tải chi tiết sản phẩm."));
                 setLoading(false);
             });
     }, [id]);
@@ -66,8 +69,7 @@ export function useProductDetail(id) {
             }
             return true; // Trả về true nếu thành công để Component xóa dữ liệu trong Form
         } catch (err) {
-            console.error(err.message);
-            alert("Có lỗi xảy ra khi gửi đánh giá.");
+            alert(getApiErrorMessage(err, "Có lỗi xảy ra khi gửi đánh giá."));
             return false;
         } finally {
             setIsSubmitting(false);
@@ -77,6 +79,7 @@ export function useProductDetail(id) {
     return {
         product,
         loading,
+        error,
         reviews,
         reviewStats,
         currentPage,

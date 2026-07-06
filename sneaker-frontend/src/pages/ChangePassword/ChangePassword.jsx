@@ -1,17 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { changePassword } from '../../services/authService';
+import { getApiErrorMessage } from '../../services/apiError';
 import './ChangePassword.css';
-
-const getApiErrorMessage = (err, fallback) => {
-    const data = err.response?.data;
-
-    if (typeof data === 'string') return data;
-    if (data?.error) return data.error;
-    if (data?.message) return data.message;
-
-    return fallback;
-};
 
 function ChangePassword() {
     const navigate = useNavigate();

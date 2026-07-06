@@ -4,6 +4,7 @@ import com.sneaker.backend.dto.product.ProductResponse;
 import com.sneaker.backend.dto.product.ProductRequest;
 import com.sneaker.backend.service.ProductService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,13 +46,13 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductResponse create(@RequestBody ProductRequest request) {
+    public ProductResponse create(@Valid @RequestBody ProductRequest request) {
         return service.create(request);
     }
 
     @PutMapping("/{id}")
     public ProductResponse update(@PathVariable Long id,
-                                  @RequestBody ProductRequest request) {
+                                  @Valid @RequestBody ProductRequest request) {
         return service.update(id, request);
     }
 

@@ -5,6 +5,7 @@ import com.sneaker.backend.dto.category.CategoryRequest;
 import com.sneaker.backend.entity.Category;
 import com.sneaker.backend.service.CategoryService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,7 @@ public class CategoryController {
 
     // CREATE
     @PostMapping
-    public CategoryResponse create(@RequestBody CategoryRequest request) {
+    public CategoryResponse create(@Valid @RequestBody CategoryRequest request) {
 
         Category c = new Category();
         c.setName(request.getName());
@@ -48,7 +49,7 @@ public class CategoryController {
     // UPDATE
     @PutMapping("/{id}")
     public CategoryResponse update(@PathVariable Long id,
-                                   @RequestBody CategoryRequest request) {
+                                   @Valid @RequestBody CategoryRequest request) {
 
         Category c = new Category();
         c.setName(request.getName());
