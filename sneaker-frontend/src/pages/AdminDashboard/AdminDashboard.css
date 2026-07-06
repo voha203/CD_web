@@ -1,0 +1,245 @@
+.admin-dashboard-page {
+    display: grid;
+    gap: 22px;
+}
+
+.admin-page-heading {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.admin-page-heading h1 {
+    font-size: 28px;
+    margin: 0 0 6px;
+}
+
+.admin-page-heading p {
+    color: #667085;
+    margin: 0;
+}
+
+.admin-page-heading button,
+.panel-heading button,
+.range-tabs button {
+    border: 0;
+    border-radius: 7px;
+    cursor: pointer;
+    font-weight: 700;
+    padding: 9px 13px;
+}
+
+.admin-page-heading button,
+.panel-heading button {
+    background: #111827;
+    color: #ffffff;
+}
+
+.admin-alert,
+.admin-loading,
+.admin-empty {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #667085;
+    padding: 16px;
+}
+
+.admin-alert.error {
+    background: #fff5f5;
+    border-color: #ffd7d3;
+    color: #b42318;
+}
+
+.dashboard-card-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.dashboard-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    display: grid;
+    gap: 8px;
+    padding: 18px;
+}
+
+.dashboard-card-icon {
+    align-items: center;
+    border-radius: 8px;
+    display: flex;
+    height: 42px;
+    justify-content: center;
+    width: 42px;
+}
+
+.dashboard-card span {
+    color: #667085;
+    font-size: 13px;
+}
+
+.dashboard-card strong {
+    font-size: 24px;
+}
+
+.dashboard-card.revenue .dashboard-card-icon,
+.dashboard-card.orders .dashboard-card-icon {
+    background: #ecfdf3;
+    color: #047857;
+}
+
+.dashboard-card.users .dashboard-card-icon,
+.dashboard-card.products .dashboard-card-icon {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.dashboard-card.pending .dashboard-card-icon {
+    background: #fffbeb;
+    color: #b45309;
+}
+
+.dashboard-card.refund .dashboard-card-icon {
+    background: #fff5f5;
+    color: #b42318;
+}
+
+.dashboard-panels {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
+}
+
+.dashboard-panel {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    min-width: 0;
+    padding: 18px;
+}
+
+.panel-heading {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.panel-heading h2 {
+    font-size: 18px;
+    margin: 0;
+}
+
+.range-tabs {
+    background: #f3f4f6;
+    border-radius: 8px;
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+}
+
+.range-tabs button {
+    background: transparent;
+    color: #667085;
+}
+
+.range-tabs button.active {
+    background: #111827;
+    color: #ffffff;
+}
+
+.revenue-list,
+.recent-order-list {
+    display: grid;
+    gap: 10px;
+}
+
+.revenue-row {
+    align-items: center;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 92px minmax(0, 1fr) 120px;
+}
+
+.revenue-row span {
+    color: #667085;
+    font-size: 13px;
+}
+
+.revenue-row strong {
+    font-size: 13px;
+    text-align: right;
+}
+
+.revenue-bar-wrap {
+    background: #eef0f3;
+    border-radius: 999px;
+    height: 9px;
+    overflow: hidden;
+}
+
+.revenue-bar {
+    background: #111827;
+    border-radius: 999px;
+    height: 100%;
+}
+
+.recent-order-item {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #eef0f3;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px;
+    text-align: left;
+}
+
+.recent-order-item:hover {
+    border-color: #111827;
+}
+
+.recent-order-item span {
+    color: #667085;
+    display: block;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+@media (max-width: 1080px) {
+    .dashboard-card-grid,
+    .dashboard-panels {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .dashboard-panels {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 680px) {
+    .admin-page-heading,
+    .panel-heading,
+    .recent-order-item {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .dashboard-card-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .revenue-row {
+        grid-template-columns: 1fr;
+    }
+
+    .revenue-row strong {
+        text-align: left;
+    }
+}

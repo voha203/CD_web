@@ -14,7 +14,10 @@ import Auth from './pages/Auth/Auth';
 import ChangePassword from './pages/ChangePassword/ChangePassword';
 import AdminCoupons from './pages/AdminCoupons/AdminCoupons';
 import AdminDiscounts from './pages/AdminDiscounts/AdminDiscounts';
+import AdminDashboard from './pages/AdminDashboard/AdminDashboard';
+import AdminOrders from './pages/AdminOrders/AdminOrders';
 import Profile from './pages/Profile/Profile';
+import AdminLayout from './components/layout/adminLayout/AdminLayout';
 
 import { CartProvider } from './context/CartContext';
 import { getCurrentUser, isAuthenticated } from './components/utils/auth';
@@ -73,14 +76,20 @@ function App() {
             <Route path="/orders/:id" element={<ProtectedRoute roles={["USER"]}><OrderDetail /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute roles={["USER"]}><Profile /></ProtectedRoute>} />
             <Route path="/change-password" element={<ProtectedRoute roles={["USER"]}><ChangePassword /></ProtectedRoute>} />
-            <Route path="/admin/coupons" element={<ProtectedRoute roles={["ADMIN"]}><AdminCoupons /></ProtectedRoute>} />
-            <Route path="/admin/discounts" element={<ProtectedRoute roles={["ADMIN"]}><AdminDiscounts /></ProtectedRoute>} />
             {/* Trang 404: Không tải được giao diện */}
             <Route path="*" element={<h1>404 - Not Found</h1>} />
           </Route>
 
           {/* Các trang không có Header và Footer */}
           {/* Trang thanh toán */}
+          <Route path="/admin" element={<ProtectedRoute roles={["ADMIN"]}><AdminLayout /></ProtectedRoute>}>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="coupons" element={<AdminCoupons />} />
+            <Route path="discounts" element={<AdminDiscounts />} />
+          </Route>
+
           <Route path="/login" element={<Auth />} />
           <Route path="/register" element={<Auth />} />
 

@@ -51,8 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/products/*/reviews").hasRole("USER")
                         .requestMatchers("/api/payment/create-url").hasRole("USER")
 
-                        .requestMatchers("/api/admin/coupons/**").hasRole("ADMIN")
-                        .requestMatchers("/api/admin/discounts/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
