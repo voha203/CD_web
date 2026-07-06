@@ -86,7 +86,10 @@ public class JwtFilter extends OncePerRequestFilter {
     private boolean isPublicEndpoint(HttpServletRequest request, String path) {
         String method = request.getMethod();
 
-        if (path.equals("/api/auth/login") || path.equals("/api/auth/register")) {
+        if (path.equals("/api/auth/login")
+                || path.equals("/api/auth/register")
+                || path.equals("/api/auth/forgot-password")
+                || path.equals("/api/auth/reset-password")) {
             return true;
         }
 

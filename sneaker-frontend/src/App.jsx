@@ -11,6 +11,7 @@ import ThankYou from './pages/ThankYou/ThankYou';
 import Orders from './pages/Orders/Orders';
 import OrderDetail from './pages/OrderDetail/OrderDetail';
 import Auth from './pages/Auth/Auth';
+import ChangePassword from './pages/ChangePassword/ChangePassword';
 
 import { CartProvider } from './context/CartContext';
 import { getCurrentUser, isAuthenticated } from './components/utils/auth';
@@ -67,6 +68,7 @@ function App() {
 
             {/* Trang chi tiết đơn hàng */}
             <Route path="/orders/:id" element={<ProtectedRoute roles={["USER"]}><OrderDetail /></ProtectedRoute>} />
+            <Route path="/change-password" element={<ProtectedRoute roles={["USER"]}><ChangePassword /></ProtectedRoute>} />
 
             {/* Trang 404: Không tải được giao diện */}
             <Route path="*" element={<h1>404 - Not Found</h1>} />

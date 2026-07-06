@@ -10,11 +10,14 @@ import java.util.List;
 public class OrderResponse {
     private Long orderId;
     private String status;
+    private String paymentStatus;
     private double totalAmount;
     private LocalDateTime createdAt;
+    private LocalDateTime cancelledAt;
     private String receiverName;
     private String receiverPhone;
     private String shippingAddress;
     private List<OrderItemResponse> items;
     private String paymentMethod;
+    private String cancelReason;
 }

@@ -129,6 +129,11 @@ function Header() {
         navigate("/");
     };
 
+    const handleChangePassword = (event) => {
+        event.stopPropagation();
+        navigate("/change-password");
+    };
+
     // Hàm thực hiện tìm kiếm chính
     const performSearch = (searchWord, categoryWord) => {
         const params = new URLSearchParams();
@@ -305,9 +310,14 @@ function Header() {
                         <span className="nav-text-bold">{authUser ? "Account" : "Account & Lists"}</span>
                     </div>
                     {authUser && (
-                        <button className="logout-btn" onClick={handleLogout}>
-                            Logout
-                        </button>
+                        <div className="account-actions">
+                            <button className="account-action-btn" onClick={handleChangePassword}>
+                                Change password
+                            </button>
+                            <button className="logout-btn" onClick={handleLogout}>
+                                Logout
+                            </button>
+                        </div>
                     )}
                 </div>
 

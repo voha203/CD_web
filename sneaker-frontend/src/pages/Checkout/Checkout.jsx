@@ -165,7 +165,8 @@ function Checkout() {
             const orderId = res.data.orderId;
 
             if (formData.paymentMethod === 'CARD' || formData.paymentMethod === 'E-WALLET') {
-                const paymentRes = await createPaymentUrl(orderId);
+                const bankCode = formData.paymentMethod === 'CARD' ? 'NCB' : 'VNPAYQR';
+                const paymentRes = await createPaymentUrl(orderId, bankCode);
                 const paymentUrl = paymentRes.data?.paymentUrl || paymentRes.paymentUrl;
 
                 if (paymentUrl) {

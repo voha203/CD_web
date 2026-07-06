@@ -7,7 +7,9 @@ export default function LoginStep({
     goToEnter,
     onLogin,
     onCreate,
+    onForgotPassword,
     error,
+    message,
     isSubmitting
 }) {
     // Nút "show-btn" giúp ẩn/hiện mật khẩu
@@ -33,7 +35,9 @@ export default function LoginStep({
             <div className="login-box-input password-wrapper">
                 <div className="password-header">
                     <label>Password</label>
-                    <span className="forgot-password">Forgot password?</span>
+                    <button className="forgot-password" type="button" onClick={onForgotPassword}>
+                        Forgot password?
+                    </button>
                 </div>
 
                 <input
@@ -56,6 +60,7 @@ export default function LoginStep({
             </div>
 
             {error && <p className="auth-error">{error}</p>}
+            {message && <p className="auth-success">{message}</p>}
 
             <div className="login-box-btn">
                 <button className="login-btn" type="submit" disabled={isSubmitting}>

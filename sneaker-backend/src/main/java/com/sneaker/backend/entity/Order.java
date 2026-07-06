@@ -31,7 +31,10 @@ public class Order {
 
     private double totalAmount; // Tổng tiền hóa đơn
     private String paymentMethod; // COD, VNPAY...
+    private String paymentStatus; // UNPAID, PAID, COD_PENDING, FAILED, REFUND_PENDING, REFUNDED
     private String status; // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+    private String cancelReason;
+    private LocalDateTime cancelledAt;
 
     private LocalDateTime createdAt;
 
@@ -43,7 +46,10 @@ public class Order {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         if (this.status == null) {
-            this.status = "PENDING"; // Mặc định là chờ xử lý
+            this.status = "PENDING";
+        }
+        if (this.paymentStatus == null) {
+            this.paymentStatus = "COD".equals(this.paymentMethod) ? "COD_PENDING" : "UNPAID";
         }
     }
 }

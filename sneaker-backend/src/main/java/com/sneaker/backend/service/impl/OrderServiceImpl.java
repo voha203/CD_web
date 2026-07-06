@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -63,6 +64,7 @@ public class OrderServiceImpl implements OrderService {
         order.setShippingAddress(request.getShippingAddress());
         order.setNote(request.getNote());
         order.setPaymentMethod(request.getPaymentMethod());
+        order.setPaymentStatus("COD".equals(request.getPaymentMethod()) ? "COD_PENDING" : "UNPAID");
         order.setItems(new ArrayList<>()); // Khởi tạo list trống để add vào sau
 
         double totalAmount = 0;
@@ -130,6 +132,45 @@ public class OrderServiceImpl implements OrderService {
                 .sorted(Comparator.comparing(Order::getCreatedAt).reversed())
                 .map(orderMapper::toDTO)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public OrderResponse cancelOrder(Long id, String reason) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+
+        Long currentUserId = getCurrentUserId();
+        if (!order.getUser().getId().equals(currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
+        }
+
+        if ("CANCELLED".equals(order.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order is already cancelled");
+        }
+
+        if (!"PENDING".equals(order.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only pending orders can be cancelled");
+        }
+
+        order.setStatus("CANCELLED");
+        if ("PAID".equals(order.getPaymentStatus())) {
+            order.setPaymentStatus("REFUND_PENDING");
+        } else if ("COD_PENDING".equals(order.getPaymentStatus())) {
+            order.setPaymentStatus("COD_PENDING");
+        } else {
+            order.setPaymentStatus("FAILED");
+        }
+        order.setCancelReason(reason.trim());
+        order.setCancelledAt(LocalDateTime.now());
+
+        for (OrderItem item : order.getItems()) {
+            ProductVariantSize variantSize = item.getVariantSize();
+            variantSize.setQuantity(variantSize.getQuantity() + item.getQuantity());
+            variantSizeRepository.save(variantSize);
+        }
+
+        return orderMapper.toDTO(orderRepository.save(order));
     }
 
     private String getCurrentUsername() {

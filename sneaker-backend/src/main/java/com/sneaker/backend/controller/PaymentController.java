@@ -42,7 +42,8 @@ public class PaymentController {
         if ("00".equals(responseCode)) {
             Order order = orderRepository.findById(Long.parseLong(orderId)).orElseThrow();
 
-            order.setStatus("PROCESSING");
+            order.setPaymentStatus("PAID");
+            order.setStatus("PENDING");
 
             orderRepository.save(order);
 

@@ -25,3 +25,7 @@ export const getOrderById = (orderId) => {
 export const getMyOrders = () => {
     return axios.get(API_URL, getAuthHeader());
 };
+
+export const cancelOrder = (orderId, reason) => {
+    return axios.post(`${API_URL}/${orderId}/cancel`, { reason }, getAuthHeader());
+};

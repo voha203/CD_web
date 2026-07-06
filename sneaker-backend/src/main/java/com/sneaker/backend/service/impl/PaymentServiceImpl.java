@@ -33,6 +33,22 @@ public class PaymentServiceImpl implements PaymentService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
+        if ("COD".equals(order.getPaymentMethod())) {
+            throw new RuntimeException("Đơn COD không cần thanh toán online");
+        }
+
+        if ("CANCELLED".equals(order.getStatus())) {
+            throw new RuntimeException("Đơn hàng đã bị hủy");
+        }
+
+        if ("PAID".equals(order.getPaymentStatus())) {
+            throw new RuntimeException("Đơn hàng đã thanh toán");
+        }
+
+        if ("REFUND_PENDING".equals(order.getPaymentStatus()) || "REFUNDED".equals(order.getPaymentStatus())) {
+            throw new RuntimeException("Đơn hàng đang trong trạng thái hoàn tiền");
+        }
+
         long amount = (long) order.getTotalAmount();
 
         String txnRef = order.getId() + "_" + System.currentTimeMillis();
@@ -177,7 +193,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             // Kiểm tra đơn hàng có tồn tại không
-            String orderIdStr = request.getParameter("vnp_TxnRef");
+            String orderIdStr = request.getParameter("vnp_TxnRef").split("_")[0];
             Long orderId = Long.parseLong(orderIdStr);
             Optional<Order> orderOptional = orderRepository.findById(orderId);
 
@@ -208,17 +224,11 @@ public class PaymentServiceImpl implements PaymentService {
             String responseCode = request.getParameter("vnp_ResponseCode");
             if ("00".equals(responseCode)) {
                 // Thanh toán thành công
-                order.setStatus("PROCESSING");
+                order.setPaymentStatus("PAID");
+                order.setStatus("PENDING");
             } else {
                 // Thanh toán thất bại
-                order.setStatus("FAILED");
-
-                // Hoàn lại kho ngay tại đây
-                for (OrderItem item : order.getItems()) {
-                    ProductVariantSize variantSize = item.getVariantSize();
-                    variantSize.setQuantity(variantSize.getQuantity() + item.getQuantity());
-                    variantSizeRepository.save(variantSize);
-                }
+                order.setPaymentStatus("FAILED");
             }
 
             // Lưu lại trạng thái mới vào DB

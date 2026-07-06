@@ -11,4 +11,6 @@ public interface OrderService {
     OrderResponse getOrderById(Long id);
 
     List<OrderResponse> getMyOrders();
+
+    OrderResponse cancelOrder(Long id, String reason);
 }

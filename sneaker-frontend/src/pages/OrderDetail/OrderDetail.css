@@ -71,6 +71,129 @@
     border-color: #111;
 }
 
+.detail-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.btn-pay-again,
+.btn-cancel-order {
+    border: 1px solid #111;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 16px;
+}
+
+.btn-pay-again {
+    background: #111;
+    color: #fff;
+}
+
+.btn-cancel-order {
+    align-items: center;
+    background: #fff;
+    border-color: #c62828;
+    color: #c62828;
+    display: inline-flex;
+    gap: 6px;
+}
+
+.btn-pay-again:disabled,
+.btn-cancel-order:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.order-action-error {
+    background: #fff5f5;
+    border: 1px solid #ffc9c9;
+    border-radius: 8px;
+    color: #b42318;
+    font-size: 14px;
+    margin: -12px 0 20px;
+    padding: 12px 14px;
+}
+
+.cancel-modal-overlay {
+    align-items: center;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    inset: 0;
+    justify-content: center;
+    padding: 20px;
+    position: fixed;
+    z-index: 1000;
+}
+
+.cancel-modal {
+    background: #fff;
+    border-radius: 8px;
+    max-width: 460px;
+    padding: 24px;
+    width: 100%;
+}
+
+.cancel-modal h2 {
+    font-size: 20px;
+    margin: 0 0 8px;
+}
+
+.cancel-modal p {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 14px;
+}
+
+.cancel-modal textarea {
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    font: inherit;
+    min-height: 120px;
+    padding: 12px;
+    resize: vertical;
+    width: 100%;
+}
+
+.cancel-modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.btn-modal-secondary,
+.btn-modal-danger {
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 9px 16px;
+}
+
+.btn-modal-secondary {
+    background: #fff;
+    border: 1px solid #ccc;
+    color: #111;
+}
+
+.btn-modal-danger {
+    background: #c62828;
+    border: 1px solid #c62828;
+    color: #fff;
+}
+
+.btn-modal-secondary:disabled,
+.btn-modal-danger:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
 .invoice-header-card {
     background: #fff;
     border: 1px solid #e6e6e6;
@@ -396,6 +519,15 @@
         flex-direction: column;
         gap: 10px;
     }
+
+    .detail-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .detail-actions {
+        justify-content: flex-start;
+    }
 }
 
 /* Định dạng khi bấm In (ẩn nút quay lại, nút in) */
@@ -423,6 +555,9 @@
     .footer-container,
     .chatbot-wrapper,
     .back-to-orders-btn,
+    .detail-actions,
+    .cancel-modal-overlay,
+    .order-action-error,
     .btn-print,
     .timeline-card {
         display: none !important;
@@ -466,12 +601,28 @@
     }
 
     .invoice-header-card {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
         margin-bottom: 16px;
-        padding: 14px 0;
+        max-width: 560px;
+        padding: 18px 24px;
+        text-align: center;
+    }
+
+    .invoice-brand-block {
+        margin-bottom: 14px;
     }
 
     .invoice-logo {
         font-size: 22px;
+    }
+
+    .invoice-meta-block {
+        margin: 0 auto;
+        max-width: 420px;
+        min-width: 0;
+        text-align: center;
     }
 
     .invoice-meta-block h2 {

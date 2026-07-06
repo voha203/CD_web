@@ -81,4 +81,24 @@ public class AuthController {
         dto.setRole(u.getRole());
         return dto;
     }
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            Principal principal,
+            @RequestBody ChangePasswordRequest request
+    ) {
+        userService.changePassword(principal.getName(), request);
+        return ResponseEntity.ok("Đổi mật khẩu thành công");
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        userService.sendForgotPasswordOtp(request);
+        return ResponseEntity.ok("OTP đã được gửi về email");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        userService.resetPassword(request);
+        return ResponseEntity.ok("Đặt lại mật khẩu thành công");
+    }
 }

@@ -57,6 +57,13 @@ body {
     gap: 8px;
 }
 
+.account-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.account-action-btn,
 .logout-btn {
     border: 1px solid #8a8f98;
     border-radius: 3px;
@@ -67,6 +74,7 @@ body {
     padding: 3px 6px;
 }
 
+.account-action-btn:hover,
 .logout-btn:hover {
     background: rgba(255, 255, 255, 0.12);
 }

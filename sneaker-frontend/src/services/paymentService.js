@@ -14,6 +14,12 @@ const getAuthHeader = () => {
     };
 };
 
-export const createPaymentUrl = (orderId) => {
-    return axios.get(`${API_URL}/create-url?orderId=${orderId}`, getAuthHeader());
+export const createPaymentUrl = (orderId, bankCode) => {
+    const params = new URLSearchParams({ orderId });
+
+    if (bankCode) {
+        params.append("bankCode", bankCode);
+    }
+
+    return axios.get(`${API_URL}/create-url?${params.toString()}`, getAuthHeader());
 };
