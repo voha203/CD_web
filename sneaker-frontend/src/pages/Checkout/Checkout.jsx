@@ -6,6 +6,7 @@ import './Checkout.css';
 import { placeOrder } from "../../services/orderService";
 import { useCart } from "../../context/CartContext";
 import { createPaymentUrl } from "../../services/paymentService"
+import { validateCoupon } from "../../services/couponService";
 import { getApiErrorMessage } from "../../services/apiError";
 
 import { FiMapPin, FiLoader } from "react-icons/fi";
@@ -31,12 +32,20 @@ function Checkout() {
 
     // Kiểm tra người dùng có đồng ý các điều khoản trước khi đặt hàng
     const [isAgreed, setIsAgreed] = useState(false);
+    const [couponInput, setCouponInput] = useState("");
+    const [couponQuote, setCouponQuote] = useState(null);
+    const [couponMessage, setCouponMessage] = useState("");
+    const [couponError, setCouponError] = useState("");
+    const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
     // Đồng bộ map ban đầu (tránh gọi API liên tục)
     const hasSyncedInitialMap = useRef(false);
 
     const navigate = useNavigate();
     const { fetchCartCount } = useCart();
+    const subtotalAmount = cartData?.totalPrice || 0;
+    const discountAmount = couponQuote?.discountAmount || 0;
+    const finalAmount = couponQuote?.finalAmount ?? subtotalAmount;
 
     // Đồng bộ map với địa chỉ ban đầu
     useEffect(() => {
@@ -135,6 +144,38 @@ function Checkout() {
         }
     };
 
+    const handleCouponInputChange = (e) => {
+        setCouponInput(e.target.value.toUpperCase());
+        setCouponQuote(null);
+        setCouponMessage("");
+        setCouponError("");
+    };
+
+    const handleApplyCoupon = async () => {
+        const code = couponInput.trim();
+
+        if (!code) {
+            setCouponError("Vui lòng nhập mã giảm giá.");
+            return;
+        }
+
+        setIsApplyingCoupon(true);
+        setCouponError("");
+        setCouponMessage("");
+
+        try {
+            const res = await validateCoupon(code);
+            setCouponQuote(res.data);
+            setCouponInput(res.data.couponCode || code);
+            setCouponMessage(res.data.message || "Áp dụng mã giảm giá thành công.");
+        } catch (err) {
+            setCouponQuote(null);
+            setCouponError(getApiErrorMessage(err, "Mã giảm giá không hợp lệ."));
+        } finally {
+            setIsApplyingCoupon(false);
+        }
+    };
+
     // Hàm xử lý Đặt hàng cuối cùng
     const handlePlaceOrder = async () => {
         // KIỂM TRA BƯỚC 1: Địa chỉ giao hàng
@@ -160,7 +201,11 @@ function Checkout() {
 
         setIsSubmitting(true);
         try {
-            const res = await placeOrder(formData);
+            const checkoutPayload = {
+                ...formData,
+                couponCode: couponQuote?.couponCode || null
+            };
+            const res = await placeOrder(checkoutPayload);
             fetchCartCount();
 
             const orderId = res.data.orderId;
@@ -538,17 +583,34 @@ function Checkout() {
                         <h3>Order Summary</h3>
 
                         <div className="summary-billing-details">
+                            <div className="coupon-box">
+                                <label>Mã giảm giá</label>
+                                <div className="coupon-input-row">
+                                    <input
+                                        type="text"
+                                        value={couponInput}
+                                        onChange={handleCouponInputChange}
+                                        placeholder="Nhập mã giảm giá"
+                                    />
+                                    <button type="button" onClick={handleApplyCoupon} disabled={isApplyingCoupon}>
+                                        {isApplyingCoupon ? "Đang áp dụng..." : "Áp dụng"}
+                                    </button>
+                                </div>
+                                {couponMessage && <p className="coupon-message success">{couponMessage}</p>}
+                                {couponError && <p className="coupon-message error">{couponError}</p>}
+                            </div>
+
                             <div className="billing-row">
                                 <span>Tạm tính ({cartData?.items.length || 0} sản phẩm)</span>
-                                <span>{cartData?.totalPrice.toLocaleString('vi-VN')}₫</span>
+                                <span>{subtotalAmount.toLocaleString('vi-VN')}₫</span>
                             </div>
                             <div className="billing-row">
                                 <span>Phí vận chuyển</span>
-                                <span>30.000₫</span>
+                                <span>0₫</span>
                             </div>
                             <div className="billing-row discount">
-                                <span>Khuyến mãi</span>
-                                <span>-30.000₫</span>
+                                <span>Giảm giá {couponQuote?.couponCode ? `(${couponQuote.couponCode})` : ""}</span>
+                                <span>-{discountAmount.toLocaleString('vi-VN')}₫</span>
                             </div>
 
                             <div className="billing-divider"></div>
@@ -556,7 +618,7 @@ function Checkout() {
                             <div className="billing-row total-price-row">
                                 <span className="price-text">Tổng cộng (Order total):</span>
                                 <span className="price-tag">
-                                    {(cartData?.totalPrice || 0).toLocaleString('vi-VN')}₫
+                                    {finalAmount.toLocaleString('vi-VN')}₫
                                 </span>
                             </div>
                         </div>

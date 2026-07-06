@@ -49,7 +49,7 @@ public class PaymentServiceImpl implements PaymentService {
             throw new RuntimeException("Đơn hàng đang trong trạng thái hoàn tiền");
         }
 
-        long amount = (long) order.getTotalAmount();
+        long amount = (long) getPayableAmount(order);
 
         String txnRef = order.getId() + "_" + System.currentTimeMillis();
 
@@ -207,7 +207,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             // Kiểm tra số tiền
             double vnp_Amount = Double.parseDouble(request.getParameter("vnp_Amount")) / 100;
-            if (order.getTotalAmount() != vnp_Amount) {
+            if (Double.compare(getPayableAmount(order), vnp_Amount) != 0) {
                 result.put("RspCode", "04");
                 result.put("Message", "Invalid Amount");
                 return result;
@@ -244,5 +244,9 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         return result;
+    }
+
+    private double getPayableAmount(Order order) {
+        return order.getFinalAmount() > 0 ? order.getFinalAmount() : order.getTotalAmount();
     }
 }

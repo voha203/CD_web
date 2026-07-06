@@ -9,6 +9,8 @@ import lombok.Data;
 public class OrderRequest {
     private Long userId;
 
+    @Size(max = 50, message = "Mã giảm giá tối đa 50 ký tự")
+    private String couponCode;
     @NotBlank(message = "Tên người nhận không được để trống")
     @Size(max = 100, message = "Tên người nhận tối đa 100 ký tự")
     private String receiverName;
@@ -22,7 +24,7 @@ public class OrderRequest {
     private String shippingAddress;
 
     @NotBlank(message = "Phương thức thanh toán không được để trống")
-    @Pattern(regexp = "^(COD|CARD|E-WALLET)$", message = "Phương thức thanh toán không hợp lệ")
+    @Pattern(regexp = "^(COD|VNPAY|CARD|E-WALLET)$", message = "Phương thức thanh toán không hợp lệ")
     private String paymentMethod;
 
     @Size(max = 500, message = "Ghi chú tối đa 500 ký tự")

@@ -20,4 +20,8 @@ public class OrderResponse {
     private List<OrderItemResponse> items;
     private String paymentMethod;
     private String cancelReason;
+    private double subtotalAmount;
+    private String discountCode;
+    private double discountAmount;
+    private double finalAmount;
 }

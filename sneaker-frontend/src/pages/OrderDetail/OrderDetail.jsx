@@ -107,6 +107,9 @@ function OrderDetail() {
 
     const currentStepIndex = Math.max(steps.findIndex(step => step.key === order?.status), 0);
     const subtotal = (order?.items || []).reduce((sum, item) => sum + (item.subTotal || item.price * item.quantity), 0);
+    const orderSubtotal = order?.subtotalAmount || subtotal;
+    const orderDiscount = order?.discountAmount || 0;
+    const orderFinalAmount = order?.finalAmount || order?.totalAmount || 0;
 
     const handlePayAgain = async () => {
         if (!canPayAgain(order)) return;
@@ -325,19 +328,23 @@ function OrderDetail() {
                     <div className="cost-summary-wrapper">
                         <div className="cost-row">
                             <span>Tạm tính</span>
-                            <span>{subtotal.toLocaleString('vi-VN')} VND</span>
+                            <span>{orderSubtotal.toLocaleString('vi-VN')} VND</span>
                         </div>
                         <div className="cost-row">
                             <span>Phí vận chuyển</span>
                             <span>0 VND</span>
                         </div>
                         <div className="cost-row">
-                            <span>Giảm giá</span>
-                            <span>0 VND</span>
+                            <span>Mã giảm giá</span>
+                            <span>{order.discountCode || 'Không có'}</span>
+                        </div>
+                        <div className="cost-row">
+                            <span>Số tiền giảm</span>
+                            <span>-{orderDiscount.toLocaleString('vi-VN')} VND</span>
                         </div>
                         <div className="cost-row total-cost-row">
-                            <span>Tổng cộng</span>
-                            <span>{(order.totalAmount || 0).toLocaleString('vi-VN')} VND</span>
+                            <span>Tổng thanh toán</span>
+                            <span>{orderFinalAmount.toLocaleString('vi-VN')} VND</span>
                         </div>
                     </div>
                 </div>

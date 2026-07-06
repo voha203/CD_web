@@ -38,6 +38,10 @@ public class Order {
 
     private LocalDateTime createdAt;
 
+    private double subtotalAmount;
+    private String discountCode;
+    private double discountAmount;
+    private double finalAmount;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 

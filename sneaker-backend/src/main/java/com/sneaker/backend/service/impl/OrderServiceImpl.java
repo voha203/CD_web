@@ -1,13 +1,20 @@
 package com.sneaker.backend.service.impl;
 
-import com.sneaker.backend.dto.order.OrderResponse;
+import com.sneaker.backend.dto.coupon.CouponCalculation;
 import com.sneaker.backend.dto.order.OrderRequest;
-import com.sneaker.backend.entity.*;
+import com.sneaker.backend.dto.order.OrderResponse;
+import com.sneaker.backend.entity.Cart;
+import com.sneaker.backend.entity.CartItem;
+import com.sneaker.backend.entity.Order;
+import com.sneaker.backend.entity.OrderItem;
+import com.sneaker.backend.entity.ProductVariantSize;
+import com.sneaker.backend.entity.User;
 import com.sneaker.backend.mapper.OrderMapper;
 import com.sneaker.backend.repository.CartRepository;
 import com.sneaker.backend.repository.OrderRepository;
 import com.sneaker.backend.repository.ProductVariantSizeRepository;
 import com.sneaker.backend.repository.UserRepository;
+import com.sneaker.backend.service.CouponService;
 import com.sneaker.backend.service.OrderService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +45,9 @@ public class OrderServiceImpl implements OrderService {
     private ProductVariantSizeRepository variantSizeRepository;
 
     @Autowired
+    private CouponService couponService;
+
+    @Autowired
     private OrderMapper orderMapper;
 
     @Override
@@ -45,7 +55,6 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse placeOrder(OrderRequest request) {
         Long currentUserId = getCurrentUserId();
 
-        // Lấy thông tin khách hàng và giỏ hàng
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
 
@@ -56,7 +65,6 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Giỏ hàng đang trống!");
         }
 
-        // Khởi tạo thực thể Order từ thông tin Request
         Order order = new Order();
         order.setUser(user);
         order.setReceiverName(request.getReceiverName());
@@ -65,43 +73,40 @@ public class OrderServiceImpl implements OrderService {
         order.setNote(request.getNote());
         order.setPaymentMethod(request.getPaymentMethod());
         order.setPaymentStatus("COD".equals(request.getPaymentMethod()) ? "COD_PENDING" : "UNPAID");
-        order.setItems(new ArrayList<>()); // Khởi tạo list trống để add vào sau
+        order.setItems(new ArrayList<>());
 
-        double totalAmount = 0;
-
-        // Chuyển đổi từ CartItem sang OrderItem & Xử lý Kho
         for (CartItem cartItem : cart.getItems()) {
             ProductVariantSize variantSize = cartItem.getVariantSize();
 
-            // KIỂM TRA TỒN KHO
             if (variantSize.getQuantity() < cartItem.getQuantity()) {
                 throw new RuntimeException("Sản phẩm " + variantSize.getVariant().getProduct().getName()
                         + " hiện không đủ số lượng trong kho.");
             }
 
-            // TRỪ KHO
             variantSize.setQuantity(variantSize.getQuantity() - cartItem.getQuantity());
             variantSizeRepository.save(variantSize);
 
-            // TẠO ORDER ITEM (Chốt giá tại thời điểm mua)
             double currentPrice = variantSize.getVariant().getProduct().getPrice();
 
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setVariantSize(variantSize);
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setPrice(currentPrice); // Lưu cứng giá vào đây
+            orderItem.setPrice(currentPrice);
 
-            totalAmount += currentPrice * cartItem.getQuantity();
             order.getItems().add(orderItem);
         }
 
-        order.setTotalAmount(totalAmount);
+        CouponCalculation couponCalculation = couponService.calculate(cart, request.getCouponCode());
+        order.setSubtotalAmount(couponCalculation.getSubtotalAmount());
+        order.setDiscountCode(couponCalculation.getCouponCode());
+        order.setDiscountAmount(couponCalculation.getDiscountAmount());
+        order.setFinalAmount(couponCalculation.getFinalAmount());
+        order.setTotalAmount(couponCalculation.getFinalAmount());
 
-        // Lưu đơn hàng vào DB
         Order savedOrder = orderRepository.save(order);
+        couponService.markCouponUsed(couponCalculation.getCouponCode());
 
-        // DỌN DẸP GIỎ HÀNG (Xóa các item đã mua)
         cart.getItems().clear();
         cartRepository.save(cart);
 
@@ -169,6 +174,8 @@ public class OrderServiceImpl implements OrderService {
             variantSize.setQuantity(variantSize.getQuantity() + item.getQuantity());
             variantSizeRepository.save(variantSize);
         }
+
+        couponService.releaseCouponUsage(order.getDiscountCode());
 
         return orderMapper.toDTO(orderRepository.save(order));
     }
