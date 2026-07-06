@@ -238,6 +238,11 @@ function Cart() {
                                 </div>
 
                                 <div className="cart-item-price">
+                                    {item.onSale && item.originalPrice > item.price && (
+                                        <span className="cart-original-price">
+                                            {(item.originalPrice * item.quantity).toLocaleString('vi-VN')}₫
+                                        </span>
+                                    )}
                                     <strong>{(item.price * item.quantity).toLocaleString('vi-VN')}₫</strong>
                                 </div>
                             </div>

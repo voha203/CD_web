@@ -40,6 +40,11 @@ public class ProductController {
         return service.getRecommendations(orderId);
     }
 
+    @GetMapping("/sale")
+    public List<ProductResponse> getSaleProducts() {
+        return service.getSaleProducts();
+    }
+
     @GetMapping("/{id}")
     public ProductResponse getById(@PathVariable Long id) {
         return service.getById(id);

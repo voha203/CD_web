@@ -60,7 +60,7 @@
 }
 
 .badge-sale {
-    background-color: #e74c3c;
+    background-color: #d92d20;
 }
 
 .card-details {
@@ -98,7 +98,11 @@
 .current-price {
     font-size: 18px;
     font-weight: 600;
-    color: black;
+    color: #111111;
+}
+
+.price-row.sale .current-price {
+    color: #d92d20;
 }
 
 .old-price {

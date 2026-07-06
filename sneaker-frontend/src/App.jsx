@@ -13,6 +13,7 @@ import OrderDetail from './pages/OrderDetail/OrderDetail';
 import Auth from './pages/Auth/Auth';
 import ChangePassword from './pages/ChangePassword/ChangePassword';
 import AdminCoupons from './pages/AdminCoupons/AdminCoupons';
+import AdminDiscounts from './pages/AdminDiscounts/AdminDiscounts';
 import Profile from './pages/Profile/Profile';
 
 import { CartProvider } from './context/CartContext';
@@ -73,7 +74,7 @@ function App() {
             <Route path="/profile" element={<ProtectedRoute roles={["USER"]}><Profile /></ProtectedRoute>} />
             <Route path="/change-password" element={<ProtectedRoute roles={["USER"]}><ChangePassword /></ProtectedRoute>} />
             <Route path="/admin/coupons" element={<ProtectedRoute roles={["ADMIN"]}><AdminCoupons /></ProtectedRoute>} />
-
+            <Route path="/admin/discounts" element={<ProtectedRoute roles={["ADMIN"]}><AdminDiscounts /></ProtectedRoute>} />
             {/* Trang 404: Không tải được giao diện */}
             <Route path="*" element={<h1>404 - Not Found</h1>} />
           </Route>

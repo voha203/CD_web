@@ -124,6 +124,43 @@
     margin: 15px 0 0 0;
 }
 
+.details-section .product-price-block {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.details-section .product-price-block .product-price {
+    margin: 0;
+}
+
+.details-section .product-price-block.sale .product-price {
+    color: #d92d20;
+    font-weight: 700;
+}
+
+.details-section .product-original-price {
+    color: #888888;
+    font-size: 15px;
+    margin: 0;
+    text-decoration: line-through;
+}
+
+.details-section .detail-sale-badge {
+    background: #d92d20;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 5px 8px;
+}
+
+.details-section .legacy-price-hidden {
+    display: none;
+}
+
 /* ====================== Lựa chọn màu sắc ====================== */
 .details-section .colors {
     display: flex;

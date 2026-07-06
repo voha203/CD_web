@@ -52,14 +52,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/payment/create-url").hasRole("USER")
 
                         .requestMatchers("/api/admin/coupons/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/discounts/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/discounts/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/discounts/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/product-sizes/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()

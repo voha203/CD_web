@@ -13,6 +13,8 @@ public interface ProductService {
 
     List<ProductResponse> getRecommendations(Long orderId);
 
+    List<ProductResponse> getSaleProducts();
+
     ProductResponse getById(Long id);
 
     ProductResponse create(ProductRequest request);

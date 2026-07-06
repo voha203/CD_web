@@ -339,6 +339,20 @@
     text-align: right;
 }
 
+.cart-item-price strong {
+    color: #d92d20;
+    display: block;
+}
+
+.cart-original-price {
+    color: #888888;
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    text-decoration: line-through;
+}
+
 .cart-subtotal-bottom {
     text-align: right;
     font-size: 18px;

@@ -15,5 +15,9 @@ public class DiscountResponse {
     private LocalDateTime endDate;
     private Boolean active;
     private Long productId;
+    private String productName;
+    private Double originalPrice;
+    private Double finalPrice;
+    private Integer discountPercent;
 
 }

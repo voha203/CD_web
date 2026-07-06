@@ -90,6 +90,10 @@ function ProductDetail() {
     const handlePrev = () => {
         setCurrentIndex((prevIndex) => (prevIndex === 0 ? images.length - 1 : prevIndex - 1));
     };
+    const originalPrice = product.price || 0;
+    const finalPrice = product.finalPrice ?? originalPrice;
+    const onSale = product.onSale || finalPrice < originalPrice;
+    const discountPercent = product.discountPercent || 0;
 
     // Hàm đổi màu (đổi Variant)
     const handleVariantChange = (index) => {
@@ -233,7 +237,22 @@ function ProductDetail() {
                     <div>
                         <h1 className="product-title">{product.name}</h1>
                         <p className="product-subtitle">{product.brand || "Shoes"}</p>
-                        <p className="product-price">
+                        <div className={`product-price-block ${onSale ? 'sale' : ''}`}>
+                            {onSale && (
+                                <span className="detail-sale-badge">
+                                    {discountPercent > 0 ? `-${discountPercent}%` : 'SALE'}
+                                </span>
+                            )}
+                            <p className="product-price">
+                                {finalPrice.toLocaleString('vi-VN')}₫
+                            </p>
+                            {onSale && (
+                                <p className="product-original-price">
+                                    {originalPrice.toLocaleString('vi-VN')}₫
+                                </p>
+                            )}
+                        </div>
+                        <p className="product-price legacy-price-hidden">
                             {product.finalPrice ? product.finalPrice.toLocaleString('vi-VN') : 0}₫
                         </p>
                     </div>

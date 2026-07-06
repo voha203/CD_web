@@ -12,6 +12,7 @@ import com.sneaker.backend.repository.CartRepository;
 import com.sneaker.backend.repository.CouponRepository;
 import com.sneaker.backend.repository.UserRepository;
 import com.sneaker.backend.service.CouponService;
+import com.sneaker.backend.service.DiscountService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,9 @@ public class CouponServiceImpl implements CouponService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private DiscountService discountService;
 
     @Override
     public CouponCalculation calculate(Cart cart, String couponCode) {
@@ -216,7 +220,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     private double calculateItemTotal(CartItem item) {
-        return item.getVariantSize().getVariant().getProduct().getPrice() * item.getQuantity();
+        return discountService.getFinalPrice(item.getVariantSize().getVariant().getProduct()) * item.getQuantity();
     }
 
     private Coupon findCoupon(Long id) {

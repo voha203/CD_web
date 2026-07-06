@@ -21,6 +21,10 @@ function ProductCard({ product }) {
         firstVariantImages.find(img => img.isMain)?.imageUrl ||
         firstVariantImages[0]?.imageUrl ||
         "https://via.placeholder.com/300";
+    const originalPrice = product.price || 0;
+    const finalPrice = product.finalPrice ?? originalPrice;
+    const onSale = product.onSale || finalPrice < originalPrice;
+    const discountPercent = product.discountPercent || 0;
 
     return (
         <Link to={`/products/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -31,8 +35,10 @@ function ProductCard({ product }) {
 
                     {/* Render Badges nếu có dữ liệu */}
                     {product.isNew && <span className="badge badge-new">New</span>}
-                    {product.salePercentage > 0 && (
-                        <span className="badge badge-sale">-${product.salePercentage}%</span>
+                    {onSale && (
+                        <span className="badge badge-sale">
+                            {discountPercent > 0 ? `-${discountPercent}%` : 'SALE'}
+                        </span>
                     )}
 
                     {/* Ảnh giày chính */}
@@ -54,15 +60,15 @@ function ProductCard({ product }) {
                     </h3>
 
                     {/* Khối hiển thị giá */}
-                    <div className="price-row">
+                    <div className={`price-row ${onSale ? 'sale' : ''}`}>
                         <span className="current-price">
-                            {formatPrice(product.price)}
+                            {formatPrice(finalPrice)}
                         </span>
 
                         {/* Hiện giá cũ (bị gạch) nếu đang sale */}
-                        {product.oldPrice && (
+                        {onSale && (
                             <span className="old-price">
-                                {formatPrice(product.oldPrice)}
+                                {formatPrice(originalPrice)}
                             </span>
                         )}
                     </div>

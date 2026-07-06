@@ -15,6 +15,7 @@ import com.sneaker.backend.repository.OrderRepository;
 import com.sneaker.backend.repository.ProductVariantSizeRepository;
 import com.sneaker.backend.repository.UserRepository;
 import com.sneaker.backend.service.CouponService;
+import com.sneaker.backend.service.DiscountService;
 import com.sneaker.backend.service.OrderService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private CouponService couponService;
+
+    @Autowired
+    private DiscountService discountService;
 
     @Autowired
     private OrderMapper orderMapper;
@@ -86,7 +90,7 @@ public class OrderServiceImpl implements OrderService {
             variantSize.setQuantity(variantSize.getQuantity() - cartItem.getQuantity());
             variantSizeRepository.save(variantSize);
 
-            double currentPrice = variantSize.getVariant().getProduct().getPrice();
+            double currentPrice = discountService.getFinalPrice(variantSize.getVariant().getProduct());
 
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);

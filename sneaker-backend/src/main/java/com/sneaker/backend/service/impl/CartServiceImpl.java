@@ -1,10 +1,12 @@
 package com.sneaker.backend.service.impl;
 
 import com.sneaker.backend.dto.cart.*;
+import com.sneaker.backend.dto.cartItem.CartItemResponse;
 import com.sneaker.backend.entity.*;
 import com.sneaker.backend.mapper.CartMapper;
 import com.sneaker.backend.repository.*;
 import com.sneaker.backend.service.CartService;
+import com.sneaker.backend.service.DiscountService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +33,9 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private CartMapper cartMapper;
 
+    @Autowired
+    private DiscountService discountService;
+
     // =========================
     // GET CART
     // =========================
@@ -42,10 +47,24 @@ public class CartServiceImpl implements CartService {
         CartResponse dto = cartMapper.toDTO(cart);
 
         // TÍNH TOTAL PRICE
-        Long total = cart.getItems().stream()
-                .mapToLong(item ->
-                        (long) (item.getVariantSize().getVariant().getProduct().getPrice() * item.getQuantity())
-                )
+        for (CartItemResponse itemResponse : dto.getItems()) {
+            cart.getItems().stream()
+                    .filter(item -> item.getId().equals(itemResponse.getId()))
+                    .findFirst()
+                    .ifPresent(cartItem -> {
+                        Product product = cartItem.getVariantSize().getVariant().getProduct();
+                        long originalPrice = Math.round(product.getPrice());
+                        long finalPrice = Math.round(discountService.getFinalPrice(product));
+
+                        itemResponse.setOriginalPrice(originalPrice);
+                        itemResponse.setPrice(finalPrice);
+                        itemResponse.setOnSale(finalPrice < originalPrice);
+                        itemResponse.setDiscountPercent(discountService.getDiscountPercent(product));
+                    });
+        }
+
+        Long total = dto.getItems().stream()
+                .mapToLong(item -> item.getPrice() * item.getQuantity())
                 .sum();
 
         dto.setTotalPrice(total);

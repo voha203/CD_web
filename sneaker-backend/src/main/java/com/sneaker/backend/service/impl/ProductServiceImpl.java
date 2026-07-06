@@ -2,8 +2,8 @@ package com.sneaker.backend.service.impl;
 
 import com.sneaker.backend.dto.product.ProductResponse;
 import com.sneaker.backend.dto.product.ProductRequest;
-import com.sneaker.backend.entity.Product;
 import com.sneaker.backend.entity.Category;
+import com.sneaker.backend.entity.Product;
 import com.sneaker.backend.mapper.ProductMapper;
 import com.sneaker.backend.repository.ProductRepository;
 import com.sneaker.backend.repository.CategoryRepository;
@@ -139,6 +139,15 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ProductResponse> getSaleProducts() {
+        return productRepository.findAll().stream()
+                .filter(product -> product.getPrice() != null)
+                .filter(product -> discountService.getFinalPrice(product) < product.getPrice())
+                .map(this::enrichProductDTO)
+                .collect(Collectors.toList());
+    }
+
     // =========================
     // GET BY ID
     // =========================
@@ -229,7 +238,19 @@ public class ProductServiceImpl implements ProductService {
 
         // 🔥 FINAL PRICE (có check null)
         if (p.getPrice() != null) {
-            dto.setFinalPrice(discountService.getFinalPrice(p));
+            Double finalPrice = discountService.getFinalPrice(p);
+            dto.setFinalPrice(finalPrice);
+            dto.setOnSale(finalPrice < p.getPrice());
+            dto.setDiscountPercent(discountService.getDiscountPercent(p));
+
+            discountService.getBestActiveDiscount(p).ifPresent(discount -> {
+                dto.setDiscountType(discount.getType());
+                dto.setDiscountValue(discount.getValue());
+            });
+        } else {
+            dto.setFinalPrice(0D);
+            dto.setOnSale(false);
+            dto.setDiscountPercent(0);
         }
 
         return dto;
