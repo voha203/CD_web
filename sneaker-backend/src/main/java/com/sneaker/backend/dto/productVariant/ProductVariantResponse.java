@@ -12,6 +12,7 @@ public class ProductVariantResponse {
     private Long id;
     private String color;
     private String sku;
+    private Boolean active;
 
     private List<ProductImageResponse> images;
     private List<ProductVariantSizeResponse> sizes;

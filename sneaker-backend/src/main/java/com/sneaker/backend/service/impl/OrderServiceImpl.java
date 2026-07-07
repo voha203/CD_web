@@ -1,14 +1,26 @@
 package com.sneaker.backend.service.impl;
 
-import com.sneaker.backend.dto.order.OrderResponse;
+import com.sneaker.backend.dto.coupon.CouponCalculation;
 import com.sneaker.backend.dto.order.OrderRequest;
-import com.sneaker.backend.entity.*;
+import com.sneaker.backend.dto.order.OrderResponse;
+import com.sneaker.backend.entity.Cart;
+import com.sneaker.backend.entity.CartItem;
+import com.sneaker.backend.entity.Order;
+import com.sneaker.backend.entity.OrderItem;
+import com.sneaker.backend.entity.ProductVariantSize;
+import com.sneaker.backend.entity.ShippingAddress;
+import com.sneaker.backend.entity.User;
 import com.sneaker.backend.mapper.OrderMapper;
 import com.sneaker.backend.repository.CartRepository;
 import com.sneaker.backend.repository.OrderRepository;
 import com.sneaker.backend.repository.ProductVariantSizeRepository;
 import com.sneaker.backend.repository.UserRepository;
+import com.sneaker.backend.service.CouponService;
+import com.sneaker.backend.service.DiscountService;
+import com.sneaker.backend.service.EmailService;
 import com.sneaker.backend.service.OrderService;
+import com.sneaker.backend.service.ShippingAddressService;
+import com.sneaker.backend.service.ShippingFeeService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -37,6 +50,21 @@ public class OrderServiceImpl implements OrderService {
     private ProductVariantSizeRepository variantSizeRepository;
 
     @Autowired
+    private CouponService couponService;
+
+    @Autowired
+    private DiscountService discountService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private ShippingAddressService shippingAddressService;
+
+    @Autowired
+    private ShippingFeeService shippingFeeService;
+
+    @Autowired
     private OrderMapper orderMapper;
 
     @Override
@@ -44,7 +72,6 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse placeOrder(OrderRequest request) {
         Long currentUserId = getCurrentUserId();
 
-        // Lấy thông tin khách hàng và giỏ hàng
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
 
@@ -55,51 +82,56 @@ public class OrderServiceImpl implements OrderService {
             throw new RuntimeException("Giỏ hàng đang trống!");
         }
 
-        // Khởi tạo thực thể Order từ thông tin Request
         Order order = new Order();
         order.setUser(user);
-        order.setReceiverName(request.getReceiverName());
-        order.setReceiverPhone(request.getReceiverPhone());
-        order.setShippingAddress(request.getShippingAddress());
+        ShippingSnapshot shippingSnapshot = resolveShippingSnapshot(request, currentUserId);
+        order.setReceiverName(shippingSnapshot.receiverName());
+        order.setReceiverPhone(shippingSnapshot.receiverPhone());
+        order.setShippingAddress(shippingSnapshot.fullAddress());
+        order.setShippingAddressId(shippingSnapshot.addressId());
         order.setNote(request.getNote());
         order.setPaymentMethod(request.getPaymentMethod());
-        order.setItems(new ArrayList<>()); // Khởi tạo list trống để add vào sau
+        order.setPaymentStatus("COD".equals(request.getPaymentMethod()) ? "COD_PENDING" : "UNPAID");
+        order.setItems(new ArrayList<>());
 
-        double totalAmount = 0;
-
-        // Chuyển đổi từ CartItem sang OrderItem & Xử lý Kho
         for (CartItem cartItem : cart.getItems()) {
             ProductVariantSize variantSize = cartItem.getVariantSize();
 
-            // KIỂM TRA TỒN KHO
             if (variantSize.getQuantity() < cartItem.getQuantity()) {
                 throw new RuntimeException("Sản phẩm " + variantSize.getVariant().getProduct().getName()
                         + " hiện không đủ số lượng trong kho.");
             }
 
-            // TRỪ KHO
             variantSize.setQuantity(variantSize.getQuantity() - cartItem.getQuantity());
             variantSizeRepository.save(variantSize);
 
-            // TẠO ORDER ITEM (Chốt giá tại thời điểm mua)
-            double currentPrice = variantSize.getVariant().getProduct().getPrice();
+            double currentPrice = discountService.getFinalPrice(variantSize.getVariant().getProduct());
 
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setVariantSize(variantSize);
             orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setPrice(currentPrice); // Lưu cứng giá vào đây
+            orderItem.setPrice(currentPrice);
 
-            totalAmount += currentPrice * cartItem.getQuantity();
             order.getItems().add(orderItem);
         }
 
-        order.setTotalAmount(totalAmount);
+        CouponCalculation couponCalculation = couponService.calculate(cart, request.getCouponCode());
+        double shippingFee = shippingFeeService.calculateFee(shippingSnapshot.regionSource(), couponCalculation.getSubtotalAmount());
+        double finalAmount = Math.max(0D, couponCalculation.getFinalAmount()) + shippingFee;
 
-        // Lưu đơn hàng vào DB
+        order.setSubtotalAmount(couponCalculation.getSubtotalAmount());
+        order.setDiscountCode(couponCalculation.getCouponCode());
+        order.setDiscountAmount(couponCalculation.getDiscountAmount());
+        order.setShippingFee(shippingFee);
+        order.setShippingRegion(shippingFeeService.resolveRegion(shippingSnapshot.regionSource()));
+        order.setFinalAmount(finalAmount);
+        order.setTotalAmount(finalAmount);
+
         Order savedOrder = orderRepository.save(order);
+        couponService.markCouponUsed(couponCalculation.getCouponCode());
+        emailService.sendOrderPlacedEmail(savedOrder);
 
-        // DỌN DẸP GIỎ HÀNG (Xóa các item đã mua)
         cart.getItems().clear();
         cartRepository.save(cart);
 
@@ -132,6 +164,49 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
     }
 
+    @Override
+    @Transactional
+    public OrderResponse cancelOrder(Long id, String reason) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+
+        Long currentUserId = getCurrentUserId();
+        if (!order.getUser().getId().equals(currentUserId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
+        }
+
+        if ("CANCELLED".equals(order.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order is already cancelled");
+        }
+
+        if (!"PENDING".equals(order.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only pending orders can be cancelled");
+        }
+
+        order.setStatus("CANCELLED");
+        if ("PAID".equals(order.getPaymentStatus())) {
+            order.setPaymentStatus("REFUND_PENDING");
+        } else if ("COD_PENDING".equals(order.getPaymentStatus())) {
+            order.setPaymentStatus("COD_PENDING");
+        } else {
+            order.setPaymentStatus("FAILED");
+        }
+        order.setCancelReason(reason.trim());
+        order.setCancelledAt(LocalDateTime.now());
+
+        for (OrderItem item : order.getItems()) {
+            ProductVariantSize variantSize = item.getVariantSize();
+            variantSize.setQuantity(variantSize.getQuantity() + item.getQuantity());
+            variantSizeRepository.save(variantSize);
+        }
+
+        couponService.releaseCouponUsage(order.getDiscountCode());
+
+        Order savedOrder = orderRepository.save(order);
+        emailService.sendOrderCancelledEmail(savedOrder);
+        return orderMapper.toDTO(savedOrder);
+    }
+
     private String getCurrentUsername() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -149,5 +224,29 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return user.getId();
+    }
+
+    private ShippingSnapshot resolveShippingSnapshot(OrderRequest request, Long currentUserId) {
+        if (request.getShippingAddressId() != null) {
+            ShippingAddress address = shippingAddressService.getOwnedAddressEntity(request.getShippingAddressId(), currentUserId);
+            return new ShippingSnapshot(
+                    address.getId(),
+                    address.getReceiverName(),
+                    address.getReceiverPhone(),
+                    address.getFullAddress(),
+                    address.getProvince()
+            );
+        }
+
+        return new ShippingSnapshot(
+                null,
+                request.getReceiverName(),
+                request.getReceiverPhone(),
+                request.getShippingAddress(),
+                request.getShippingAddress()
+        );
+    }
+
+    private record ShippingSnapshot(Long addressId, String receiverName, String receiverPhone, String fullAddress, String regionSource) {
     }
 }

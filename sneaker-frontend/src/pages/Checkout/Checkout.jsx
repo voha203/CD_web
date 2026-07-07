@@ -6,9 +6,27 @@ import './Checkout.css';
 import { placeOrder } from "../../services/orderService";
 import { useCart } from "../../context/CartContext";
 import { createPaymentUrl } from "../../services/paymentService"
+import { validateCoupon } from "../../services/couponService";
+import { getAddresses } from "../../services/addressService";
+import { getApiErrorMessage } from "../../services/apiError";
 
 import { FiMapPin, FiLoader } from "react-icons/fi";
 import MapPicker from '../../components/layout/mapPicker/MapPicker';
+
+const calculateShippingFee = (provinceOrAddress, subtotal) => {
+    if (subtotal >= 1000000) return 0;
+    const normalized = (provinceOrAddress || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    return normalized.includes("ho chi minh")
+        || normalized.includes("hcm")
+        || normalized.includes("tphcm")
+        || normalized.includes("sai gon")
+        ? 20000
+        : 35000;
+};
 
 function Checkout() {
     const {
@@ -30,12 +48,57 @@ function Checkout() {
 
     // Kiểm tra người dùng có đồng ý các điều khoản trước khi đặt hàng
     const [isAgreed, setIsAgreed] = useState(false);
+    const [couponInput, setCouponInput] = useState("");
+    const [couponQuote, setCouponQuote] = useState(null);
+    const [couponMessage, setCouponMessage] = useState("");
+    const [couponError, setCouponError] = useState("");
+    const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+    const [addresses, setAddresses] = useState([]);
+    const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+    const [addressError, setAddressError] = useState("");
 
     // Đồng bộ map ban đầu (tránh gọi API liên tục)
     const hasSyncedInitialMap = useRef(false);
 
     const navigate = useNavigate();
     const { fetchCartCount } = useCart();
+    const subtotalAmount = cartData?.totalPrice || 0;
+    const discountAmount = couponQuote?.discountAmount || 0;
+    const selectedAddress = addresses.find(address => address.id === formData.shippingAddressId);
+    const shippingRegionSource = selectedAddress?.province || formData.shippingAddress;
+    const shippingFee = calculateShippingFee(shippingRegionSource, subtotalAmount);
+    const finalAmount = (couponQuote?.finalAmount ?? subtotalAmount) + shippingFee;
+
+    useEffect(() => {
+        let active = true;
+
+        const loadAddresses = async () => {
+            setIsLoadingAddresses(true);
+            setAddressError("");
+
+            try {
+                const res = await getAddresses();
+                if (!active) return;
+
+                const list = res.data || [];
+                setAddresses(list);
+                const defaultAddress = list.find(item => item.isDefault) || list[0];
+                if (defaultAddress) {
+                    applyAddress(defaultAddress);
+                }
+            } catch (err) {
+                if (active) setAddressError(getApiErrorMessage(err, "Không thể tải địa chỉ giao hàng."));
+            } finally {
+                if (active) setIsLoadingAddresses(false);
+            }
+        };
+
+        loadAddresses();
+
+        return () => {
+            active = false;
+        };
+    }, []);
 
     // Đồng bộ map với địa chỉ ban đầu
     useEffect(() => {
@@ -85,8 +148,24 @@ function Checkout() {
         setShowSuggestions(false);  // Ngừng hiển thị gợi ý
         setSuggestions([]);
 
-        setFormData(prev => ({ ...prev, shippingAddress: suggestion.display_name }));
+        setFormData(prev => ({ ...prev, shippingAddress: suggestion.display_name, shippingAddressId: null }));
         setMapPosition([lat, lon]);
+    };
+
+    const applyAddress = (address) => {
+        setFormData(prev => ({
+            ...prev,
+            shippingAddressId: address.id,
+            receiverName: address.receiverName || prev.receiverName,
+            receiverPhone: address.receiverPhone || prev.receiverPhone,
+            shippingAddress: address.fullAddress || prev.shippingAddress
+        }));
+        setErrors(prev => ({
+            ...prev,
+            receiverName: "",
+            receiverPhone: "",
+            shippingAddress: ""
+        }));
     };
 
     // Lấy ra vị trí hiện tại của người dùng dựa trên dữ liệu "Address" trong cơ sở dữ liệu
@@ -105,7 +184,7 @@ function Checkout() {
                     const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=vi`);
                     const data = await response.json();
                     if (data?.display_name) {
-                        setFormData(prev => ({ ...prev, shippingAddress: data.display_name }));
+                        setFormData(prev => ({ ...prev, shippingAddress: data.display_name, shippingAddressId: null }));
                     }
                 } catch (error) {
                     console.error("Lỗi lấy địa chỉ:", error);
@@ -134,6 +213,38 @@ function Checkout() {
         }
     };
 
+    const handleCouponInputChange = (e) => {
+        setCouponInput(e.target.value.toUpperCase());
+        setCouponQuote(null);
+        setCouponMessage("");
+        setCouponError("");
+    };
+
+    const handleApplyCoupon = async () => {
+        const code = couponInput.trim();
+
+        if (!code) {
+            setCouponError("Vui lòng nhập mã giảm giá.");
+            return;
+        }
+
+        setIsApplyingCoupon(true);
+        setCouponError("");
+        setCouponMessage("");
+
+        try {
+            const res = await validateCoupon(code);
+            setCouponQuote(res.data);
+            setCouponInput(res.data.couponCode || code);
+            setCouponMessage(res.data.message || "Áp dụng mã giảm giá thành công.");
+        } catch (err) {
+            setCouponQuote(null);
+            setCouponError(getApiErrorMessage(err, "Mã giảm giá không hợp lệ."));
+        } finally {
+            setIsApplyingCoupon(false);
+        }
+    };
+
     // Hàm xử lý Đặt hàng cuối cùng
     const handlePlaceOrder = async () => {
         // KIỂM TRA BƯỚC 1: Địa chỉ giao hàng
@@ -159,13 +270,18 @@ function Checkout() {
 
         setIsSubmitting(true);
         try {
-            const res = await placeOrder(formData);
+            const checkoutPayload = {
+                ...formData,
+                couponCode: couponQuote?.couponCode || null
+            };
+            const res = await placeOrder(checkoutPayload);
             fetchCartCount();
 
             const orderId = res.data.orderId;
 
             if (formData.paymentMethod === 'CARD' || formData.paymentMethod === 'E-WALLET') {
-                const paymentRes = await createPaymentUrl(orderId);
+                const bankCode = formData.paymentMethod === 'CARD' ? 'NCB' : 'VNPAYQR';
+                const paymentRes = await createPaymentUrl(orderId, bankCode);
                 const paymentUrl = paymentRes.data?.paymentUrl || paymentRes.paymentUrl;
 
                 if (paymentUrl) {
@@ -180,7 +296,7 @@ function Checkout() {
                 navigate(`/thank-you?orderId=${orderId}`);
             }
         } catch (err) {
-            const errorMsg = err.response?.data?.message || err.response?.data || err.message || "Không thể đặt hàng";
+            const errorMsg = getApiErrorMessage(err, "Không thể đặt hàng");
             showError("Lỗi: " + errorMsg);
         } finally {
             setIsSubmitting(false);
@@ -302,6 +418,34 @@ function Checkout() {
                         {activeStep === 1 && (
                             <div className="step-body fade-in">
                                 <form className="address-form">
+                                    <div className="saved-addresses-box">
+                                        <div className="saved-addresses-header">
+                                            <strong>Địa chỉ đã lưu</strong>
+                                            {isLoadingAddresses && <span>Đang tải...</span>}
+                                        </div>
+                                        {addressError && <p className="saved-address-error">{addressError}</p>}
+                                        {!isLoadingAddresses && addresses.length === 0 && (
+                                            <p className="saved-address-empty">Bạn chưa có địa chỉ lưu sẵn. Hãy nhập địa chỉ thủ công bên dưới.</p>
+                                        )}
+                                        {addresses.length > 0 && (
+                                            <div className="saved-address-list">
+                                                {addresses.map(address => (
+                                                    <button
+                                                        key={address.id}
+                                                        type="button"
+                                                        className={`saved-address-card ${formData.shippingAddressId === address.id ? "selected" : ""}`}
+                                                        onClick={() => applyAddress(address)}
+                                                    >
+                                                        <span>
+                                                            <strong>{address.receiverName}</strong> - {address.receiverPhone}
+                                                        </span>
+                                                        <small>{address.fullAddress}</small>
+                                                        {address.isDefault && <em>Mặc định</em>}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="form-row">
                                         <div className={`form-group ${errors.receiverName ? 'has-error' : ''}`}>
                                             <label>Họ và tên</label>
@@ -518,6 +662,11 @@ function Checkout() {
                                                 <h4>{item.productName}</h4>
                                                 <p className="product-meta">Size: <span>{item.sizeValue}</span> | Màu: <span>{item.color}</span></p>
                                                 <p className="product-quantity">Số lượng: {item.quantity}</p>
+                                                {item.onSale && item.originalPrice > item.price && (
+                                                    <span className="product-original-price">
+                                                        {(item.originalPrice * item.quantity).toLocaleString('vi-VN')}₫
+                                                    </span>
+                                                )}
                                                 <span className="product-item-price">
                                                     {(item.price * item.quantity).toLocaleString('vi-VN')}₫
                                                 </span>
@@ -536,17 +685,40 @@ function Checkout() {
                         <h3>Order Summary</h3>
 
                         <div className="summary-billing-details">
+                            <div className="coupon-box">
+                                <label>Mã giảm giá</label>
+                                <div className="coupon-input-row">
+                                    <input
+                                        type="text"
+                                        value={couponInput}
+                                        onChange={handleCouponInputChange}
+                                        placeholder="Nhập mã giảm giá"
+                                    />
+                                    <button type="button" onClick={handleApplyCoupon} disabled={isApplyingCoupon}>
+                                        {isApplyingCoupon ? "Đang áp dụng..." : "Áp dụng"}
+                                    </button>
+                                </div>
+                                {couponMessage && <p className="coupon-message success">{couponMessage}</p>}
+                                {couponError && <p className="coupon-message error">{couponError}</p>}
+                            </div>
+
                             <div className="billing-row">
                                 <span>Tạm tính ({cartData?.items.length || 0} sản phẩm)</span>
-                                <span>{cartData?.totalPrice.toLocaleString('vi-VN')}₫</span>
+                                <span>{subtotalAmount.toLocaleString('vi-VN')}₫</span>
                             </div>
                             <div className="billing-row">
                                 <span>Phí vận chuyển</span>
-                                <span>30.000₫</span>
+                                <span>{shippingFee === 0 ? "Miễn phí" : `${shippingFee.toLocaleString('vi-VN')}đ`}</span>
                             </div>
+                            {subtotalAmount >= 1000000 && (
+                                <div className="billing-row shipping-note">
+                                    <span>Ưu đãi vận chuyển</span>
+                                    <span>Đơn từ 1.000.000đ được miễn phí ship</span>
+                                </div>
+                            )}
                             <div className="billing-row discount">
-                                <span>Khuyến mãi</span>
-                                <span>-30.000₫</span>
+                                <span>Giảm giá {couponQuote?.couponCode ? `(${couponQuote.couponCode})` : ""}</span>
+                                <span>-{discountAmount.toLocaleString('vi-VN')}₫</span>
                             </div>
 
                             <div className="billing-divider"></div>
@@ -554,7 +726,7 @@ function Checkout() {
                             <div className="billing-row total-price-row">
                                 <span className="price-text">Tổng cộng (Order total):</span>
                                 <span className="price-tag">
-                                    {(cartData?.totalPrice || 0).toLocaleString('vi-VN')}₫
+                                    {finalAmount.toLocaleString('vi-VN')}₫
                                 </span>
                             </div>
                         </div>

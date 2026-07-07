@@ -1,11 +1,13 @@
 package com.sneaker.backend.service.impl;
 
-import com.sneaker.backend.dto.review.ReviewResponse;
 import com.sneaker.backend.dto.review.ReviewRequest;
+import com.sneaker.backend.dto.review.ReviewResponse;
+import com.sneaker.backend.dto.review.ReviewSummaryResponse;
+import com.sneaker.backend.entity.Order;
 import com.sneaker.backend.entity.Product;
 import com.sneaker.backend.entity.Review;
 import com.sneaker.backend.entity.User;
-import com.sneaker.backend.mapper.ReviewMapper;
+import com.sneaker.backend.repository.OrderItemRepository;
 import com.sneaker.backend.repository.ProductRepository;
 import com.sneaker.backend.repository.ReviewRepository;
 import com.sneaker.backend.repository.UserRepository;
@@ -22,6 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class ReviewServiceImpl implements ReviewService {
 
@@ -35,65 +40,136 @@ public class ReviewServiceImpl implements ReviewService {
     private UserRepository userRepository;
 
     @Autowired
-    private ReviewMapper reviewMapper;
+    private OrderItemRepository orderItemRepository;
 
-    // =========================
-    // ADD REVIEW
-    // =========================
     @Override
     @Transactional
     public ReviewResponse addReview(Long productId, ReviewRequest request) {
-        Long userId = getCurrentUserId();
+        User user = getCurrentUser();
+        Product product = findProduct(productId);
+        Order reviewOrder = findReviewableOrder(user.getId(), productId);
 
-        if (request.getRating() == null || request.getRating() < 1 || request.getRating() > 5) {
-            throw new RuntimeException("Rating must be between 1 and 5");
+        if (reviewRepository.existsByUserIdAndProductIdAndOrderId(user.getId(), productId, reviewOrder.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn đã đánh giá sản phẩm này cho đơn hàng đã chọn");
         }
-
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
 
         Review review = new Review();
         review.setRating(request.getRating());
-        review.setComment(request.getComment());
+        review.setComment(request.getComment().trim());
         review.setProduct(product);
         review.setUser(user);
+        review.setOrder(reviewOrder);
 
-        Review savedReview = reviewRepository.save(review);
-        productRepository.save(product);
-
-        return reviewMapper.toDTO(savedReview);
+        return toResponse(reviewRepository.save(review), user.getId());
     }
 
-    // =========================
-    // GET REVIEWS BY PRODUCT
-    // =========================
     @Override
     public Page<ReviewResponse> getReviewsByProduct(Long productId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Review> reviews = reviewRepository.findByProductId(productId, pageable);
-
-        return reviews.map(reviewMapper::toDTO);
+        findProduct(productId);
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 20), Sort.by("createdAt").descending());
+        Long currentUserId = getOptionalCurrentUserId();
+        return reviewRepository.findByProductId(productId, pageable)
+                .map(review -> toResponse(review, currentUserId));
     }
 
-    // =========================
-    // CÁC PHƯƠNG THỨC HỖ TRỢ LẤY USER
-    // =========================
-    private String getCurrentUsername() {
+    @Override
+    public ReviewSummaryResponse getSummary(Long productId) {
+        findProduct(productId);
+        return new ReviewSummaryResponse(
+                reviewRepository.getAverageRatingByProductId(productId),
+                reviewRepository.countByProductId(productId)
+        );
+    }
+
+    @Override
+    public Map<String, Object> canReview(Long productId) {
+        User user = getCurrentUser();
+        findProduct(productId);
+        List<Order> deliveredOrders = orderItemRepository.findDeliveredOrdersForReview(user.getId(), productId);
+
+        Order reviewableOrder = deliveredOrders.stream()
+                .filter(order -> !reviewRepository.existsByUserIdAndProductIdAndOrderId(user.getId(), productId, order.getId()))
+                .findFirst()
+                .orElse(null);
+
+        boolean canReview = reviewableOrder != null;
+        return Map.of(
+                "canReview", canReview,
+                "orderId", canReview ? reviewableOrder.getId() : 0,
+                "message", canReview
+                        ? "Bạn có thể đánh giá sản phẩm này"
+                        : "Bạn chỉ có thể đánh giá sản phẩm sau khi đơn hàng đã giao và chưa đánh giá trước đó"
+        );
+    }
+
+    @Override
+    @Transactional
+    public ReviewResponse updateReview(Long reviewId, ReviewRequest request) {
+        User user = getCurrentUser();
+        Review review = reviewRepository.findByIdAndUserId(reviewId, user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đánh giá của bạn"));
+
+        review.setRating(request.getRating());
+        review.setComment(request.getComment().trim());
+        return toResponse(reviewRepository.save(review), user.getId());
+    }
+
+    @Override
+    @Transactional
+    public void deleteReview(Long reviewId) {
+        User user = getCurrentUser();
+        Review review = reviewRepository.findByIdAndUserId(reviewId, user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy đánh giá của bạn"));
+        reviewRepository.delete(review);
+    }
+
+    private Order findReviewableOrder(Long userId, Long productId) {
+        return orderItemRepository.findDeliveredOrdersForReview(userId, productId)
+                .stream()
+                .filter(order -> !reviewRepository.existsByUserIdAndProductIdAndOrderId(userId, productId, order.getId()))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bạn chỉ có thể đánh giá sản phẩm đã mua trong đơn đã giao"));
+    }
+
+    private Product findProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy sản phẩm"));
+        if (Boolean.FALSE.equals(product.getActive())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy sản phẩm");
+        }
+        return product;
+    }
+
+    private ReviewResponse toResponse(Review review, Long currentUserId) {
+        ReviewResponse response = new ReviewResponse();
+        response.setId(review.getId());
+        response.setProductId(review.getProduct().getId());
+        response.setOrderId(review.getOrder() == null ? null : review.getOrder().getId());
+        response.setOwner(currentUserId != null && review.getUser().getId().equals(currentUserId));
+        response.setRating(review.getRating());
+        response.setComment(review.getComment());
+        response.setUsername(review.getUser().getUsername());
+        response.setCreatedAt(review.getCreatedAt());
+        response.setUpdatedAt(review.getUpdatedAt());
+        return response;
+    }
+
+    private User getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth == null || auth.getPrincipal() == null || !auth.isAuthenticated()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthenticated");
         }
 
-        return auth.getName();
+        return userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
     }
 
-    private Long getCurrentUserId() {
-        String username = getCurrentUsername();
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return user.getId();
+    private Long getOptionalCurrentUserId() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getPrincipal() == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getName())) {
+            return null;
+        }
+        return userRepository.findByUsername(auth.getName()).map(User::getId).orElse(null);
     }
 }

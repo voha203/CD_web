@@ -19,6 +19,9 @@ public class CartItemResponse {
 
     private String brand;
     private Long price;
+    private Long originalPrice;
+    private Boolean onSale;
+    private Integer discountPercent;
 
     private int quantity;
 }

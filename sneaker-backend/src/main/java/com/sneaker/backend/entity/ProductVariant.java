@@ -24,6 +24,8 @@ public class ProductVariant {
     @Column(unique = true)
     private String sku;
 
+    private Boolean active = true;
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     @JsonIgnore

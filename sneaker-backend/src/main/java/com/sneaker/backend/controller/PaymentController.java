@@ -2,6 +2,7 @@ package com.sneaker.backend.controller;
 
 import com.sneaker.backend.entity.Order;
 import com.sneaker.backend.repository.OrderRepository;
+import com.sneaker.backend.service.EmailService;
 import com.sneaker.backend.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class PaymentController {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping("/create-url")
     public ResponseEntity<?> createPaymentUrl(
@@ -42,9 +46,14 @@ public class PaymentController {
         if ("00".equals(responseCode)) {
             Order order = orderRepository.findById(Long.parseLong(orderId)).orElseThrow();
 
-            order.setStatus("PROCESSING");
+            boolean wasPaid = "PAID".equals(order.getPaymentStatus());
+            order.setPaymentStatus("PAID");
+            order.setStatus("PENDING");
 
             orderRepository.save(order);
+            if (!wasPaid) {
+                emailService.sendPaymentSuccessEmail(order);
+            }
 
             return new RedirectView("http://localhost:5173/thank-you?orderId=" + orderId);
         }

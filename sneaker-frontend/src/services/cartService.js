@@ -1,35 +1,21 @@
-import axios from "axios";
-import { getToken } from "../components/utils/auth";
-
-const API_URL = "http://localhost:8080/api/cart";
-
-const getAuthHeader = () => {
-    const token = getToken();
-    if (!token) return {};
-
-    return {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    };
-};
+import apiClient from "./apiClient";
 
 export const getCart = () => {
-    return axios.get(`${API_URL}`, getAuthHeader());
+    return apiClient.get("/cart");
 };
 
 export const addToCart = ({ variantSizeId, quantity = 1 }) => {
-    return axios.post(`${API_URL}/add`, { variantSizeId, quantity }, getAuthHeader());
+    return apiClient.post("/cart/add", { variantSizeId, quantity });
 };
 
 export const updateQuantity = (itemId, quantity) => {
-    return axios.put(`${API_URL}/${itemId}?quantity=${quantity}`, {}, getAuthHeader());
+    return apiClient.put(`/cart/${itemId}?quantity=${quantity}`, {});
 };
 
 export const deleteItem = (itemId) => {
-    return axios.delete(`${API_URL}/${itemId}`, getAuthHeader());
+    return apiClient.delete(`/cart/${itemId}`);
 };
 
 export const clearCart = () => {
-    return axios.delete(`${API_URL}/clear`, getAuthHeader());
+    return apiClient.delete("/cart/clear");
 };

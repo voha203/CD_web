@@ -10,9 +10,11 @@ import logo_new_balance from "../../assets/images/logoBrand/new_balance.svg"
 import ProductCard from '../../components/layout/productCard/ProductCard';
 
 import { getProducts } from "../../services/api";
+import { getSaleProducts } from "../../services/discountService";
 
 function Home() {
   const [products, setProducts] = useState([]);
+  const [saleProducts, setSaleProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -20,8 +22,13 @@ function Home() {
   useEffect(() => {
     const fetchApi = async () => {
       try {
-        const data = await getProducts();
-        setProducts(data);
+        const [productData, saleRes] = await Promise.all([
+          getProducts(),
+          getSaleProducts()
+        ]);
+
+        setProducts(Array.isArray(productData) ? productData : (productData.content || []));
+        setSaleProducts(Array.isArray(saleRes.data) ? saleRes.data : []);
         setIsLoading(false);
       } catch (err) {
         console.error("Lỗi khi tải sản phẩm:", err);
@@ -81,6 +88,21 @@ function Home() {
       </div>
 
       {/* HIỂN THỊ NHỮNG SẢN PHẨM "HÀNG MỚI VỀ", "BÁN CHẠY NHẤT", "ĐANG GIẢM GIÁ" */}
+      {!isLoading && saleProducts.length > 0 && (
+        <div className="featuredProducts saleProducts">
+          <div className="section-heading-row">
+            <h2>SẢN PHẨM KHUYẾN MÃI</h2>
+            <button type="button" onClick={() => navigate('/products')}>Xem tất cả</button>
+          </div>
+
+          <div className="home-products-grid">
+            {saleProducts.slice(0, 8).map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="featuredProducts">
         <h2>NEW ARRIVALS</h2>
 

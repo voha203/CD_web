@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FiBox, FiCheck, FiChevronRight, FiTruck } from 'react-icons/fi';
 import { getMyOrders } from '../../services/orderService';
+import { getApiErrorMessage } from '../../services/apiError';
 import './Orders.css';
 
 const getImageUrl = (images = []) => {
@@ -19,17 +20,37 @@ const formatDate = (value) => {
     });
 };
 
-const getStatusText = (status) => {
+const getStatusText = (order) => {
+    if ((order.paymentMethod === 'CARD' || order.paymentMethod === 'E-WALLET') && (!order.paymentStatus || order.paymentStatus === 'UNPAID')) {
+        return 'Chưa thanh toán';
+    }
+
+    if (order.paymentStatus === 'FAILED' && order.status !== 'CANCELLED') {
+        return 'Thanh toán thất bại - có thể thanh toán lại';
+    }
+
+    if (order.paymentStatus === 'REFUND_PENDING') {
+        return 'Đã hủy - đang chờ hoàn tiền';
+    }
+
+    if (order.paymentStatus === 'REFUNDED') {
+        return 'Đã hủy - đã hoàn tiền';
+    }
+
+    if (order.paymentStatus === 'PAID' && order.status === 'PENDING') {
+        return 'Đã thanh toán - chờ xác nhận';
+    }
+
     const labels = {
-        PENDING: 'Cho thanh toan / xu ly',
-        PROCESSING: 'Dang chuan bi hang',
-        SHIPPED: 'Dang giao hang',
-        DELIVERED: 'Giao hang thanh cong',
-        CANCELLED: 'Da huy',
-        FAILED: 'Thanh toan that bai'
+        PENDING: 'Chờ xử lý',
+        PROCESSING: 'Đang chuẩn bị hàng',
+        SHIPPED: 'Đang giao hàng',
+        DELIVERED: 'Giao hàng thành công',
+        CANCELLED: 'Đã hủy',
+        FAILED: 'Thanh toán thất bại'
     };
 
-    return labels[status] || status || 'N/A';
+    return labels[order.status] || order.status || 'N/A';
 };
 
 function Orders() {
@@ -45,7 +66,7 @@ function Orders() {
                 setOrders(res.data || []);
             })
             .catch((err) => {
-                setError(err.response?.data || err.message || 'Khong the tai danh sach don hang.');
+                setError(getApiErrorMessage(err, 'Không thể tải danh sách đơn hàng.'));
             })
             .finally(() => {
                 setIsLoading(false);
@@ -73,30 +94,30 @@ function Orders() {
         <div className="orders-page-container">
             <div className="orders-layout">
                 <div className="orders-header-section">
-                    <h1 className="orders-main-title">Don hang cua ban</h1>
+                    <h1 className="orders-main-title">Đơn hàng của bạn</h1>
                     <div className="orders-tabs">
                         <button className={`tab-btn ${activeTab === 'ALL' ? 'active' : ''}`} onClick={() => setActiveTab('ALL')}>
-                            Tat ca don
+                            Tất cả đơn
                         </button>
                         <button className={`tab-btn ${activeTab === 'PENDING' ? 'active' : ''}`} onClick={() => setActiveTab('PENDING')}>
-                            Cho xu ly
+                            Chờ xử lý
                         </button>
                         <button className={`tab-btn ${activeTab === 'PROCESSING' ? 'active' : ''}`} onClick={() => setActiveTab('PROCESSING')}>
-                            Dang chuan bi
+                            Đang chuẩn bị
                         </button>
                         <button className={`tab-btn ${activeTab === 'SHIPPED' ? 'active' : ''}`} onClick={() => setActiveTab('SHIPPED')}>
-                            Dang giao
+                            Đang giao
                         </button>
                         <button className={`tab-btn ${activeTab === 'DELIVERED' ? 'active' : ''}`} onClick={() => setActiveTab('DELIVERED')}>
-                            Hoan thanh
+                            Hoàn thành
                         </button>
                     </div>
                 </div>
 
-                {isLoading && <div className="orders-empty-state">Dang tai danh sach don hang...</div>}
+                {isLoading && <div className="orders-empty-state">Đang tải danh sách đơn hàng...</div>}
                 {error && <div className="orders-empty-state">{error}</div>}
                 {!isLoading && !error && filteredOrders.length === 0 && (
-                    <div className="orders-empty-state">Chua co don hang nao.</div>
+                    <div className="orders-empty-state">Chưa có đơn hàng nào.</div>
                 )}
 
                 {!isLoading && !error && filteredOrders.length > 0 && (
@@ -106,22 +127,22 @@ function Orders() {
                                 <div className="order-card-header">
                                     <div className="header-info-group">
                                         <div className="header-item">
-                                            <span className="label">Da dat hang</span>
+                                            <span className="label">Đã đặt hàng</span>
                                             <span className="value">{formatDate(order.createdAt)}</span>
                                         </div>
                                         <div className="header-item">
-                                            <span className="label">Tong tien</span>
+                                            <span className="label">Tổng tiền</span>
                                             <span className="value">{(order.totalAmount || 0).toLocaleString('vi-VN')} VND</span>
                                         </div>
                                         <div className="header-item ship-to">
-                                            <span className="label">Giao den</span>
+                                            <span className="label">Giao đến</span>
                                             <span className="value hover-link">{order.receiverName}</span>
                                         </div>
                                     </div>
                                     <div className="header-order-id">
-                                        <span className="label">Ma don hang #MS-{order.orderId}</span>
+                                        <span className="label">Mã đơn hàng #MS-{order.orderId}</span>
                                         <span className="value hover-link" onClick={() => navigate(`/orders/${order.orderId}`)}>
-                                            Xem chi tiet don hang
+                                            Xem chi tiết đơn hàng
                                         </span>
                                     </div>
                                 </div>
@@ -130,7 +151,7 @@ function Orders() {
                                     <div className="order-status-banner">
                                         {renderStatusIcon(order.status)}
                                         <span className={`status-text ${(order.status || '').toLowerCase()}`}>
-                                            {getStatusText(order.status)}
+                                            {getStatusText(order)}
                                         </span>
                                     </div>
 
@@ -141,15 +162,15 @@ function Orders() {
                                             </div>
                                             <div className="product-details">
                                                 <h3 className="product-name">{item.productName}</h3>
-                                                <p className="product-meta">Mau: {item.color}</p>
-                                                <p className="product-meta">Size: {item.sizeValue} | So luong: {item.quantity}</p>
+                                                <p className="product-meta">Màu: {item.color}</p>
+                                                <p className="product-meta">Size: {item.sizeValue} | Số lượng: {item.quantity}</p>
                                                 <div className="product-actions">
                                                     <button className="btn-text" onClick={() => navigate(`/products/${item.productId}`)}>
-                                                        Mua lai
+                                                        Mua lại
                                                     </button>
                                                     <div className="divider-vertical"></div>
                                                     <button className="btn-text" onClick={() => navigate(`/orders/${order.orderId}`)}>
-                                                        Chi tiet <FiChevronRight />
+                                                        Chi tiết <FiChevronRight />
                                                     </button>
                                                 </div>
                                             </div>
@@ -159,7 +180,7 @@ function Orders() {
 
                                 <div className="order-card-footer">
                                     <button className="btn-action btn-secondary" onClick={() => navigate(`/orders/${order.orderId}`)}>
-                                        Xem chi tiet
+                                        Xem chi tiết
                                     </button>
                                 </div>
                             </div>

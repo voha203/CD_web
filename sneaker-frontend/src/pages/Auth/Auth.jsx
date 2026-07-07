@@ -2,12 +2,19 @@ import { useAuth } from "../../components/hooks/useAuth";
 import "./Auth.css";
 import ConfirmNewStep from "./components/ConfirmNewStep";
 import EnterStep from "./components/EnterStep";
+import ForgotPasswordStep from "./components/ForgotPasswordStep";
 import LoginStep from "./components/LoginStep";
 import OtpStep from "./components/OtpStep";
 import RegisterStep from "./components/RegisterStep";
+import ResetPasswordStep from "./components/ResetPasswordStep";
+import { useSearchParams } from "react-router-dom";
 
 function Auth() {
     const auth = useAuth();
+    const [searchParams] = useSearchParams();
+    const oauthError = searchParams.get("oauth2Error")
+        ? "Không thể đăng nhập bằng Google. Vui lòng thử lại."
+        : "";
 
     return (
         <div className="auth">
@@ -24,7 +31,7 @@ function Auth() {
                         identifier={auth.identifier}
                         setIdentifier={auth.setIdentifier}
                         onContinue={auth.handleContinue}
-                        error={auth.error}
+                        error={auth.error || oauthError}
                         isSubmitting={auth.isSubmitting}
                     />
                 )}
@@ -75,8 +82,39 @@ function Auth() {
                         goToEnter={auth.goToEnter}
                         onLogin={auth.handleLogin}
                         onCreate={() => auth.setStep("register")}
+                        onForgotPassword={auth.goToForgotPassword}
                         error={auth.error}
+                        message={auth.message}
                         isSubmitting={auth.isSubmitting}
+                    />
+                )}
+
+                {auth.step === "forgot-password" && (
+                    <ForgotPasswordStep
+                        identifier={auth.identifier}
+                        setIdentifier={auth.setIdentifier}
+                        error={auth.error}
+                        message={auth.message}
+                        isSubmitting={auth.isSubmitting}
+                        onSubmit={auth.handleForgotPassword}
+                        onBack={() => auth.setStep("login")}
+                    />
+                )}
+
+                {auth.step === "reset-password" && (
+                    <ResetPasswordStep
+                        identifier={auth.identifier}
+                        otp={auth.otp}
+                        setOtp={auth.setOtp}
+                        password={auth.password}
+                        setPassword={auth.setPassword}
+                        rePassword={auth.rePassword}
+                        setRePassword={auth.setRePassword}
+                        error={auth.error}
+                        message={auth.message}
+                        isSubmitting={auth.isSubmitting}
+                        onSubmit={auth.handleResetPassword}
+                        onBack={() => auth.setStep("login")}
                     />
                 )}
             </div>

@@ -1,0 +1,344 @@
+:root {
+    --ui-bg: #f6f7f9;
+    --ui-surface: #ffffff;
+    --ui-surface-soft: #f9fafb;
+    --ui-text: #111827;
+    --ui-muted: #667085;
+    --ui-border: #e5e7eb;
+    --ui-primary: #111827;
+    --ui-primary-hover: #263244;
+    --ui-success: #047857;
+    --ui-success-bg: #ecfdf3;
+    --ui-warning: #b54708;
+    --ui-warning-bg: #fffaeb;
+    --ui-danger: #b42318;
+    --ui-danger-bg: #fff5f5;
+    --ui-info: #175cd3;
+    --ui-info-bg: #eff8ff;
+    --ui-radius: 8px;
+    --ui-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+    background: var(--ui-bg);
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+input,
+select,
+textarea {
+    max-width: 100%;
+    min-width: 0;
+}
+
+img {
+    max-width: 100%;
+}
+
+button {
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
+}
+
+button:disabled,
+button[disabled] {
+    cursor: not-allowed;
+    opacity: 0.58;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+    outline-offset: 3px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.28);
+}
+
+.ui-card,
+.admin-card,
+.coupon-form,
+.discount-form,
+.profile-card,
+.checkout-section,
+.order-detail-card {
+    background: var(--ui-surface);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.ui-button,
+.admin-page-heading button,
+.admin-topbar button,
+.coupon-form button,
+.discount-form button,
+.profile-form button,
+.checkout-page-container button {
+    min-height: 40px;
+    border-radius: 7px;
+}
+
+.ui-alert,
+.admin-alert,
+.profile-alert,
+.coupon-error,
+.discount-error,
+.order-action-error,
+.auth-error,
+.change-password-error {
+    border-radius: var(--ui-radius);
+    line-height: 1.45;
+}
+
+.ui-empty-state,
+.admin-empty,
+.admin-loading,
+.coupon-empty,
+.discount-empty,
+.orders-empty-state,
+.cart-empty-error-state,
+.profile-loading,
+.checkout-loading {
+    align-items: center;
+    background: var(--ui-surface);
+    border: 1px dashed #d0d5dd;
+    border-radius: 10px;
+    color: var(--ui-muted);
+    display: flex;
+    justify-content: center;
+    min-height: 120px;
+    padding: 22px;
+    text-align: center;
+}
+
+.ui-spinner,
+.admin-loading::before,
+.checkout-loading::before,
+.profile-loading::before {
+    animation: ui-spin 0.8s linear infinite;
+    border: 3px solid #e5e7eb;
+    border-top-color: #111827;
+    border-radius: 999px;
+    content: "";
+    display: inline-block;
+    height: 22px;
+    margin-right: 10px;
+    width: 22px;
+}
+
+@keyframes ui-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.ui-badge,
+.status-badge,
+.payment-badge,
+.role-badge,
+.badge {
+    align-items: center;
+    border-radius: 999px;
+    display: inline-flex;
+    font-weight: 800;
+    gap: 4px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.admin-table-wrap,
+.admin-products-table-wrap,
+.admin-orders-table-wrap,
+.admin-users-table-wrap,
+.admin-categories-table-wrap,
+.coupon-table-wrap,
+.discount-table-wrap,
+.orders-table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.admin-table-wrap table,
+.admin-products-table-wrap table,
+.admin-orders-table-wrap table,
+.admin-users-table-wrap table,
+.admin-categories-table-wrap table,
+.coupon-table-wrap table,
+.discount-table-wrap table,
+.orders-table-wrap table {
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 760px;
+    width: 100%;
+}
+
+.admin-table-wrap thead th,
+.admin-products-table-wrap thead th,
+.admin-orders-table-wrap thead th,
+.admin-users-table-wrap thead th,
+.admin-categories-table-wrap thead th,
+.coupon-table-wrap thead th,
+.discount-table-wrap thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.admin-table-wrap tbody tr,
+.admin-products-table-wrap tbody tr,
+.admin-orders-table-wrap tbody tr,
+.admin-users-table-wrap tbody tr,
+.admin-categories-table-wrap tbody tr,
+.coupon-table-wrap tbody tr,
+.discount-table-wrap tbody tr {
+    transition: background-color 0.16s ease;
+}
+
+.admin-table-wrap tbody tr:hover,
+.admin-products-table-wrap tbody tr:hover,
+.admin-orders-table-wrap tbody tr:hover,
+.admin-users-table-wrap tbody tr:hover,
+.admin-categories-table-wrap tbody tr:hover,
+.coupon-table-wrap tbody tr:hover,
+.discount-table-wrap tbody tr:hover {
+    background: #f9fafb;
+}
+
+.coupon-form,
+.discount-form,
+.admin-form,
+.profile-form {
+    max-width: 760px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.coupon-form-row,
+.discount-form-row,
+.admin-form-row,
+.profile-form-row {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+}
+
+.coupon-form label,
+.discount-form label,
+.admin-form label,
+.profile-form label {
+    min-width: 0;
+}
+
+.coupon-form input,
+.coupon-form select,
+.coupon-form textarea,
+.discount-form input,
+.discount-form select,
+.discount-form textarea,
+.admin-form input,
+.admin-form select,
+.admin-form textarea,
+.profile-form input,
+.profile-form select,
+.profile-form textarea {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+}
+
+.page-container,
+.cart-page-container,
+.checkout-page-container,
+.profile-page,
+.orders-page,
+.order-detail-page,
+.product-list-page,
+.product-detail-page {
+    max-width: 100%;
+    min-width: 0;
+}
+
+@media (max-width: 992px) {
+    .admin-page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-page-heading button {
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    #root {
+        border-inline: 0;
+    }
+
+    .coupon-form-row,
+    .discount-form-row,
+    .admin-form-row,
+    .profile-form-row {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .ui-card,
+    .admin-card,
+    .coupon-form,
+    .discount-form,
+    .profile-card,
+    .checkout-section {
+        border-radius: 7px;
+    }
+}
+
+@media (max-width: 576px) {
+    h1 {
+        font-size: 30px;
+        letter-spacing: 0;
+    }
+
+    h2 {
+        font-size: 19px;
+        letter-spacing: 0;
+    }
+
+    .admin-content,
+    .profile-page,
+    .orders-page,
+    .order-detail-page,
+    .checkout-page-container,
+    .cart-page-container {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}

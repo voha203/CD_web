@@ -27,14 +27,24 @@ public class Order {
     private String receiverName;
     private String receiverPhone;
     private String shippingAddress;
+    private Long shippingAddressId;
+    private double shippingFee;
+    private String shippingRegion;
     private String note;
 
     private double totalAmount; // Tổng tiền hóa đơn
     private String paymentMethod; // COD, VNPAY...
+    private String paymentStatus; // UNPAID, PAID, COD_PENDING, FAILED, REFUND_PENDING, REFUNDED
     private String status; // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+    private String cancelReason;
+    private LocalDateTime cancelledAt;
 
     private LocalDateTime createdAt;
 
+    private double subtotalAmount;
+    private String discountCode;
+    private double discountAmount;
+    private double finalAmount;
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
 
@@ -43,7 +53,10 @@ public class Order {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         if (this.status == null) {
-            this.status = "PENDING"; // Mặc định là chờ xử lý
+            this.status = "PENDING";
+        }
+        if (this.paymentStatus == null) {
+            this.paymentStatus = "COD".equals(this.paymentMethod) ? "COD_PENDING" : "UNPAID";
         }
     }
 }

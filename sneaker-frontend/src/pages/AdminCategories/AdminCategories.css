@@ -1,0 +1,138 @@
+.admin-categories-page {
+    display: grid;
+    gap: 18px;
+}
+
+.admin-category-layout {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+}
+
+.admin-category-form,
+.admin-category-table-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 18px;
+}
+
+.admin-category-form,
+.admin-category-form * {
+    box-sizing: border-box;
+}
+
+.admin-category-form h2 {
+    font-size: 18px;
+    margin: 0 0 16px;
+}
+
+.admin-category-form label {
+    display: grid;
+    gap: 6px;
+    margin-bottom: 14px;
+    min-width: 0;
+}
+
+.admin-category-form label span {
+    color: #374151;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.admin-category-form input,
+.category-search input {
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    font: inherit;
+    min-width: 0;
+    padding: 10px;
+    width: 100%;
+}
+
+.category-form-actions,
+.category-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.category-actions {
+    display: table-cell;
+    text-align: right !important;
+    vertical-align: middle !important;
+    white-space: nowrap;
+}
+
+.category-form-actions button,
+.category-actions button,
+.category-search button {
+    align-items: center;
+    background: #111827;
+    border: 0;
+    border-radius: 7px;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-flex;
+    font-weight: 700;
+    gap: 7px;
+    justify-content: center;
+    padding: 9px 13px;
+}
+
+.category-form-actions .secondary {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+.category-actions .danger {
+    background: #fee2e2;
+    color: #b42318;
+}
+
+.category-actions button {
+    line-height: 1;
+    margin-left: 8px;
+    min-height: 40px;
+}
+
+.category-search {
+    align-items: center;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    margin-bottom: 14px;
+}
+
+.category-table-wrap {
+    overflow-x: auto;
+}
+
+.category-table {
+    border-collapse: collapse;
+    min-width: 680px;
+    width: 100%;
+}
+
+.category-table th,
+.category-table td {
+    border-bottom: 1px solid #eef0f3;
+    padding: 12px 10px;
+    text-align: left;
+}
+
+.category-table th {
+    color: #667085;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+    .admin-category-layout,
+    .category-search {
+        grid-template-columns: 1fr;
+    }
+
+    .category-form-actions {
+        flex-direction: column;
+    }
+}

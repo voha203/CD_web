@@ -11,6 +11,7 @@ import {
 
 import ProductCard from '../../components/layout/productCard/ProductCard';
 import { getOrderById } from '../../services/orderService';
+import { getApiErrorMessage } from '../../services/apiError';
 import './ThankYou.css';
 
 function ThankYou() {
@@ -26,7 +27,7 @@ function ThankYou() {
 
     useEffect(() => {
         if (!orderId) {
-            setError('Khong tim thay ma don hang hop le.');
+            setError('Không tìm thấy mã đơn hàng hợp lệ.');
             setIsLoading(false);
             return;
         }
@@ -39,7 +40,7 @@ function ThankYou() {
                 setOrderData(res.data);
             })
             .catch((err) => {
-                setError(err.response?.data || err.message || 'Khong the tai thong tin don hang.');
+                setError(getApiErrorMessage(err, 'Không thể tải thông tin đơn hàng.'));
             })
             .finally(() => {
                 setIsLoading(false);
@@ -69,36 +70,40 @@ function ThankYou() {
         });
     };
 
-    const getPaymentDetails = (method, status) => {
+    const getPaymentDetails = (method, status, paymentStatus) => {
         const configs = {
             CARD: {
-                methodLabel: 'The tin dung / The ghi no',
-                statusLabel: status === 'PROCESSING' ? 'Da thanh toan' : 'Cho xac thuc the',
-                note: 'Don hang cua ban da duoc thanh toan truc tuyen thanh cong.'
+                methodLabel: 'Thẻ tín dụng / Thẻ ghi nợ',
+                statusLabel: paymentStatus === 'PAID' ? 'Đã thanh toán - chờ xác nhận' : 'Chưa thanh toán',
+                note: paymentStatus === 'PAID'
+                    ? 'Đơn hàng của bạn đã được thanh toán trực tuyến thành công. Shop sẽ kiểm tra và xác nhận đơn.'
+                    : 'Bạn có thể thanh toán lại trong phần chi tiết đơn hàng.'
             },
             'E-WALLET': {
-                methodLabel: 'Vi dien tu',
-                statusLabel: status === 'PROCESSING' ? 'Da thanh toan' : 'Cho vi phan hoi',
-                note: 'Giao dich qua vi dien tu da hoan tat.'
+                methodLabel: 'Ví điện tử',
+                statusLabel: paymentStatus === 'PAID' ? 'Đã thanh toán - chờ xác nhận' : 'Chưa thanh toán',
+                note: paymentStatus === 'PAID'
+                    ? 'Giao dịch ví điện tử đã hoàn tất. Shop sẽ kiểm tra và xác nhận đơn.'
+                    : 'Bạn có thể thanh toán lại trong phần chi tiết đơn hàng.'
             },
             COD: {
-                methodLabel: 'Thanh toan khi nhan hang (COD)',
-                statusLabel: 'Cho xu ly va giao hang',
-                note: 'Vui long chuan bi so tien can thanh toan khi don hang duoc giao.'
+                methodLabel: 'Thanh toán khi nhận hàng (COD)',
+                statusLabel: 'Chờ xử lý',
+                note: 'Vui lòng chuẩn bị số tiền cần thanh toán khi đơn hàng được giao.'
             }
         };
 
         return configs[method] || {
-            methodLabel: 'Phuong thuc khac',
+            methodLabel: 'Phương thức khác',
             statusLabel: status,
-            note: 'Chung toi se lien he lai de xac nhan don hang.'
+            note: 'Chúng tôi sẽ liên hệ lại để xác nhận đơn hàng.'
         };
     };
 
     if (isLoading) {
         return (
             <div className="thankyou-page-container">
-                <h2>Dang tai thong tin don hang...</h2>
+                <h2>Đang tải thông tin đơn hàng...</h2>
             </div>
         );
     }
@@ -106,14 +111,14 @@ function ThankYou() {
     if (error) {
         return (
             <div className="thankyou-page-container">
-                <h2>Co loi xay ra: {error}</h2>
+                <h2>Có lỗi xảy ra: {error}</h2>
             </div>
         );
     }
 
     if (!orderData) return null;
 
-    const paymentDetails = getPaymentDetails(orderData.paymentMethod, orderData.status);
+    const paymentDetails = getPaymentDetails(orderData.paymentMethod, orderData.status, orderData.paymentStatus);
 
     return (
         <div className="thankyou-page-container">
@@ -122,20 +127,20 @@ function ThankYou() {
                     <FiCheckCircle className="success-icon" />
                 </div>
 
-                <h1 className="thankyou-title">Dat hang thanh cong!</h1>
+                <h1 className="thankyou-title">Đặt hàng thành công!</h1>
                 <p className="thankyou-subtitle">
-                    Cam on ban da tin tuong va mua sam tai <strong>mysneaker</strong>.
+                    Cảm ơn bạn đã tin tưởng và mua sắm tại <strong>mysneaker</strong>.
                 </p>
 
                 <div className="order-info-box">
-                    <h3 className="order-summary-title">Tom tat don hang</h3>
+                    <h3 className="order-summary-title">Tóm tắt đơn hàng</h3>
 
                     <div className="order-summary-row">
-                        <span>Ma don hang:</span>
+                        <span>Mã đơn hàng:</span>
                         <strong>#MS-{orderData.orderId}</strong>
                     </div>
                     <div className="order-summary-row">
-                        <span>Thoi gian dat:</span>
+                        <span>Thời gian đặt:</span>
                         <span>
                             {orderData.createdAt
                                 ? new Date(orderData.createdAt).toLocaleString('vi-VN')
@@ -143,18 +148,18 @@ function ThankYou() {
                         </span>
                     </div>
                     <div className="order-summary-row">
-                        <span>Trang thai:</span>
+                        <span>Trạng thái:</span>
                         <span className="status-badge">{paymentDetails.statusLabel}</span>
                     </div>
                     <div className="order-summary-row">
-                        <span>Phuong thuc:</span>
+                        <span>Phương thức:</span>
                         <span>{paymentDetails.methodLabel}</span>
                     </div>
 
                     <div className="order-summary-divider"></div>
 
                     <div className="order-summary-row total-row">
-                        <span>Tong thanh toan:</span>
+                        <span>Tổng thanh toán:</span>
                         <span className="total-price">
                             {(orderData.totalAmount || 0).toLocaleString('vi-VN')} VND
                         </span>
@@ -168,13 +173,13 @@ function ThankYou() {
                         className="btn-action btn-secondary"
                         onClick={() => navigate('/products')}
                     >
-                        <FiHome /> Tiep tuc mua sam
+                        <FiHome /> Tiếp tục mua sắm
                     </button>
                     <button
                         className="btn-action btn-primary"
                         onClick={() => navigate('/orders')}
                     >
-                        <FiShoppingBag /> Xem don hang cua toi
+                        <FiShoppingBag /> Xem đơn hàng của tôi
                     </button>
                 </div>
             </div>
@@ -182,9 +187,9 @@ function ThankYou() {
             {recommendedProducts.length > 0 && (
                 <div className="recommendation-section">
                     <div className="recommendation-header">
-                        <h2>Co the ban cung thich</h2>
+                        <h2>Có thể bạn cũng thích</h2>
                         <a href="/products" className="view-all-link">
-                            Xem tat ca <FiArrowRight />
+                            Xem tất cả <FiArrowRight />
                         </a>
                     </div>
 

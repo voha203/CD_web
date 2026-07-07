@@ -31,8 +31,11 @@ function Header() {
     const searchRef = useRef(null);
 
     const [language, setLanguage] = useState("VN");
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const [authUser, setAuthUser] = useState(() => getCurrentUser());
+    const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+    const accountRef = useRef(null);
 
     const { cartCount, fetchCartCount } = useCart();
 
@@ -68,11 +71,15 @@ function Header() {
         return () => clearTimeout(delayDebounceFn);
     }, [keyword]);
 
-    // Click ra ngoài để ẩm dropdown
+    // Click ra ngoài để ẩn dropdown
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (searchRef.current && !searchRef.current.contains(event.target)) {
                 setShowDropdown(false);
+            }
+
+            if (accountRef.current && !accountRef.current.contains(event.target)) {
+                setIsAccountMenuOpen(false);
             }
         };
 
@@ -84,6 +91,8 @@ function Header() {
     useEffect(() => {
         setShowDropdown(false);
         setSuggestions([]);
+        setIsAccountMenuOpen(false);
+        setIsMobileMenuOpen(false);
     }, [location]);
 
     useEffect(() => {
@@ -117,16 +126,46 @@ function Header() {
         }
     };
 
+    const handleWishlistClick = (event) => {
+        if (event) event.stopPropagation();
+        if (isAuthenticated()) {
+            navigate("/wishlist");
+        } else {
+            navigate("/login");
+        }
+    };
+
     const handleAccountClick = () => {
         if (!isAuthenticated()) {
             navigate("/login");
+            return;
         }
+
+        setIsAccountMenuOpen(prev => !prev);
     };
 
     const handleLogout = (event) => {
         event.stopPropagation();
         logout();
         navigate("/");
+    };
+
+    const handleProfileClick = (event) => {
+        event.stopPropagation();
+        setIsAccountMenuOpen(false);
+        navigate("/profile");
+    };
+
+    const handleAccountOrdersClick = (event) => {
+        event.stopPropagation();
+        setIsAccountMenuOpen(false);
+        navigate("/orders");
+    };
+
+    const handleChangePassword = (event) => {
+        event.stopPropagation();
+        setIsAccountMenuOpen(false);
+        navigate("/profile", { state: { tab: "security" } });
     };
 
     // Hàm thực hiện tìm kiếm chính
@@ -297,17 +336,25 @@ function Header() {
                 </div>
 
                 {/* Account và Orders */}
-                <div className="nav-item account-nav-item" onClick={handleAccountClick}>
+                <div className="nav-item account-nav-item" ref={accountRef} onClick={handleAccountClick}>
                     <div className="flex-col-text">
                         <span className="nav-text-small">
                             {authUser ? `Hello, ${authUser.fullName || authUser.username}` : "Hello, sign in"}
                         </span>
                         <span className="nav-text-bold">{authUser ? "Account" : "Account & Lists"}</span>
                     </div>
-                    {authUser && (
-                        <button className="logout-btn" onClick={handleLogout}>
-                            Logout
-                        </button>
+                    <svg className="account-caret" width="12" height="12" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M7 10l5 5 5-5z"></path>
+                    </svg>
+                    {authUser && isAccountMenuOpen && (
+                        <div className="account-dropdown-menu">
+                            <button type="button" onClick={handleProfileClick}>Hồ sơ của tôi</button>
+                            <button type="button" onClick={handleAccountOrdersClick}>Đơn hàng của tôi</button>
+                            <button type="button" onClick={handleChangePassword}>Đổi mật khẩu</button>
+                            <button type="button" onClick={handleWishlistClick}>Sản phẩm yêu thích</button>
+                            <div className="account-dropdown-divider"></div>
+                            <button type="button" className="danger" onClick={handleLogout}>Đăng xuất</button>
+                        </div>
                     )}
                 </div>
 
@@ -315,6 +362,13 @@ function Header() {
                     <div className="flex-col-text">
                         <span className="nav-text-small">Returns</span>
                         <span className="nav-text-bold">& Orders</span>
+                    </div>
+                </div>
+
+                <div className="nav-item hide-on-mobile" onClick={handleWishlistClick}>
+                    <div className="flex-col-text">
+                        <span className="nav-text-small">Your</span>
+                        <span className="nav-text-bold">Wishlist</span>
                     </div>
                 </div>
 
@@ -333,18 +387,25 @@ function Header() {
 
             {/* NavBar dưới */}
             <div className="nav-sub">
-                <button className="nav-item" style={{ fontWeight: 'bold', marginRight: '8px' }}>
+                <button
+                    className={`nav-item mobile-menu-toggle ${isMobileMenuOpen ? 'active' : ''}`}
+                    type="button"
+                    aria-label="Mở menu danh mục"
+                    aria-expanded={isMobileMenuOpen}
+                    onClick={() => setIsMobileMenuOpen(prev => !prev)}
+                    style={{ fontWeight: 'bold', marginRight: '8px' }}
+                >
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ marginRight: '4px' }}>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                     All
                 </button>
 
-                <div className="nav-sub-links hide-on-mobile">
-                    <a href="/" className="nav-item">Today's Deals</a>
-                    <a href="/" className="nav-item">Customer Service</a>
-                    <a href="/" className="nav-item">Registry</a>
-                    <a href="/" className="nav-item">Gift Cards</a>
+                <div className={`nav-sub-links ${isMobileMenuOpen ? 'open' : ''}`}>
+                    <a href="/products" className="nav-item">Sản phẩm</a>
+                    <a href="/products?sort=sale" className="nav-item">Khuyến mãi</a>
+                    <a href="/orders" className="nav-item">Đơn hàng</a>
+                    <a href="/profile" className="nav-item">Tài khoản</a>
                 </div>
             </div>
 

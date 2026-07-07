@@ -6,6 +6,7 @@ import com.sneaker.backend.entity.OrderItem;
 import com.sneaker.backend.entity.ProductVariantSize;
 import com.sneaker.backend.repository.OrderRepository;
 import com.sneaker.backend.repository.ProductVariantSizeRepository;
+import com.sneaker.backend.service.EmailService;
 import com.sneaker.backend.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +29,31 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private ProductVariantSizeRepository variantSizeRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     @Override
     public String createVNPayOrder(Long orderId, String bankCode, HttpServletRequest request) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
 
-        long amount = (long) order.getTotalAmount();
+        if ("COD".equals(order.getPaymentMethod())) {
+            throw new RuntimeException("Đơn COD không cần thanh toán online");
+        }
+
+        if ("CANCELLED".equals(order.getStatus())) {
+            throw new RuntimeException("Đơn hàng đã bị hủy");
+        }
+
+        if ("PAID".equals(order.getPaymentStatus())) {
+            throw new RuntimeException("Đơn hàng đã thanh toán");
+        }
+
+        if ("REFUND_PENDING".equals(order.getPaymentStatus()) || "REFUNDED".equals(order.getPaymentStatus())) {
+            throw new RuntimeException("Đơn hàng đang trong trạng thái hoàn tiền");
+        }
+
+        long amount = (long) getPayableAmount(order);
 
         String txnRef = order.getId() + "_" + System.currentTimeMillis();
 
@@ -177,7 +197,7 @@ public class PaymentServiceImpl implements PaymentService {
             }
 
             // Kiểm tra đơn hàng có tồn tại không
-            String orderIdStr = request.getParameter("vnp_TxnRef");
+            String orderIdStr = request.getParameter("vnp_TxnRef").split("_")[0];
             Long orderId = Long.parseLong(orderIdStr);
             Optional<Order> orderOptional = orderRepository.findById(orderId);
 
@@ -191,7 +211,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             // Kiểm tra số tiền
             double vnp_Amount = Double.parseDouble(request.getParameter("vnp_Amount")) / 100;
-            if (order.getTotalAmount() != vnp_Amount) {
+            if (Double.compare(getPayableAmount(order), vnp_Amount) != 0) {
                 result.put("RspCode", "04");
                 result.put("Message", "Invalid Amount");
                 return result;
@@ -207,18 +227,16 @@ public class PaymentServiceImpl implements PaymentService {
             // Kiểm tra mã phản hồi thanh toán từ VNPay
             String responseCode = request.getParameter("vnp_ResponseCode");
             if ("00".equals(responseCode)) {
+                boolean wasPaid = "PAID".equals(order.getPaymentStatus());
                 // Thanh toán thành công
-                order.setStatus("PROCESSING");
+                order.setPaymentStatus("PAID");
+                order.setStatus("PENDING");
+                if (!wasPaid) {
+                    emailService.sendPaymentSuccessEmail(order);
+                }
             } else {
                 // Thanh toán thất bại
-                order.setStatus("FAILED");
-
-                // Hoàn lại kho ngay tại đây
-                for (OrderItem item : order.getItems()) {
-                    ProductVariantSize variantSize = item.getVariantSize();
-                    variantSize.setQuantity(variantSize.getQuantity() + item.getQuantity());
-                    variantSizeRepository.save(variantSize);
-                }
+                order.setPaymentStatus("FAILED");
             }
 
             // Lưu lại trạng thái mới vào DB
@@ -234,5 +252,9 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         return result;
+    }
+
+    private double getPayableAmount(Order order) {
+        return order.getFinalAmount() > 0 ? order.getFinalAmount() : order.getTotalAmount();
     }
 }

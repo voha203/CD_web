@@ -13,4 +13,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // Tìm các đơn hàng theo Trạng thái VÀ Thời gian tạo trước một mốc cụ thể
     List<Order> findByStatusAndCreatedAtBefore(String status, LocalDateTime time);
+
+    List<Order> findByStatusAndPaymentStatusAndCreatedAtBefore(String status, String paymentStatus, LocalDateTime time);
 }

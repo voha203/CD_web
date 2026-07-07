@@ -1,0 +1,113 @@
+.ui-loading-state {
+    align-items: center;
+    color: var(--ui-muted, #667085);
+    display: inline-flex;
+    font-weight: 700;
+    gap: 10px;
+    justify-content: center;
+    min-height: 80px;
+    width: 100%;
+}
+
+.ui-empty-panel {
+    align-items: center;
+    background: var(--ui-surface, #ffffff);
+    border: 1px dashed #d0d5dd;
+    border-radius: 12px;
+    color: var(--ui-muted, #667085);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+    min-height: 220px;
+    padding: 28px;
+    text-align: center;
+}
+
+.ui-empty-panel h2 {
+    color: var(--ui-text, #111827);
+    font-size: 22px;
+    margin: 0;
+}
+
+.ui-empty-panel p {
+    max-width: 460px;
+}
+
+.ui-empty-icon {
+    align-items: center;
+    background: #f2f4f7;
+    border-radius: 999px;
+    color: #344054;
+    display: flex;
+    font-size: 22px;
+    font-weight: 900;
+    height: 48px;
+    justify-content: center;
+    width: 48px;
+}
+
+.ui-toast-stack {
+    display: grid;
+    gap: 10px;
+    max-width: min(360px, calc(100vw - 24px));
+    position: fixed;
+    right: 16px;
+    top: 18px;
+    z-index: 1200;
+}
+
+.ui-toast {
+    align-items: center;
+    animation: ui-toast-in 0.18s ease;
+    background: #111827;
+    border-radius: 8px;
+    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.18);
+    color: #ffffff;
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    padding: 12px 14px;
+    text-align: left;
+}
+
+.ui-toast.success {
+    background: #047857;
+}
+
+.ui-toast.error {
+    background: #b42318;
+}
+
+.ui-toast.warning {
+    background: #b54708;
+}
+
+.ui-toast button {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    font-weight: 900;
+    min-height: auto;
+    padding: 0 2px;
+}
+
+@keyframes ui-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 576px) {
+    .ui-toast-stack {
+        left: 12px;
+        right: 12px;
+        top: 12px;
+    }
+}

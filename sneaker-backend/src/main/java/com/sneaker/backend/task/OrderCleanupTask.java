@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -29,12 +30,17 @@ public class OrderCleanupTask {
         LocalDateTime timeLimit = LocalDateTime.now().minusMinutes(15);
 
         // Tìm các đơn PENDING quá hạn
-        List<Order> pendingOrders = orderRepository.findByStatusAndCreatedAtBefore("PENDING", timeLimit);
+        List<Order> pendingOrders = new ArrayList<>();
+        pendingOrders.addAll(orderRepository.findByStatusAndPaymentStatusAndCreatedAtBefore("PENDING", "UNPAID", timeLimit));
+        pendingOrders.addAll(orderRepository.findByStatusAndPaymentStatusAndCreatedAtBefore("PENDING", "FAILED", timeLimit));
 
         if (!pendingOrders.isEmpty()) {
             for (Order order : pendingOrders) {
                 // Đổi trạng thái đơn thành CANCELLED
                 order.setStatus("CANCELLED");
+                order.setPaymentStatus("FAILED");
+                order.setCancelReason("Đơn online chưa thanh toán quá 15 phút");
+                order.setCancelledAt(LocalDateTime.now());
 
                 // HOÀN TRẢ TỒN KHO: Duyệt qua từng sản phẩm trong đơn bị hủy
                 for (OrderItem item : order.getItems()) {

@@ -31,6 +31,8 @@ public class Product {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    private Boolean active = true;
+
     // cascade
     @OneToMany(mappedBy = "product",
             cascade = CascadeType.ALL,
@@ -47,4 +49,14 @@ public class Product {
     // Đếm tổng số bình luận trực tiếp từ bảng reviews
     @Formula("(SELECT COUNT(r.id) FROM reviews r WHERE r.product_id = id)")
     private Integer reviewCount;
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+        if (this.active == null) {
+            this.active = true;
+        }
+    }
 }

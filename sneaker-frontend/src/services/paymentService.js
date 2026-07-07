@@ -1,19 +1,11 @@
-import axios from "axios";
-import { getToken } from "../components/utils/auth";
+import apiClient from "./apiClient";
 
-const API_URL = "http://localhost:8080/api/payment";
+export const createPaymentUrl = (orderId, bankCode) => {
+    const params = new URLSearchParams({ orderId });
 
-const getAuthHeader = () => {
-    const token = getToken();
-    if (!token) return {};
+    if (bankCode) {
+        params.append("bankCode", bankCode);
+    }
 
-    return {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    };
-};
-
-export const createPaymentUrl = (orderId) => {
-    return axios.get(`${API_URL}/create-url?orderId=${orderId}`, getAuthHeader());
+    return apiClient.get(`/payment/create-url?${params.toString()}`);
 };

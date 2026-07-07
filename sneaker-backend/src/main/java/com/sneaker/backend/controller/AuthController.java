@@ -1,18 +1,19 @@
 package com.sneaker.backend.controller;
 
 import com.sneaker.backend.dto.auth.*;
+import com.sneaker.backend.dto.user.ProfileResponse;
+import com.sneaker.backend.dto.user.UpdateProfileRequest;
 import com.sneaker.backend.dto.user.UserResponse;
 import com.sneaker.backend.entity.User;
 import com.sneaker.backend.security.JwtUtil;
 import com.sneaker.backend.service.UserService;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -27,7 +28,7 @@ public class AuthController {
 
     // REGISTER
     @PostMapping("/register")
-    public UserResponse register(@RequestBody RegisterRequest request) {
+    public UserResponse register(@Valid @RequestBody RegisterRequest request) {
 
         User user = new User();
         user.setUsername(request.getUsername());
@@ -44,7 +45,7 @@ public class AuthController {
 
     // LOGIN
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest request) {
+    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
 
         User user = userService.login(
                 request.getUsername(),
@@ -58,15 +59,16 @@ public class AuthController {
 
     // PROFILE
     @GetMapping("/profile")
-    public ResponseEntity<?> getUserProfile(Principal principal) {
-        User user = userService.findByUsername(principal.getName());
+    public ResponseEntity<ProfileResponse> getUserProfile(Principal principal) {
+        return ResponseEntity.ok(userService.getProfile(principal.getName()));
+    }
 
-        Map<String, String> profile = new HashMap<>();
-        profile.put("fullName", user.getFullName());
-        profile.put("phone", user.getPhone());
-        profile.put("address", user.getAddress());
-
-        return ResponseEntity.ok(profile);
+    @PutMapping("/profile")
+    public ResponseEntity<ProfileResponse> updateUserProfile(
+            Principal principal,
+            @Valid @RequestBody UpdateProfileRequest request
+    ) {
+        return ResponseEntity.ok(userService.updateProfile(principal.getName(), request));
     }
 
     // convert User → DTO (RẤT QUAN TRỌNG)
@@ -78,7 +80,29 @@ public class AuthController {
         dto.setFullName(u.getFullName());
         dto.setPhone(u.getPhone());
         dto.setAddress(u.getAddress());
+        dto.setAvatarUrl(u.getAvatarUrl());
+        dto.setProvider(u.getProvider());
         dto.setRole(u.getRole());
         return dto;
+    }
+    @PutMapping("/change-password")
+    public ResponseEntity<?> changePassword(
+            Principal principal,
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        userService.changePassword(principal.getName(), request);
+        return ResponseEntity.ok("Đổi mật khẩu thành công");
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        userService.sendForgotPasswordOtp(request);
+        return ResponseEntity.ok("OTP đã được gửi về email");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        userService.resetPassword(request);
+        return ResponseEntity.ok("Đặt lại mật khẩu thành công");
     }
 }

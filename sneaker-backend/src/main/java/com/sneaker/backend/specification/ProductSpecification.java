@@ -8,6 +8,13 @@ import java.util.List;
 
 public class ProductSpecification {
 
+    public static Specification<Product> isActive() {
+        return (root, query, cb) -> cb.or(
+                cb.isNull(root.get("active")),
+                cb.isTrue(root.get("active"))
+        );
+    }
+
     // Lọc theo danh sách thương hiệu (WHERE brand IN ('Nike', 'Adidas'))
     public static Specification<Product> hasBrands(List<String> brands) {
         return (root, query, cb) -> (brands == null || brands.isEmpty())

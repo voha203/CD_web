@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     // Lấy danh sách đánh giá của một sản phẩm (Có phân trang, ví dụ: 5 bình luận mỗi trang)
@@ -17,4 +19,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Double getAverageRatingByProductId(@Param("productId") Long productId);
 
     Integer countByProductId(Long productId);
+
+    boolean existsByUserIdAndProductIdAndOrderId(Long userId, Long productId, Long orderId);
+
+    Optional<Review> findByIdAndUserId(Long id, Long userId);
 }

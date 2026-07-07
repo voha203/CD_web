@@ -2,7 +2,9 @@ package com.sneaker.backend.controller;
 
 import com.sneaker.backend.dto.review.ReviewResponse;
 import com.sneaker.backend.dto.review.ReviewRequest;
+import com.sneaker.backend.dto.review.ReviewSummaryResponse;
 import com.sneaker.backend.service.ReviewService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -24,7 +26,7 @@ public class ReviewController {
     @PostMapping("/{productId}/reviews")
     public ResponseEntity<ReviewResponse> addReview(
             @PathVariable Long productId,
-            @RequestBody ReviewRequest request) {
+            @Valid @RequestBody ReviewRequest request) {
 
         ReviewResponse createdReview = reviewService.addReview(productId, request);
         return new ResponseEntity<>(createdReview, HttpStatus.CREATED);
@@ -42,5 +44,10 @@ public class ReviewController {
 
         Page<ReviewResponse> reviews = reviewService.getReviewsByProduct(productId, page, size);
         return ResponseEntity.ok(reviews);
+    }
+
+    @GetMapping("/{productId}/reviews/summary")
+    public ResponseEntity<ReviewSummaryResponse> getSummary(@PathVariable Long productId) {
+        return ResponseEntity.ok(reviewService.getSummary(productId));
     }
 }

@@ -149,6 +149,35 @@
     margin-bottom: 10px;
 }
 
+.saleProducts {
+    border-bottom: 1px solid #eeeeee;
+    padding-bottom: 40px;
+}
+
+.section-heading-row {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    position: relative;
+}
+
+.section-heading-row h2 {
+    color: #d92d20;
+}
+
+.section-heading-row button {
+    background: #111111;
+    border: 0;
+    border-radius: 6px;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: 700;
+    padding: 9px 14px;
+    position: absolute;
+    right: 0;
+}
+
 .home-products-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -231,6 +260,17 @@
 
     .featuredProducts h2 {
         font-size: 22px;
+    }
+
+    .section-heading-row {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .section-heading-row button {
+        position: static;
+        width: 100%;
     }
     
     .home-products-grid {

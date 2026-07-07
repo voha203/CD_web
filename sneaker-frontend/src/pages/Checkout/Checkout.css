@@ -541,6 +541,14 @@
     color: #131921;
 }
 
+.review-item-info .product-original-price {
+    color: #8a8a8a;
+    display: block;
+    font-size: 13px;
+    margin-top: 6px;
+    text-decoration: line-through;
+}
+
 /* ================== CỘT PHẢI: PHƯƠNG THỨC THANH TOÁN ============== --- */
 .checkout-summary-column {
     flex: 3;
@@ -567,6 +575,61 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+.coupon-box {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 14px;
+}
+
+.coupon-box label {
+    color: #111827;
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.coupon-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.coupon-input-row input {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    flex: 1;
+    font-size: 14px;
+    padding: 9px 10px;
+}
+
+.coupon-input-row button {
+    background: #111827;
+    border: 0;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 0 14px;
+}
+
+.coupon-input-row button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
+.coupon-message {
+    font-size: 13px;
+    margin: 8px 0 0;
+}
+
+.coupon-message.success {
+    color: #047857;
+}
+
+.coupon-message.error {
+    color: #b42318;
 }
 
 .billing-row {
@@ -667,4 +730,77 @@
         position: static;
         margin-top: 20px;
     }
+}
+
+.saved-addresses-box {
+    width: 100%;
+    max-width: 760px;
+    margin-bottom: 18px;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #f9fafb;
+    box-sizing: border-box;
+}
+
+.saved-addresses-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    color: #111827;
+}
+
+.saved-address-list {
+    display: grid;
+    gap: 10px;
+}
+
+.saved-address-card {
+    display: grid;
+    gap: 4px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #111827;
+    text-align: left;
+    cursor: pointer;
+}
+
+.saved-address-card.selected {
+    border-color: #111827;
+    box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.08);
+}
+
+.saved-address-card small {
+    color: #4b5563;
+    line-height: 1.45;
+}
+
+.saved-address-card em {
+    width: fit-content;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+}
+
+.saved-address-error {
+    color: #b91c1c;
+    margin: 0;
+}
+
+.saved-address-empty {
+    color: #6b7280;
+    margin: 0;
+}
+
+.shipping-note {
+    color: #15803d;
+    font-size: 13px;
 }

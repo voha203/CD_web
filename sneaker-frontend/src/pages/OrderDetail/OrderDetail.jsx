@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FiCheckCircle, FiChevronLeft, FiCreditCard, FiMapPin, FiPackage, FiTruck } from 'react-icons/fi';
-import { getOrderById } from '../../services/orderService';
+import { FiCheckCircle, FiChevronLeft, FiCreditCard, FiMapPin, FiPackage, FiTruck, FiXCircle } from 'react-icons/fi';
+import { cancelOrder, getOrderById } from '../../services/orderService';
+import { createPaymentUrl } from '../../services/paymentService';
+import { getApiErrorMessage } from '../../services/apiError';
 import './OrderDetail.css';
 
 const getImageUrl = (images = []) => {
@@ -38,24 +40,62 @@ const getStatusLabel = (status) => {
     return labels[status] || status || 'N/A';
 };
 
+const getPaymentStatusLabel = (paymentStatus) => {
+    const labels = {
+        UNPAID: 'Chưa thanh toán',
+        PAID: 'Đã thanh toán',
+        COD_PENDING: 'Thanh toán khi nhận hàng',
+        FAILED: 'Thanh toán thất bại',
+        REFUND_PENDING: 'Chờ hoàn tiền',
+        REFUNDED: 'Đã hoàn tiền'
+    };
+
+    return labels[paymentStatus] || paymentStatus || 'Chưa thanh toán';
+};
+
+const canPayAgain = (order) => {
+    return order
+        && (order.paymentMethod === 'CARD' || order.paymentMethod === 'E-WALLET')
+        && (!order.paymentStatus || order.paymentStatus === 'UNPAID' || order.paymentStatus === 'FAILED')
+        && order.status !== 'CANCELLED';
+};
+
+const canCancelOrder = (order) => {
+    return order
+        && order.status === 'PENDING'
+        && order.paymentStatus !== 'REFUND_PENDING'
+        && order.paymentStatus !== 'REFUNDED';
+};
+
 function OrderDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [order, setOrder] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isActionLoading, setIsActionLoading] = useState(false);
     const [error, setError] = useState('');
+    const [actionError, setActionError] = useState('');
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [cancelReason, setCancelReason] = useState('');
 
-    useEffect(() => {
-        getOrderById(id)
+    const loadOrder = () => {
+        setIsLoading(true);
+        setError('');
+
+        return getOrderById(id)
             .then((res) => {
                 setOrder(res.data);
             })
             .catch((err) => {
-                setError(err.response?.data || err.message || 'Không thể tải chi tiết đơn hàng.');
+                setError(getApiErrorMessage(err, 'Không thể tải chi tiết đơn hàng.'));
             })
             .finally(() => {
                 setIsLoading(false);
             });
+    };
+
+    useEffect(() => {
+        loadOrder();
     }, [id]);
 
     const steps = [
@@ -67,6 +107,62 @@ function OrderDetail() {
 
     const currentStepIndex = Math.max(steps.findIndex(step => step.key === order?.status), 0);
     const subtotal = (order?.items || []).reduce((sum, item) => sum + (item.subTotal || item.price * item.quantity), 0);
+    const orderSubtotal = order?.subtotalAmount || subtotal;
+    const orderDiscount = order?.discountAmount || 0;
+    const orderShippingFee = order?.shippingFee || 0;
+    const orderFinalAmount = order?.finalAmount || order?.totalAmount || 0;
+
+    const handlePayAgain = async () => {
+        if (!canPayAgain(order)) return;
+
+        setIsActionLoading(true);
+        setActionError('');
+
+        try {
+            const bankCode = order.paymentMethod === 'CARD' ? 'NCB' : 'VNPAYQR';
+            const paymentRes = await createPaymentUrl(order.orderId, bankCode);
+            const paymentUrl = paymentRes.data?.paymentUrl || paymentRes.paymentUrl;
+
+            if (!paymentUrl) {
+                setActionError('Không thể tạo liên kết thanh toán VNPay.');
+                return;
+            }
+
+            window.location.href = paymentUrl;
+        } catch (err) {
+            setActionError(getApiErrorMessage(err, 'Không thể tạo liên kết thanh toán.'));
+        } finally {
+            setIsActionLoading(false);
+        }
+    };
+
+    const handleCancelOrder = async () => {
+        const reason = cancelReason.trim();
+
+        if (!reason) {
+            setActionError('Vui lòng nhập lý do hủy đơn.');
+            return;
+        }
+
+        if (reason.length > 500) {
+            setActionError('Lý do hủy đơn tối đa 500 ký tự.');
+            return;
+        }
+
+        setIsActionLoading(true);
+        setActionError('');
+
+        try {
+            const res = await cancelOrder(order.orderId, reason);
+            setOrder(res.data);
+            setIsCancelModalOpen(false);
+            setCancelReason('');
+        } catch (err) {
+            setActionError(getApiErrorMessage(err, 'Không thể hủy đơn hàng.'));
+        } finally {
+            setIsActionLoading(false);
+        }
+    };
 
     if (isLoading) {
         return (
@@ -105,8 +201,22 @@ function OrderDetail() {
                             Đặt ngày {formatDateTime(order.createdAt)} - Mã đơn hàng: <span>#MS-{order.orderId}</span>
                         </p>
                     </div>
-                    <button className="btn-print" onClick={() => window.print()}>In hóa đơn</button>
+                    <div className="detail-actions">
+                        {canPayAgain(order) && (
+                            <button className="btn-pay-again" onClick={handlePayAgain} disabled={isActionLoading}>
+                                {isActionLoading ? 'Đang xử lý...' : 'Thanh toán lại'}
+                            </button>
+                        )}
+                        {canCancelOrder(order) && (
+                            <button className="btn-cancel-order" onClick={() => setIsCancelModalOpen(true)} disabled={isActionLoading}>
+                                <FiXCircle /> Hủy đơn
+                            </button>
+                        )}
+                        <button className="btn-print" onClick={() => window.print()}>In hóa đơn</button>
+                    </div>
                 </div>
+
+                {actionError && <div className="order-action-error">{actionError}</div>}
 
                 <section className="invoice-header-card">
                     <div className="invoice-brand-block">
@@ -121,6 +231,8 @@ function OrderDetail() {
                         <p><span>Mã hóa đơn:</span> #MS-{order.orderId}</p>
                         <p><span>Ngày lập:</span> {formatDateTime(order.createdAt)}</p>
                         <p><span>Trạng thái:</span> {getStatusLabel(order.status)}</p>
+                        <p><span>Thanh toán:</span> {getPaymentStatusLabel(order.paymentStatus)}</p>
+                        {order.cancelReason && <p><span>Lý do hủy:</span> {order.cancelReason}</p>}
                     </div>
                 </section>
 
@@ -155,7 +267,9 @@ function OrderDetail() {
                         <h3 className="block-title"><FiCreditCard /> Phương thức thanh toán</h3>
                         <div className="block-content">
                             <p>{getPaymentLabel(order.paymentMethod)}</p>
-                            <p>Trạng thái: {getStatusLabel(order.status)}</p>
+                            <p>Trạng thái đơn: {getStatusLabel(order.status)}</p>
+                            <p>Trạng thái thanh toán: {getPaymentStatusLabel(order.paymentStatus)}</p>
+                            {order.cancelReason && <p>Lý do hủy: {order.cancelReason}</p>}
                         </div>
                     </div>
                 </div>
@@ -207,6 +321,15 @@ function OrderDetail() {
                                     <span className="item-price">
                                         {(item.subTotal || item.price * item.quantity).toLocaleString('vi-VN')} VND
                                     </span>
+                                    {order.status === 'DELIVERED' && (
+                                        <button
+                                            type="button"
+                                            className="btn-review-product"
+                                            onClick={() => navigate(`/products/${item.productId}`)}
+                                        >
+                                            Review
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -215,23 +338,63 @@ function OrderDetail() {
                     <div className="cost-summary-wrapper">
                         <div className="cost-row">
                             <span>Tạm tính</span>
-                            <span>{subtotal.toLocaleString('vi-VN')} VND</span>
+                            <span>{orderSubtotal.toLocaleString('vi-VN')} VND</span>
                         </div>
                         <div className="cost-row">
                             <span>Phí vận chuyển</span>
-                            <span>0 VND</span>
+                            <span>{orderShippingFee === 0 ? 'Miễn phí' : `${orderShippingFee.toLocaleString('vi-VN')} VND`}</span>
                         </div>
                         <div className="cost-row">
-                            <span>Giảm giá</span>
-                            <span>0 VND</span>
+                            <span>Mã giảm giá</span>
+                            <span>{order.discountCode || 'Không có'}</span>
+                        </div>
+                        <div className="cost-row">
+                            <span>Số tiền giảm</span>
+                            <span>-{orderDiscount.toLocaleString('vi-VN')} VND</span>
                         </div>
                         <div className="cost-row total-cost-row">
-                            <span>Tổng cộng</span>
-                            <span>{(order.totalAmount || 0).toLocaleString('vi-VN')} VND</span>
+                            <span>Tổng thanh toán</span>
+                            <span>{orderFinalAmount.toLocaleString('vi-VN')} VND</span>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {isCancelModalOpen && (
+                <div className="cancel-modal-overlay" role="dialog" aria-modal="true">
+                    <div className="cancel-modal">
+                        <h2>Hủy đơn hàng</h2>
+                        <p>Vui lòng cho shop biết lý do bạn muốn hủy đơn #MS-{order.orderId}.</p>
+                        <textarea
+                            value={cancelReason}
+                            onChange={(e) => setCancelReason(e.target.value)}
+                            maxLength={500}
+                            placeholder="Nhập lý do hủy đơn..."
+                            rows={5}
+                        />
+                        <div className="cancel-modal-footer">
+                            <button
+                                className="btn-modal-secondary"
+                                onClick={() => {
+                                    setIsCancelModalOpen(false);
+                                    setCancelReason('');
+                                    setActionError('');
+                                }}
+                                disabled={isActionLoading}
+                            >
+                                Đóng
+                            </button>
+                            <button
+                                className="btn-modal-danger"
+                                onClick={handleCancelOrder}
+                                disabled={isActionLoading}
+                            >
+                                {isActionLoading ? 'Đang hủy...' : 'Xác nhận hủy'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
