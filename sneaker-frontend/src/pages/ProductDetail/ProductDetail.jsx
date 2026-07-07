@@ -9,6 +9,8 @@ import { isAuthenticated } from "../../components/utils/auth";
 import { getApiErrorMessage } from "../../services/apiError";
 import { addWishlistItem, checkWishlistItem, removeWishlistItem } from "../../services/wishlistService";
 
+const PLACEHOLDER_IMAGE = "https://via.placeholder.com/600";
+
 function ProductDetail() {
     // Lấy id từ trên thanh URL xuống
     const { id } = useParams();
@@ -91,9 +93,12 @@ function ProductDetail() {
 
     // Map mảng object thành mảng các chuỗi URL
     const currentVariant = product.variants?.[selectedVariantIndex];
-    const rawImages = currentVariant?.images || [];
+    const rawImages = [...(currentVariant?.images || [])].sort(
+        (a, b) => Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0)
+    );
     let images = rawImages.map(img => {
         let url = img.imageUrl;
+        if (!url) return PLACEHOLDER_IMAGE;
         if (!url.startsWith("http")) {
             return `http://localhost:8080${url}`;
         }
@@ -102,7 +107,7 @@ function ProductDetail() {
 
     // Nếu không có ảnh, chèn 1 ảnh mặc định vào mảng
     if (images.length === 0) {
-        images.push("https://via.placeholder.com/600");
+        images.push(PLACEHOLDER_IMAGE);
     }
 
     // Hàm xử lý nút Next
@@ -256,12 +261,21 @@ function ProductDetail() {
                                 alt={`thumbnail-${index}`}
                                 className={currentIndex === index ? 'active' : ''}
                                 onMouseEnter={() => setCurrentIndex(index)}
+                                onError={(event) => {
+                                    event.currentTarget.src = PLACEHOLDER_IMAGE;
+                                }}
                             />
                         ))}
                     </div>
 
                     <div className="main-image-container">
-                        <img src={images[currentIndex]} alt="main-product" />
+                        <img
+                            src={images[currentIndex]}
+                            alt="main-product"
+                            onError={(event) => {
+                                event.currentTarget.src = PLACEHOLDER_IMAGE;
+                            }}
+                        />
 
                         <div className="nav-buttons">
                             <button className="nav-btn" onClick={handlePrev}>
@@ -306,18 +320,26 @@ function ProductDetail() {
                     <div className="colors">
                         {product.variants?.map((variant, index) => {
                             // Lấy ảnh đầu tiên của từng Variant để làm nút chọn màu
-                            const firstImgOfVariant = variant.images?.[0]?.imageUrl;
+                            const firstImage = [...(variant.images || [])].sort(
+                                (a, b) => Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0)
+                            )[0];
+                            const firstImgOfVariant = firstImage?.imageUrl;
                             const displayImg = firstImgOfVariant?.startsWith("http")
                                 ? firstImgOfVariant
-                                : `http://localhost:8080${firstImgOfVariant}`;
+                                : firstImgOfVariant
+                                    ? `http://localhost:8080${firstImgOfVariant}`
+                                    : PLACEHOLDER_IMAGE;
 
                             return (
                                 <img
                                     key={variant.id}
-                                    src={displayImg || "https://via.placeholder.com/600"}
+                                    src={displayImg || PLACEHOLDER_IMAGE}
                                     alt="variant-color"
                                     className={selectedVariantIndex === index ? 'active-variant' : ''}
                                     onClick={() => handleVariantChange(index)}
+                                    onError={(event) => {
+                                        event.currentTarget.src = PLACEHOLDER_IMAGE;
+                                    }}
                                     title={variant.color} // Hiện tên màu khi di chuột vào
                                 />
                             );

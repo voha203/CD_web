@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { saveAuth } from "../../components/utils/auth";
+import { isAdminUser, saveAuth } from "../../components/utils/auth";
 import { getProfile } from "../../services/profileService";
 import "./Auth.css";
 
@@ -33,7 +33,7 @@ function OAuth2Redirect() {
                     token,
                     user: profileRes.data
                 });
-                navigate("/", { replace: true });
+                navigate(isAdminUser(profileRes.data) ? "/admin/dashboard" : "/", { replace: true });
             } catch (err) {
                 localStorage.removeItem("token");
                 setMessage("Không thể tải thông tin tài khoản Google.");

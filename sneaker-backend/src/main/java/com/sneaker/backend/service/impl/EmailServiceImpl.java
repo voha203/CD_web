@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,6 +22,7 @@ public class EmailServiceImpl implements EmailService {
     private Environment environment;
 
     @Override
+    @Async
     public void sendOtpEmail(String toEmail, String otp) {
         safeSend(toEmail,
                 "Mã OTP đặt lại mật khẩu - MySneaker",
@@ -32,6 +34,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Async
     public void sendOrderPlacedEmail(Order order) {
         safeSend(order.getUser().getEmail(),
                 "MySneaker đã nhận đơn hàng #" + order.getId(),
@@ -39,6 +42,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Async
     public void sendPaymentSuccessEmail(Order order) {
         safeSend(order.getUser().getEmail(),
                 "Thanh toán thành công cho đơn hàng #" + order.getId(),
@@ -46,6 +50,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
+    @Async
     public void sendOrderCancelledEmail(Order order) {
         safeSend(order.getUser().getEmail(),
                 "Đơn hàng #" + order.getId() + " đã được hủy",

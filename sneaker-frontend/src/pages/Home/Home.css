@@ -185,6 +185,55 @@
     padding: 20px 0;
 }
 
+.home-page-loading {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #475569;
+    font-size: 14px;
+    margin: 14px auto 0;
+    max-width: 360px;
+    padding: 10px 14px;
+    text-align: center;
+}
+
+.home-pagination {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+.home-pagination button {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    color: #111827;
+    cursor: pointer;
+    display: inline-flex;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 38px;
+    min-width: 38px;
+    padding: 0 12px;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.home-pagination button:hover:not(:disabled),
+.home-pagination button.active {
+    background: #111827;
+    border-color: #111827;
+    color: #ffffff;
+}
+
+.home-pagination button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
 
 
 /* =========================== GIAO DIỆN RESPONSIVE =========================== */

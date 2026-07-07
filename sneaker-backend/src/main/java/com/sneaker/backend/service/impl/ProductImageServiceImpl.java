@@ -20,7 +20,9 @@ public class ProductImageServiceImpl implements ProductImageService {
 
         dto.setId(img.getId());
         dto.setImageUrl(img.getImageUrl());
+        dto.setPublicId(img.getPublicId());
         dto.setMain(img.isMain());
+        dto.setSortOrder(img.getSortOrder());
 
         return dto;
     }

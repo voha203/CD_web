@@ -4,6 +4,8 @@ import './ProductCard.css';
 import { isAuthenticated } from "../../utils/auth";
 import { addWishlistItem, checkWishlistItem, removeWishlistItem } from "../../../services/wishlistService";
 
+const PLACEHOLDER_IMAGE = "https://via.placeholder.com/300";
+
 function ProductCard({ product }) {
     const navigate = useNavigate();
     const [isFavorite, setIsFavorite] = useState(false);
@@ -17,15 +19,15 @@ function ProductCard({ product }) {
     };
 
     // Lấy mảng images từ Variant đầu tiên (nếu có)
-    const firstVariantImages = product.variants && product.variants.length > 0
-        ? product.variants[0].images
-        : [];
+    const allImages = (product.variants || [])
+        .flatMap(variant => variant.images || [])
+        .sort((a, b) => Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0));
 
     // Tìm ảnh có isMain = true (1), nếu không có thì lấy ảnh đầu tiên
     const mainImage =
-        firstVariantImages.find(img => img.isMain)?.imageUrl ||
-        firstVariantImages[0]?.imageUrl ||
-        "https://via.placeholder.com/300";
+        allImages.find(img => img.isMain || img.main)?.imageUrl ||
+        allImages[0]?.imageUrl ||
+        PLACEHOLDER_IMAGE;
     const originalPrice = product.price || 0;
     const finalPrice = product.finalPrice ?? originalPrice;
     const onSale = product.onSale || finalPrice < originalPrice;
@@ -104,6 +106,9 @@ function ProductCard({ product }) {
                         src={mainImage}
                         alt={product.name}
                         className="product-image"
+                        onError={(event) => {
+                            event.currentTarget.src = PLACEHOLDER_IMAGE;
+                        }}
                     />
                 </div>
 
