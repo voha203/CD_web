@@ -3,8 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import './ProductCard.css';
 import { isAuthenticated } from "../../utils/auth";
 import { addWishlistItem, checkWishlistItem, removeWishlistItem } from "../../../services/wishlistService";
+import { PLACEHOLDER_IMAGE_300 } from "../../../config/apiConfig";
 
-const PLACEHOLDER_IMAGE = "https://via.placeholder.com/300";
+const PLACEHOLDER_IMAGE = PLACEHOLDER_IMAGE_300;
 
 function ProductCard({ product }) {
     const navigate = useNavigate();

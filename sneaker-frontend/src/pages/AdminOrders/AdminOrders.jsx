@@ -9,7 +9,7 @@ import {
     updateAdminOrderStatus,
     updateAdminPaymentStatus
 } from '../../services/adminService';
-import { resolveAssetUrl } from '../../config/apiConfig';
+import { PLACEHOLDER_IMAGE_300, resolveAssetUrl } from '../../config/apiConfig';
 import './AdminOrders.css';
 
 const orderStatuses = ['ALL', 'PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
@@ -37,7 +37,7 @@ const formatDateTime = (value) => value ? new Date(value).toLocaleString('vi-VN'
 
 const getImageUrl = (images = []) => {
     const imageUrl = images[0]?.imageUrl;
-    if (!imageUrl) return 'https://via.placeholder.com/300';
+    if (!imageUrl) return PLACEHOLDER_IMAGE_300;
     return resolveAssetUrl(imageUrl);
 };
 

@@ -201,14 +201,17 @@
     justify-content: center;
     gap: 30px;
     background-color: #f8f8f8;
-    padding-top: 20px;
+    padding: 20px 24px 40px;
+    box-sizing: border-box;
 }
 
 /* ================= CỘT TRÁI: CÁC BƯỚC THANH TOÁN ================= --- */
 .checkout-steps-column {
     flex: 7;
     background-color: #f8f8f8;
-    margin-left: 90px;
+    margin-left: 0;
+    min-width: 0;
+    max-width: 860px;
 }
 
 /* ================= CÁC KHỐI BƯỚC (STEPS) ================= --- */
@@ -554,7 +557,9 @@
     flex: 3;
     position: sticky;
     top: 20px;
-    margin-right: 90px;
+    margin-right: 0;
+    min-width: 300px;
+    max-width: 420px;
 }
 
 .summary-box {
@@ -601,6 +606,7 @@
     flex: 1;
     font-size: 14px;
     padding: 9px 10px;
+    min-width: 0;
 }
 
 .coupon-input-row button {
@@ -718,17 +724,21 @@
 @media screen and (max-width: 768px) {
     .checkout-main-content {
         flex-direction: column;
+        gap: 16px;
+        padding: 14px;
     }
 
     .checkout-steps-column,
     .checkout-summary-column {
         width: 100%;
         flex: none;
+        max-width: none;
+        min-width: 0;
     }
 
     .checkout-summary-column {
         position: static;
-        margin-top: 20px;
+        margin-top: 0;
     }
 }
 
@@ -803,4 +813,145 @@
 .shipping-note {
     color: #15803d;
     font-size: 13px;
+}
+
+@media screen and (max-width: 576px) {
+    .checkout-page-container {
+        background: #f8f8f8;
+        min-width: 0;
+    }
+
+    .checkout-page-container .nav-main {
+        gap: 8px;
+        min-height: 58px;
+        padding: 8px 10px;
+    }
+
+    .checkout-page-container .logo-text {
+        font-size: 20px;
+    }
+
+    .secure-checkout-container {
+        min-width: 0;
+    }
+
+    .checkout-text {
+        font-size: 14px;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .secure-popup-box {
+        left: 50%;
+        max-width: calc(100vw - 28px);
+        padding: 16px;
+        transform: translateX(-50%);
+        width: 320px;
+    }
+
+    .checkout-main-content {
+        padding: 12px;
+    }
+
+    .checkout-step {
+        border-radius: 12px;
+        margin-bottom: 12px;
+        padding-left: 0;
+    }
+
+    .step-header {
+        align-items: flex-start;
+        gap: 10px;
+        padding: 14px;
+    }
+
+    .step-title-wrapper {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .step-title-wrapper h3 {
+        font-size: 20px;
+        line-height: 1.25;
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .step-title-content p {
+        margin-top: 4px;
+    }
+
+    .change-btn {
+        padding: 0;
+    }
+
+    .step-body {
+        padding: 0 14px 16px;
+    }
+
+    .saved-addresses-box {
+        padding: 12px;
+    }
+
+    .saved-addresses-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .saved-address-card {
+        overflow-wrap: anywhere;
+    }
+
+    .address-form .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .address-form .form-group {
+        max-width: none;
+        width: 100%;
+    }
+
+    .suggestions-dropdown {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .payment-options {
+        max-width: none;
+    }
+
+    .review-item {
+        gap: 12px;
+    }
+
+    .product-image-wrapper img {
+        height: 72px;
+        width: 72px;
+    }
+
+    .coupon-input-row {
+        flex-direction: column;
+    }
+
+    .coupon-input-row button {
+        min-height: 42px;
+        width: 100%;
+    }
+
+    .billing-row {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .billing-row span:last-child,
+    .billing-row strong:last-child {
+        text-align: right;
+    }
+
+    .place-order-btn {
+        min-height: 46px;
+    }
 }

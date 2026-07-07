@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { uploadAdminProductImage } from '../../../services/adminService';
 import { getApiErrorMessage } from '../../../services/apiError';
+import { PLACEHOLDER_IMAGE_300 } from '../../../config/apiConfig';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ACCEPTED_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/300';
+const PLACEHOLDER_IMAGE = PLACEHOLDER_IMAGE_300;
 
 function ImageManager({ images = [], onChange }) {
     const [isDragging, setIsDragging] = useState(false);

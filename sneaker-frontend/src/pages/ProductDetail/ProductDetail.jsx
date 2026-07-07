@@ -8,9 +8,9 @@ import { addToCart } from "../../services/cartService";
 import { isAuthenticated } from "../../components/utils/auth";
 import { getApiErrorMessage } from "../../services/apiError";
 import { addWishlistItem, checkWishlistItem, removeWishlistItem } from "../../services/wishlistService";
-import { resolveAssetUrl } from "../../config/apiConfig";
+import { PLACEHOLDER_IMAGE_600, resolveAssetUrl } from "../../config/apiConfig";
 
-const PLACEHOLDER_IMAGE = "https://via.placeholder.com/600";
+const PLACEHOLDER_IMAGE = PLACEHOLDER_IMAGE_600;
 
 function ProductDetail() {
     // Lấy id từ trên thanh URL xuống
