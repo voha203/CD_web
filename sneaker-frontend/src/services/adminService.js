@@ -48,6 +48,15 @@ export const updateAdminProductStatus = (id, active) => {
     return apiClient.patch(`/admin/products/${id}/status`, { active });
 };
 
+export const uploadAdminProductImage = (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return apiClient.post("/admin/uploads/images", formData, {
+        timeout: 60000
+    });
+};
+
 export const getAdminCategories = (params = {}) => {
     return apiClient.get("/admin/categories", { params });
 };

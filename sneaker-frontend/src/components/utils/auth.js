@@ -20,6 +20,15 @@ export const saveAuth = ({ token, user }) => {
     window.dispatchEvent(new Event("auth-changed"));
 };
 
+export const normalizeRole = (role) => {
+    if (!role) return "";
+    return String(role).toUpperCase().replace("ROLE_", "");
+};
+
+export const isAdminUser = (user) => {
+    return normalizeRole(user?.role) === "ADMIN";
+};
+
 export const updateStoredUser = (userPatch) => {
     const currentUser = getCurrentUser();
     const nextUser = { ...(currentUser || {}), ...(userPatch || {}) };

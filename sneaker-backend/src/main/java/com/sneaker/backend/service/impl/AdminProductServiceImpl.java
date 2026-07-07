@@ -225,7 +225,11 @@ public class AdminProductServiceImpl implements AdminProductService {
             ProductImage image = new ProductImage();
             image.setVariant(variant);
             image.setImageUrl(request.getImageUrl().trim());
+            image.setPublicId(request.getPublicId() == null || request.getPublicId().trim().isEmpty()
+                    ? null
+                    : request.getPublicId().trim());
             image.setMain(Boolean.TRUE.equals(request.getMain()) || (!hasMain && i == 0));
+            image.setSortOrder(request.getSortOrder() == null ? i : request.getSortOrder());
             imageRepository.save(image);
         }
     }

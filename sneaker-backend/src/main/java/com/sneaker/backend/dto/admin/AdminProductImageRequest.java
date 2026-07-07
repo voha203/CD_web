@@ -10,5 +10,9 @@ public class AdminProductImageRequest {
     @NotBlank(message = "URL ảnh không được để trống")
     private String imageUrl;
 
+    private String publicId;
+
     private Boolean main;
+
+    private Integer sortOrder;
 }

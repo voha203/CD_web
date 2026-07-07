@@ -16,7 +16,9 @@ const normalizeVariant = (variant) => ({
     images: (variant.images || []).map(image => ({
         id: image.id,
         imageUrl: image.imageUrl,
-        main: image.main ?? image.isMain ?? false
+        publicId: image.publicId || '',
+        main: image.main ?? image.isMain ?? false,
+        sortOrder: image.sortOrder ?? 0
     })),
     sizes: variant.sizes || []
 });
@@ -70,7 +72,9 @@ function ProductForm({ product, categories, sizes, onClose, onSubmit, isSaving }
                 images: (variant.images || []).map(image => ({
                     id: image.id,
                     imageUrl: image.imageUrl,
-                    main: Boolean(image.main)
+                    publicId: image.publicId || '',
+                    main: Boolean(image.main),
+                    sortOrder: image.sortOrder ?? 0
                 }))
             }))
         });

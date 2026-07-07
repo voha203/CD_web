@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { detectIdentifier } from "../utils/validate";
-import { saveAuth } from "../utils/auth";
+import { isAdminUser, saveAuth } from "../utils/auth";
 import { forgotPassword, login, register, resetPassword } from "../../services/authService";
 import { getApiErrorMessage } from "../../services/apiError";
 
@@ -22,6 +22,9 @@ export const useAuth = () => {
     const [otp, setOtp] = useState("");
 
     const redirectTo = location.state?.from?.pathname || "/";
+    const getPostLoginRedirect = (user) => {
+        return isAdminUser(user) ? "/admin/dashboard" : redirectTo;
+    };
 
     const resetForm = () => {
         setPassword("");
@@ -82,7 +85,7 @@ export const useAuth = () => {
                 user: res.data.user
             });
 
-            navigate(redirectTo, { replace: true });
+            navigate(getPostLoginRedirect(res.data.user), { replace: true });
         } catch (err) {
             setError(getApiErrorMessage(err, "Sign in failed. Please check your account and password."));
         } finally {
@@ -129,7 +132,7 @@ export const useAuth = () => {
                 user: res.data.user
             });
 
-            navigate(redirectTo, { replace: true });
+            navigate(getPostLoginRedirect(res.data.user), { replace: true });
         } catch (err) {
             setError(getApiErrorMessage(err, "Could not create account. Please try another email or phone."));
         } finally {

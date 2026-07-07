@@ -32,6 +32,7 @@ public class ProductVariant {
     private Product product;
 
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OrderBy("sortOrder ASC, id ASC")
     private List<ProductImage> images;
 
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL)
