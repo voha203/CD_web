@@ -27,7 +27,7 @@ function Home() {
           getSaleProducts()
         ]);
 
-        setProducts(Array.isArray(productData) ? productData : []);
+        setProducts(Array.isArray(productData) ? productData : (productData.content || []));
         setSaleProducts(Array.isArray(saleRes.data) ? saleRes.data : []);
         setIsLoading(false);
       } catch (err) {

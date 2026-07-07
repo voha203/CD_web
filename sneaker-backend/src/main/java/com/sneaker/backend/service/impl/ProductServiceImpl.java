@@ -1,5 +1,6 @@
 package com.sneaker.backend.service.impl;
 
+import com.sneaker.backend.dto.common.PageResponse;
 import com.sneaker.backend.dto.product.ProductResponse;
 import com.sneaker.backend.dto.product.ProductRequest;
 import com.sneaker.backend.entity.Category;
@@ -13,13 +14,16 @@ import com.sneaker.backend.service.ProductService;
 
 import com.sneaker.backend.specification.ProductSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,10 +48,11 @@ public class ProductServiceImpl implements ProductService {
     // GET ALL
     // =========================
     @Override
-    public List<ProductResponse> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes, String keyword) {
+    public PageResponse<ProductResponse> getAll(int page, int size, String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes, String keyword) {
         // Tạo đối tượng Sort từ tham số truyền vào
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort sort = Sort.by(direction, sortBy);
+        Sort sort = Sort.by(direction, normalizeSortBy(sortBy));
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), 60), sort);
 
         // Gom các điều kiện lọc động lại (Nếu param truyền vào là null, JPA tự động bỏ qua điều kiện đó)
         Specification<Product> spec = Specification.where(ProductSpecification.isActive())
@@ -59,11 +64,25 @@ public class ProductServiceImpl implements ProductService {
                 .and(ProductSpecification.hasKeyword(keyword));
 
         // Tìm kiếm theo cả Bộ lọc (Specification) và Sắp xếp (Sort)
-        List<Product> products = productRepository.findAll(spec, sort);
-
-        return products.stream()
+        Page<Product> products = productRepository.findAll(spec, pageable);
+        List<ProductResponse> content = products.getContent().stream()
                 .map(this::enrichProductDTO)
                 .collect(Collectors.toList());
+
+        return new PageResponse<>(
+                content,
+                products.getNumber(),
+                products.getSize(),
+                products.getTotalElements(),
+                products.getTotalPages(),
+                products.isFirst(),
+                products.isLast()
+        );
+    }
+
+    private String normalizeSortBy(String sortBy) {
+        Set<String> allowedFields = Set.of("id", "name", "price", "brand", "createdAt");
+        return allowedFields.contains(sortBy) ? sortBy : "id";
     }
 
     // =========================

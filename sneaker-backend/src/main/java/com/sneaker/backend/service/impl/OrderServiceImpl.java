@@ -8,6 +8,7 @@ import com.sneaker.backend.entity.CartItem;
 import com.sneaker.backend.entity.Order;
 import com.sneaker.backend.entity.OrderItem;
 import com.sneaker.backend.entity.ProductVariantSize;
+import com.sneaker.backend.entity.ShippingAddress;
 import com.sneaker.backend.entity.User;
 import com.sneaker.backend.mapper.OrderMapper;
 import com.sneaker.backend.repository.CartRepository;
@@ -17,6 +18,8 @@ import com.sneaker.backend.repository.UserRepository;
 import com.sneaker.backend.service.CouponService;
 import com.sneaker.backend.service.DiscountService;
 import com.sneaker.backend.service.OrderService;
+import com.sneaker.backend.service.ShippingAddressService;
+import com.sneaker.backend.service.ShippingFeeService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -52,6 +55,12 @@ public class OrderServiceImpl implements OrderService {
     private DiscountService discountService;
 
     @Autowired
+    private ShippingAddressService shippingAddressService;
+
+    @Autowired
+    private ShippingFeeService shippingFeeService;
+
+    @Autowired
     private OrderMapper orderMapper;
 
     @Override
@@ -71,9 +80,11 @@ public class OrderServiceImpl implements OrderService {
 
         Order order = new Order();
         order.setUser(user);
-        order.setReceiverName(request.getReceiverName());
-        order.setReceiverPhone(request.getReceiverPhone());
-        order.setShippingAddress(request.getShippingAddress());
+        ShippingSnapshot shippingSnapshot = resolveShippingSnapshot(request, currentUserId);
+        order.setReceiverName(shippingSnapshot.receiverName());
+        order.setReceiverPhone(shippingSnapshot.receiverPhone());
+        order.setShippingAddress(shippingSnapshot.fullAddress());
+        order.setShippingAddressId(shippingSnapshot.addressId());
         order.setNote(request.getNote());
         order.setPaymentMethod(request.getPaymentMethod());
         order.setPaymentStatus("COD".equals(request.getPaymentMethod()) ? "COD_PENDING" : "UNPAID");
@@ -102,11 +113,16 @@ public class OrderServiceImpl implements OrderService {
         }
 
         CouponCalculation couponCalculation = couponService.calculate(cart, request.getCouponCode());
+        double shippingFee = shippingFeeService.calculateFee(shippingSnapshot.regionSource(), couponCalculation.getSubtotalAmount());
+        double finalAmount = Math.max(0D, couponCalculation.getFinalAmount()) + shippingFee;
+
         order.setSubtotalAmount(couponCalculation.getSubtotalAmount());
         order.setDiscountCode(couponCalculation.getCouponCode());
         order.setDiscountAmount(couponCalculation.getDiscountAmount());
-        order.setFinalAmount(couponCalculation.getFinalAmount());
-        order.setTotalAmount(couponCalculation.getFinalAmount());
+        order.setShippingFee(shippingFee);
+        order.setShippingRegion(shippingFeeService.resolveRegion(shippingSnapshot.regionSource()));
+        order.setFinalAmount(finalAmount);
+        order.setTotalAmount(finalAmount);
 
         Order savedOrder = orderRepository.save(order);
         couponService.markCouponUsed(couponCalculation.getCouponCode());
@@ -201,5 +217,29 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         return user.getId();
+    }
+
+    private ShippingSnapshot resolveShippingSnapshot(OrderRequest request, Long currentUserId) {
+        if (request.getShippingAddressId() != null) {
+            ShippingAddress address = shippingAddressService.getOwnedAddressEntity(request.getShippingAddressId(), currentUserId);
+            return new ShippingSnapshot(
+                    address.getId(),
+                    address.getReceiverName(),
+                    address.getReceiverPhone(),
+                    address.getFullAddress(),
+                    address.getProvince()
+            );
+        }
+
+        return new ShippingSnapshot(
+                null,
+                request.getReceiverName(),
+                request.getReceiverPhone(),
+                request.getShippingAddress(),
+                request.getShippingAddress()
+        );
+    }
+
+    private record ShippingSnapshot(Long addressId, String receiverName, String receiverPhone, String fullAddress, String regionSource) {
     }
 }

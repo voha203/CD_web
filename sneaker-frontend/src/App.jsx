@@ -11,6 +11,7 @@ import ThankYou from './pages/ThankYou/ThankYou';
 import Orders from './pages/Orders/Orders';
 import OrderDetail from './pages/OrderDetail/OrderDetail';
 import Auth from './pages/Auth/Auth';
+import OAuth2Redirect from './pages/Auth/OAuth2Redirect';
 import ChangePassword from './pages/ChangePassword/ChangePassword';
 import AdminCoupons from './pages/AdminCoupons/AdminCoupons';
 import AdminDiscounts from './pages/AdminDiscounts/AdminDiscounts';
@@ -101,6 +102,7 @@ function App() {
 
           <Route path="/login" element={<Auth />} />
           <Route path="/register" element={<Auth />} />
+          <Route path="/oauth2/redirect" element={<OAuth2Redirect />} />
 
           <Route path="/checkout" element={<ProtectedRoute roles={["USER"]}><Checkout /></ProtectedRoute>} />
         </Routes>

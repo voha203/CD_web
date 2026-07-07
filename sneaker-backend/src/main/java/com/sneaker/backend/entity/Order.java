@@ -27,6 +27,9 @@ public class Order {
     private String receiverName;
     private String receiverPhone;
     private String shippingAddress;
+    private Long shippingAddressId;
+    private double shippingFee;
+    private String shippingRegion;
     private String note;
 
     private double totalAmount; // Tổng tiền hóa đơn

@@ -81,6 +81,7 @@ public class AuthController {
         dto.setPhone(u.getPhone());
         dto.setAddress(u.getAddress());
         dto.setAvatarUrl(u.getAvatarUrl());
+        dto.setProvider(u.getProvider());
         dto.setRole(u.getRole());
         return dto;
     }

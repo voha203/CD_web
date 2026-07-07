@@ -252,7 +252,10 @@ function AdminOrders() {
                                             <strong>{order.receiverName}</strong>
                                             <span>{order.receiverPhone}</span>
                                         </td>
-                                        <td>{formatMoney(order.finalAmount || order.totalAmount)}</td>
+                                        <td>
+                                            {formatMoney(order.finalAmount || order.totalAmount)}
+                                            <span>Ship: {order.shippingFee ? formatMoney(order.shippingFee) : 'Miễn phí'}</span>
+                                        </td>
                                         <td><span className={`admin-badge status-${order.status}`}>{statusLabels[order.status] || order.status}</span></td>
                                         <td><span className={`admin-badge payment-${order.paymentStatus}`}>{paymentLabels[order.paymentStatus] || order.paymentStatus}</span></td>
                                         <td>{formatDateTime(order.createdAt)}</td>
@@ -376,6 +379,7 @@ function AdminOrders() {
                                 </div>
 
                                 <div className="admin-order-money">
+                                    <div><span>Phí vận chuyển</span><strong>{selectedOrder.shippingFee ? formatMoney(selectedOrder.shippingFee) : 'Miễn phí'}</strong></div>
                                     <div><span>Tạm tính</span><strong>{formatMoney(selectedOrder.subtotalAmount)}</strong></div>
                                     <div><span>Mã giảm giá</span><strong>{selectedOrder.discountCode || 'Không có'}</strong></div>
                                     <div><span>Số tiền giảm</span><strong>-{formatMoney(selectedOrder.discountAmount)}</strong></div>

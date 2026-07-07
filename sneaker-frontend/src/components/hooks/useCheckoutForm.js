@@ -7,6 +7,7 @@ export const useCheckoutForm = () => {
         receiverName: '',
         receiverPhone: '',
         shippingAddress: '',
+        shippingAddressId: null,
         paymentMethod: 'COD',
         note: '',
     });
@@ -52,7 +53,8 @@ export const useCheckoutForm = () => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: value,
+            ...(name === 'shippingAddress' ? { shippingAddressId: null } : {})
         }));
 
         if (name === 'shippingAddress') {

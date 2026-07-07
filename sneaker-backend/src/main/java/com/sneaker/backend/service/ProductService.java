@@ -2,12 +2,13 @@ package com.sneaker.backend.service;
 
 import com.sneaker.backend.dto.product.ProductResponse;
 import com.sneaker.backend.dto.product.ProductRequest;
+import com.sneaker.backend.dto.common.PageResponse;
 
 import java.util.List;
 
 public interface ProductService {
 
-    List<ProductResponse> getAll(String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes, String keyword);
+    PageResponse<ProductResponse> getAll(int page, int size, String sortBy, String sortDir, List<String> brands, Double minPrice, Double maxPrice, Long categoryId, List<Integer> sizes, String keyword);
 
     List<ProductResponse> getSuggestions(String keyword);
 

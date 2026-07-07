@@ -1,6 +1,7 @@
 package com.sneaker.backend.dto.order;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -11,6 +12,9 @@ public class OrderRequest {
 
     @Size(max = 50, message = "Mã giảm giá tối đa 50 ký tự")
     private String couponCode;
+
+    @Min(value = 1, message = "Địa chỉ giao hàng không hợp lệ")
+    private Long shippingAddressId;
     @NotBlank(message = "Tên người nhận không được để trống")
     @Size(max = 100, message = "Tên người nhận tối đa 100 ký tự")
     private String receiverName;

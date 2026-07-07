@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getGoogleLoginUrl } from "../../../services/authService";
 
 export default function LoginStep({
     identifier,
@@ -17,6 +18,10 @@ export default function LoginStep({
     const handleSubmit = (e) => {
         e.preventDefault();
         onLogin();
+    };
+
+    const handleGoogleLogin = () => {
+        window.location.href = getGoogleLoginUrl();
     };
 
     return (
@@ -73,14 +78,15 @@ export default function LoginStep({
             </div>
 
             <div className="login-box-btn">
-                <button className="other-login-btn" type="button" onClick={onCreate}>
-                    Create a new account
+                <button className="google-login-btn" type="button" onClick={handleGoogleLogin}>
+                    <span className="google-mark" aria-hidden="true">G</span>
+                    Continue with Google
                 </button>
             </div>
 
             <div className="login-box-btn">
                 <button className="other-login-btn" type="button" onClick={onCreate}>
-                    Continue to registration
+                    Create a new account
                 </button>
             </div>
         </form>

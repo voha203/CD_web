@@ -109,6 +109,7 @@ function OrderDetail() {
     const subtotal = (order?.items || []).reduce((sum, item) => sum + (item.subTotal || item.price * item.quantity), 0);
     const orderSubtotal = order?.subtotalAmount || subtotal;
     const orderDiscount = order?.discountAmount || 0;
+    const orderShippingFee = order?.shippingFee || 0;
     const orderFinalAmount = order?.finalAmount || order?.totalAmount || 0;
 
     const handlePayAgain = async () => {
@@ -332,7 +333,7 @@ function OrderDetail() {
                         </div>
                         <div className="cost-row">
                             <span>Phí vận chuyển</span>
-                            <span>0 VND</span>
+                            <span>{orderShippingFee === 0 ? 'Miễn phí' : `${orderShippingFee.toLocaleString('vi-VN')} VND`}</span>
                         </div>
                         <div className="cost-row">
                             <span>Mã giảm giá</span>

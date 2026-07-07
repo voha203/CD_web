@@ -1,5 +1,6 @@
 package com.sneaker.backend.controller;
 
+import com.sneaker.backend.dto.common.PageResponse;
 import com.sneaker.backend.dto.product.ProductResponse;
 import com.sneaker.backend.dto.product.ProductRequest;
 import com.sneaker.backend.service.ProductService;
@@ -19,7 +20,9 @@ public class ProductController {
     private ProductService service;
 
     @GetMapping
-    public List<ProductResponse> getAll(@RequestParam(defaultValue = "id") String sortBy,
+    public PageResponse<ProductResponse> getAll(@RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "12") int size,
+                                        @RequestParam(defaultValue = "id") String sortBy,
                                         @RequestParam(defaultValue = "asc") String sortDir,
                                         @RequestParam(required = false) List<String> brands,
                                         @RequestParam(required = false) Double minPrice,
@@ -27,7 +30,7 @@ public class ProductController {
                                         @RequestParam(required = false) Long categoryId,
                                         @RequestParam(required = false) List<Integer> sizes,
                                         @RequestParam(required = false) String keyword) {
-        return service.getAll(sortBy, sortDir,  brands, minPrice, maxPrice, categoryId, sizes, keyword);
+        return service.getAll(page, size, sortBy, sortDir,  brands, minPrice, maxPrice, categoryId, sizes, keyword);
     }
 
     @GetMapping("/suggestions")

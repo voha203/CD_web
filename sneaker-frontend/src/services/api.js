@@ -12,7 +12,22 @@ const fetchJson = async (url, options, fallback) => {
   return res.json();
 };
 
-export const getProducts = async () => {
+export const getProducts = async (params = {}) => {
+  const query = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === "") return;
+    if (Array.isArray(value)) {
+      if (value.length > 0) query.append(key, value.join(","));
+      return;
+    }
+    query.append(key, value);
+  });
+
+  const suffix = query.toString() ? `?${query.toString()}` : "";
+  if (suffix) {
+    return fetchJson(`${BASE_URL}/products${suffix}`, undefined, "KhÃ´ng thá»ƒ táº£i danh sÃ¡ch sáº£n pháº©m");
+  }
   return fetchJson(`${BASE_URL}/products`, undefined, "Không thể tải danh sách sản phẩm");
 };
 

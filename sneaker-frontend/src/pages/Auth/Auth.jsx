@@ -7,9 +7,14 @@ import LoginStep from "./components/LoginStep";
 import OtpStep from "./components/OtpStep";
 import RegisterStep from "./components/RegisterStep";
 import ResetPasswordStep from "./components/ResetPasswordStep";
+import { useSearchParams } from "react-router-dom";
 
 function Auth() {
     const auth = useAuth();
+    const [searchParams] = useSearchParams();
+    const oauthError = searchParams.get("oauth2Error")
+        ? "Không thể đăng nhập bằng Google. Vui lòng thử lại."
+        : "";
 
     return (
         <div className="auth">
@@ -26,7 +31,7 @@ function Auth() {
                         identifier={auth.identifier}
                         setIdentifier={auth.setIdentifier}
                         onContinue={auth.handleContinue}
-                        error={auth.error}
+                        error={auth.error || oauthError}
                         isSubmitting={auth.isSubmitting}
                     />
                 )}

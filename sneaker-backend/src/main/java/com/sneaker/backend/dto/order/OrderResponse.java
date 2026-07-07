@@ -17,6 +17,9 @@ public class OrderResponse {
     private String receiverName;
     private String receiverPhone;
     private String shippingAddress;
+    private Long shippingAddressId;
+    private double shippingFee;
+    private String shippingRegion;
     private List<OrderItemResponse> items;
     private String paymentMethod;
     private String cancelReason;

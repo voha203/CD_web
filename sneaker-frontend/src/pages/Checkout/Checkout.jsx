@@ -7,10 +7,26 @@ import { placeOrder } from "../../services/orderService";
 import { useCart } from "../../context/CartContext";
 import { createPaymentUrl } from "../../services/paymentService"
 import { validateCoupon } from "../../services/couponService";
+import { getAddresses } from "../../services/addressService";
 import { getApiErrorMessage } from "../../services/apiError";
 
 import { FiMapPin, FiLoader } from "react-icons/fi";
 import MapPicker from '../../components/layout/mapPicker/MapPicker';
+
+const calculateShippingFee = (provinceOrAddress, subtotal) => {
+    if (subtotal >= 1000000) return 0;
+    const normalized = (provinceOrAddress || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+
+    return normalized.includes("ho chi minh")
+        || normalized.includes("hcm")
+        || normalized.includes("tphcm")
+        || normalized.includes("sai gon")
+        ? 20000
+        : 35000;
+};
 
 function Checkout() {
     const {
@@ -37,6 +53,9 @@ function Checkout() {
     const [couponMessage, setCouponMessage] = useState("");
     const [couponError, setCouponError] = useState("");
     const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+    const [addresses, setAddresses] = useState([]);
+    const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+    const [addressError, setAddressError] = useState("");
 
     // Đồng bộ map ban đầu (tránh gọi API liên tục)
     const hasSyncedInitialMap = useRef(false);
@@ -45,7 +64,41 @@ function Checkout() {
     const { fetchCartCount } = useCart();
     const subtotalAmount = cartData?.totalPrice || 0;
     const discountAmount = couponQuote?.discountAmount || 0;
-    const finalAmount = couponQuote?.finalAmount ?? subtotalAmount;
+    const selectedAddress = addresses.find(address => address.id === formData.shippingAddressId);
+    const shippingRegionSource = selectedAddress?.province || formData.shippingAddress;
+    const shippingFee = calculateShippingFee(shippingRegionSource, subtotalAmount);
+    const finalAmount = (couponQuote?.finalAmount ?? subtotalAmount) + shippingFee;
+
+    useEffect(() => {
+        let active = true;
+
+        const loadAddresses = async () => {
+            setIsLoadingAddresses(true);
+            setAddressError("");
+
+            try {
+                const res = await getAddresses();
+                if (!active) return;
+
+                const list = res.data || [];
+                setAddresses(list);
+                const defaultAddress = list.find(item => item.isDefault) || list[0];
+                if (defaultAddress) {
+                    applyAddress(defaultAddress);
+                }
+            } catch (err) {
+                if (active) setAddressError(getApiErrorMessage(err, "Không thể tải địa chỉ giao hàng."));
+            } finally {
+                if (active) setIsLoadingAddresses(false);
+            }
+        };
+
+        loadAddresses();
+
+        return () => {
+            active = false;
+        };
+    }, []);
 
     // Đồng bộ map với địa chỉ ban đầu
     useEffect(() => {
@@ -95,8 +148,24 @@ function Checkout() {
         setShowSuggestions(false);  // Ngừng hiển thị gợi ý
         setSuggestions([]);
 
-        setFormData(prev => ({ ...prev, shippingAddress: suggestion.display_name }));
+        setFormData(prev => ({ ...prev, shippingAddress: suggestion.display_name, shippingAddressId: null }));
         setMapPosition([lat, lon]);
+    };
+
+    const applyAddress = (address) => {
+        setFormData(prev => ({
+            ...prev,
+            shippingAddressId: address.id,
+            receiverName: address.receiverName || prev.receiverName,
+            receiverPhone: address.receiverPhone || prev.receiverPhone,
+            shippingAddress: address.fullAddress || prev.shippingAddress
+        }));
+        setErrors(prev => ({
+            ...prev,
+            receiverName: "",
+            receiverPhone: "",
+            shippingAddress: ""
+        }));
     };
 
     // Lấy ra vị trí hiện tại của người dùng dựa trên dữ liệu "Address" trong cơ sở dữ liệu
@@ -115,7 +184,7 @@ function Checkout() {
                     const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=vi`);
                     const data = await response.json();
                     if (data?.display_name) {
-                        setFormData(prev => ({ ...prev, shippingAddress: data.display_name }));
+                        setFormData(prev => ({ ...prev, shippingAddress: data.display_name, shippingAddressId: null }));
                     }
                 } catch (error) {
                     console.error("Lỗi lấy địa chỉ:", error);
@@ -349,6 +418,34 @@ function Checkout() {
                         {activeStep === 1 && (
                             <div className="step-body fade-in">
                                 <form className="address-form">
+                                    <div className="saved-addresses-box">
+                                        <div className="saved-addresses-header">
+                                            <strong>Địa chỉ đã lưu</strong>
+                                            {isLoadingAddresses && <span>Đang tải...</span>}
+                                        </div>
+                                        {addressError && <p className="saved-address-error">{addressError}</p>}
+                                        {!isLoadingAddresses && addresses.length === 0 && (
+                                            <p className="saved-address-empty">Bạn chưa có địa chỉ lưu sẵn. Hãy nhập địa chỉ thủ công bên dưới.</p>
+                                        )}
+                                        {addresses.length > 0 && (
+                                            <div className="saved-address-list">
+                                                {addresses.map(address => (
+                                                    <button
+                                                        key={address.id}
+                                                        type="button"
+                                                        className={`saved-address-card ${formData.shippingAddressId === address.id ? "selected" : ""}`}
+                                                        onClick={() => applyAddress(address)}
+                                                    >
+                                                        <span>
+                                                            <strong>{address.receiverName}</strong> - {address.receiverPhone}
+                                                        </span>
+                                                        <small>{address.fullAddress}</small>
+                                                        {address.isDefault && <em>Mặc định</em>}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="form-row">
                                         <div className={`form-group ${errors.receiverName ? 'has-error' : ''}`}>
                                             <label>Họ và tên</label>
@@ -611,8 +708,14 @@ function Checkout() {
                             </div>
                             <div className="billing-row">
                                 <span>Phí vận chuyển</span>
-                                <span>0₫</span>
+                                <span>{shippingFee === 0 ? "Miễn phí" : `${shippingFee.toLocaleString('vi-VN')}đ`}</span>
                             </div>
+                            {subtotalAmount >= 1000000 && (
+                                <div className="billing-row shipping-note">
+                                    <span>Ưu đãi vận chuyển</span>
+                                    <span>Đơn từ 1.000.000đ được miễn phí ship</span>
+                                </div>
+                            )}
                             <div className="billing-row discount">
                                 <span>Giảm giá {couponQuote?.couponCode ? `(${couponQuote.couponCode})` : ""}</span>
                                 <span>-{discountAmount.toLocaleString('vi-VN')}₫</span>

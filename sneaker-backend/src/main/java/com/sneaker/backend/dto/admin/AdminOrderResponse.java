@@ -18,6 +18,9 @@ public class AdminOrderResponse {
     private String receiverName;
     private String receiverPhone;
     private String shippingAddress;
+    private Long shippingAddressId;
+    private double shippingFee;
+    private String shippingRegion;
     private String note;
     private String status;
     private String paymentMethod;

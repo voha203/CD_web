@@ -21,6 +21,8 @@ public class User {
     private String phone;
     private String address;
     private String avatarUrl;
+    private String provider;
+    private String providerId;
 
     private String role; // USER / ADMIN
     private Boolean active = true;
