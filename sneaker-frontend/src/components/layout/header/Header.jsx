@@ -209,7 +209,7 @@ function Header() {
 
                 {/* Cụm logo */}
                 <a href="/" className="nav-item">
-                    <span className="logo-text">mysneaker</span>
+                    <span className="logo-text">Mysneaker</span>
                 </a>
 
                 {/* Vị trí giao hàng */}
