@@ -530,6 +530,20 @@
     }
 }
 
+.btn-review-product {
+    border: 0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    background: #111827;
+    color: #ffffff;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-review-product:hover {
+    background: #374151;
+}
+
 /* Định dạng khi bấm In (ẩn nút quay lại, nút in) */
 @media print {
     body {

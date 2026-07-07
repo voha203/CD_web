@@ -351,6 +351,7 @@ function Header() {
                             <button type="button" onClick={handleProfileClick}>Hồ sơ của tôi</button>
                             <button type="button" onClick={handleAccountOrdersClick}>Đơn hàng của tôi</button>
                             <button type="button" onClick={handleChangePassword}>Đổi mật khẩu</button>
+                            <button type="button" onClick={handleWishlistClick}>Sản phẩm yêu thích</button>
                             <div className="account-dropdown-divider"></div>
                             <button type="button" className="danger" onClick={handleLogout}>Đăng xuất</button>
                         </div>
@@ -361,6 +362,13 @@ function Header() {
                     <div className="flex-col-text">
                         <span className="nav-text-small">Returns</span>
                         <span className="nav-text-bold">& Orders</span>
+                    </div>
+                </div>
+
+                <div className="nav-item hide-on-mobile" onClick={handleWishlistClick}>
+                    <div className="flex-col-text">
+                        <span className="nav-text-small">Your</span>
+                        <span className="nav-text-bold">Wishlist</span>
                     </div>
                 </div>
 

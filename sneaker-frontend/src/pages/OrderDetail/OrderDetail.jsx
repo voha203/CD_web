@@ -321,6 +321,15 @@ function OrderDetail() {
                                     <span className="item-price">
                                         {(item.subTotal || item.price * item.quantity).toLocaleString('vi-VN')} VND
                                     </span>
+                                    {order.status === 'DELIVERED' && (
+                                        <button
+                                            type="button"
+                                            className="btn-review-product"
+                                            onClick={() => navigate(`/products/${item.productId}`)}
+                                        >
+                                            Review
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         ))}
