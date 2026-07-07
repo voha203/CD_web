@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/product-sizes")
-@CrossOrigin("*")
 public class ProductSizeController {
 
     @Autowired

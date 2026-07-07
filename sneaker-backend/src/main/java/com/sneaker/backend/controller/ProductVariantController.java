@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/variants")
-@CrossOrigin("*")
 public class ProductVariantController {
 
     @Autowired
