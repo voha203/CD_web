@@ -15,6 +15,7 @@ import com.sneaker.backend.repository.OrderRepository;
 import com.sneaker.backend.repository.ProductVariantSizeRepository;
 import com.sneaker.backend.service.AdminOrderService;
 import com.sneaker.backend.service.CouponService;
+import com.sneaker.backend.service.EmailService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,6 +42,9 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 
     @Autowired
     private CouponService couponService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public List<AdminOrderResponse> getOrders(String status, String paymentStatus, String keyword) {
@@ -76,6 +80,7 @@ public class AdminOrderServiceImpl implements AdminOrderService {
 
         if ("CANCELLED".equals(nextStatus)) {
             cancelOrder(order, request.getCancelReason());
+            emailService.sendOrderCancelledEmail(order);
         } else {
             order.setStatus(nextStatus);
         }

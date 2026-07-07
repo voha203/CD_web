@@ -69,6 +69,37 @@
     background-color: #d92d20;
 }
 
+.product-favorite-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 3;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    color: #475467;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.product-favorite-btn:hover {
+    transform: scale(1.06);
+}
+
+.product-favorite-btn.active {
+    color: #ef4444;
+}
+
+.product-favorite-btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
 .card-details {
     padding: 16px;
     display: flex;

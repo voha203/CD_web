@@ -17,6 +17,7 @@ import com.sneaker.backend.repository.ProductVariantSizeRepository;
 import com.sneaker.backend.repository.UserRepository;
 import com.sneaker.backend.service.CouponService;
 import com.sneaker.backend.service.DiscountService;
+import com.sneaker.backend.service.EmailService;
 import com.sneaker.backend.service.OrderService;
 import com.sneaker.backend.service.ShippingAddressService;
 import com.sneaker.backend.service.ShippingFeeService;
@@ -53,6 +54,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private DiscountService discountService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private ShippingAddressService shippingAddressService;
@@ -126,6 +130,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
         couponService.markCouponUsed(couponCalculation.getCouponCode());
+        emailService.sendOrderPlacedEmail(savedOrder);
 
         cart.getItems().clear();
         cartRepository.save(cart);
@@ -197,7 +202,9 @@ public class OrderServiceImpl implements OrderService {
 
         couponService.releaseCouponUsage(order.getDiscountCode());
 
-        return orderMapper.toDTO(orderRepository.save(order));
+        Order savedOrder = orderRepository.save(order);
+        emailService.sendOrderCancelledEmail(savedOrder);
+        return orderMapper.toDTO(savedOrder);
     }
 
     private String getCurrentUsername() {

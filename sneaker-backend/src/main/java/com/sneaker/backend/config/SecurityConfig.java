@@ -62,8 +62,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/cart/**").hasRole("USER")
                         .requestMatchers("/api/orders/**").hasRole("USER")
                         .requestMatchers("/api/addresses/**").hasRole("USER")
+                        .requestMatchers("/api/wishlist/**").hasRole("USER")
                         .requestMatchers("/api/coupons/validate").hasRole("USER")
                         .requestMatchers(HttpMethod.POST, "/api/products/*/reviews").hasRole("USER")
+                        .requestMatchers(HttpMethod.PUT, "/api/reviews/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/reviews/**").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/can-review/**").hasRole("USER")
                         .requestMatchers("/api/payment/create-url").hasRole("USER")
 
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")

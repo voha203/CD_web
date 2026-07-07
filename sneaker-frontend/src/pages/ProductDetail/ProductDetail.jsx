@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import './ProductDetail.css'
 
@@ -7,6 +7,7 @@ import { useCart } from "../../context/CartContext";
 import { addToCart } from "../../services/cartService";
 import { isAuthenticated } from "../../components/utils/auth";
 import { getApiErrorMessage } from "../../services/apiError";
+import { addWishlistItem, checkWishlistItem, removeWishlistItem } from "../../services/wishlistService";
 
 function ProductDetail() {
     // Lấy id từ trên thanh URL xuống
@@ -21,6 +22,8 @@ function ProductDetail() {
         error,
         reviews,
         reviewStats,
+        reviewSummary,
+        canReview,
         currentPage,
         setCurrentPage,
         isSubmitting,
@@ -32,6 +35,8 @@ function ProductDetail() {
     const [selectedSize, setSelectedSize] = useState(null);
     const [cartStatus, setCartStatus] = useState({ type: "", message: "" });
     const [isAddingToCart, setIsAddingToCart] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
     // State lưu vị trí ảnh đang được chọn (mặc định là 0 - ảnh đầu tiên)
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -41,6 +46,25 @@ function ProductDetail() {
 
     // State cho Form gửi đánh giá
     const [newReview, setNewReview] = useState({ rating: 5, comment: "" });
+
+    useEffect(() => {
+        let active = true;
+
+        const loadFavorite = async () => {
+            if (!isAuthenticated() || !id) return;
+            try {
+                const res = await checkWishlistItem(id);
+                if (active) setIsFavorite(Boolean(res.data?.favorited));
+            } catch {
+                if (active) setIsFavorite(false);
+            }
+        };
+
+        loadFavorite();
+        return () => {
+            active = false;
+        };
+    }, [id]);
 
     // Hàm gửi đánh giá mới
     const handleReviewSubmit = async (e) => {
@@ -127,6 +151,28 @@ function ProductDetail() {
             setCartStatus({ type: "error", message });
         } finally {
             setIsAddingToCart(false);
+        }
+    };
+
+    const handleToggleFavorite = async () => {
+        if (!isAuthenticated()) {
+            navigate("/login", { state: { from: location } });
+            return;
+        }
+
+        setIsFavoriteLoading(true);
+        try {
+            if (isFavorite) {
+                await removeWishlistItem(product.id);
+                setIsFavorite(false);
+            } else {
+                await addWishlistItem(product.id);
+                setIsFavorite(true);
+            }
+        } catch (err) {
+            setCartStatus({ type: "error", message: getApiErrorMessage(err, "Không thể cập nhật yêu thích.") });
+        } finally {
+            setIsFavoriteLoading(false);
         }
     };
 
@@ -325,7 +371,13 @@ function ProductDetail() {
                         >
                             {isAddingToCart ? "Adding..." : "Add to Bag"}
                         </button>
-                        <button className="btn btn-fav">Favourite
+                        <button
+                            className={`btn btn-fav ${isFavorite ? "active" : ""}`}
+                            type="button"
+                            onClick={handleToggleFavorite}
+                            disabled={isFavoriteLoading}
+                        >
+                            {isFavorite ? "Favorited" : "Favourite"}
                             <span className="material-symbols-outlined">
                                 favorite
                             </span>
@@ -400,11 +452,11 @@ function ProductDetail() {
                             className="accordion-header"
                             onClick={() => setIsReviewsOpen(!isReviewsOpen)}
                         >
-                            <h3>Reviews ({product.reviewCount || reviewStats.totalElements || 0})</h3>
+                            <h3>Reviews ({reviewSummary.totalReviews || product.reviewCount || reviewStats.totalElements || 0})</h3>
 
                             <div className="accordion-right-group">
                                 <div className="header-stars-preview">
-                                    {renderStars(product?.averageRating)}
+                                    {renderStars(reviewSummary.averageRating || product?.averageRating)}
                                 </div>
                                 <span
                                     className="material-symbols-outlined"
@@ -448,9 +500,37 @@ function ProductDetail() {
                                 </div>
 
                                 {/* ======== Các nút hành động dưới đáy (See Reviews & Write a review) ======== */}
-                                <div className="review-actions">
-                                    <button className="btn-outline">See Reviews</button>
-                                    <button className="btn-outline">Write a review</button>
+                                <div className="review-write-box">
+                                    {canReview.canReview ? (
+                                        <form onSubmit={handleReviewSubmit} className="review-form">
+                                            <label>
+                                                <span>Rating</span>
+                                                <select
+                                                    value={newReview.rating}
+                                                    onChange={(e) => setNewReview(prev => ({ ...prev, rating: Number(e.target.value) }))}
+                                                >
+                                                    {[5, 4, 3, 2, 1].map(value => (
+                                                        <option key={value} value={value}>{value} sao</option>
+                                                    ))}
+                                                </select>
+                                            </label>
+                                            <label>
+                                                <span>Nhận xét</span>
+                                                <textarea
+                                                    value={newReview.comment}
+                                                    onChange={(e) => setNewReview(prev => ({ ...prev, comment: e.target.value }))}
+                                                    maxLength={1000}
+                                                    rows={4}
+                                                    placeholder="Chia sẻ cảm nhận sau khi mua sản phẩm..."
+                                                />
+                                            </label>
+                                            <button type="submit" className="btn-outline" disabled={isSubmitting}>
+                                                {isSubmitting ? "Đang gửi..." : "Gửi đánh giá"}
+                                            </button>
+                                        </form>
+                                    ) : (
+                                        <p className="review-note">{canReview.message || "Bạn chỉ có thể đánh giá sau khi mua và nhận hàng."}</p>
+                                    )}
                                 </div>
                             </div>
                         </div>

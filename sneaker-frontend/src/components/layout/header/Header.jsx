@@ -126,6 +126,15 @@ function Header() {
         }
     };
 
+    const handleWishlistClick = (event) => {
+        if (event) event.stopPropagation();
+        if (isAuthenticated()) {
+            navigate("/wishlist");
+        } else {
+            navigate("/login");
+        }
+    };
+
     const handleAccountClick = () => {
         if (!isAuthenticated()) {
             navigate("/login");

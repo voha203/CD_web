@@ -6,6 +6,7 @@ import com.sneaker.backend.entity.OrderItem;
 import com.sneaker.backend.entity.ProductVariantSize;
 import com.sneaker.backend.repository.OrderRepository;
 import com.sneaker.backend.repository.ProductVariantSizeRepository;
+import com.sneaker.backend.service.EmailService;
 import com.sneaker.backend.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Autowired
     private ProductVariantSizeRepository variantSizeRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public String createVNPayOrder(Long orderId, String bankCode, HttpServletRequest request) {
@@ -223,9 +227,13 @@ public class PaymentServiceImpl implements PaymentService {
             // Kiểm tra mã phản hồi thanh toán từ VNPay
             String responseCode = request.getParameter("vnp_ResponseCode");
             if ("00".equals(responseCode)) {
+                boolean wasPaid = "PAID".equals(order.getPaymentStatus());
                 // Thanh toán thành công
                 order.setPaymentStatus("PAID");
                 order.setStatus("PENDING");
+                if (!wasPaid) {
+                    emailService.sendPaymentSuccessEmail(order);
+                }
             } else {
                 // Thanh toán thất bại
                 order.setPaymentStatus("FAILED");

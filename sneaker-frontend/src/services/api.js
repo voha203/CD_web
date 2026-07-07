@@ -1,3 +1,4 @@
+import apiClient from "./apiClient";
 import { createApiError } from "./apiError";
 
 const BASE_URL = "http://localhost:8080/api";
@@ -25,10 +26,7 @@ export const getProducts = async (params = {}) => {
   });
 
   const suffix = query.toString() ? `?${query.toString()}` : "";
-  if (suffix) {
-    return fetchJson(`${BASE_URL}/products${suffix}`, undefined, "KhÃ´ng thá»ƒ táº£i danh sÃ¡ch sáº£n pháº©m");
-  }
-  return fetchJson(`${BASE_URL}/products`, undefined, "Không thể tải danh sách sản phẩm");
+  return fetchJson(`${BASE_URL}/products${suffix}`, undefined, "Không thể tải danh sách sản phẩm");
 };
 
 export const getProductSuggestions = async (keyword) => {
@@ -58,16 +56,26 @@ export const getProductReviews = async (id, page = 0, size = 5) => {
   );
 };
 
+export const getProductReviewSummary = async (id) => {
+  return fetchJson(`${BASE_URL}/products/${id}/reviews/summary`, undefined, "Không thể tải tổng quan đánh giá");
+};
+
 export const submitProductReview = async (id, reviewData) => {
-  return fetchJson(
-    `${BASE_URL}/products/${id}/reviews`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(reviewData)
-    },
-    "Không thể gửi đánh giá"
-  );
+  const res = await apiClient.post(`/products/${id}/reviews`, reviewData);
+  return res.data;
+};
+
+export const canReviewProduct = async (id) => {
+  const res = await apiClient.get(`/reviews/can-review/${id}`);
+  return res.data;
+};
+
+export const updateProductReview = async (reviewId, reviewData) => {
+  const res = await apiClient.put(`/reviews/${reviewId}`, reviewData);
+  return res.data;
+};
+
+export const deleteProductReview = async (reviewId) => {
+  const res = await apiClient.delete(`/reviews/${reviewId}`);
+  return res.data;
 };

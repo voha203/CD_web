@@ -21,6 +21,7 @@ import AdminProducts from './pages/AdminProducts/AdminProducts';
 import AdminCategories from './pages/AdminCategories/AdminCategories';
 import AdminUsers from './pages/AdminUsers/AdminUsers';
 import Profile from './pages/Profile/Profile';
+import Wishlist from './pages/Wishlist/Wishlist';
 import AdminLayout from './components/layout/adminLayout/AdminLayout';
 import ErrorPage from './pages/ErrorPage/ErrorPage';
 
@@ -79,6 +80,7 @@ function App() {
 
             {/* Trang chi tiết đơn hàng */}
             <Route path="/orders/:id" element={<ProtectedRoute roles={["USER"]}><OrderDetail /></ProtectedRoute>} />
+            <Route path="/wishlist" element={<ProtectedRoute roles={["USER"]}><Wishlist /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute roles={["USER"]}><Profile /></ProtectedRoute>} />
             <Route path="/change-password" element={<ProtectedRoute roles={["USER"]}><ChangePassword /></ProtectedRoute>} />
             {/* Trang 404: Không tải được giao diện */}

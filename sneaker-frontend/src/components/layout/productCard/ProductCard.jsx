@@ -1,8 +1,13 @@
-import React from "react";
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from 'react-router-dom';
 import './ProductCard.css';
+import { isAuthenticated } from "../../utils/auth";
+import { addWishlistItem, checkWishlistItem, removeWishlistItem } from "../../../services/wishlistService";
 
 function ProductCard({ product }) {
+    const navigate = useNavigate();
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat('vi-VN', {
@@ -28,6 +33,48 @@ function ProductCard({ product }) {
     const rating = product.averageRating || product.rating;
     const reviewCount = product.reviewCount || product.totalReviews;
 
+    useEffect(() => {
+        let active = true;
+
+        const loadFavorite = async () => {
+            if (!isAuthenticated() || !product?.id) return;
+            try {
+                const res = await checkWishlistItem(product.id);
+                if (active) setIsFavorite(Boolean(res.data?.favorited));
+            } catch {
+                if (active) setIsFavorite(false);
+            }
+        };
+
+        loadFavorite();
+        return () => {
+            active = false;
+        };
+    }, [product?.id]);
+
+    const handleFavoriteClick = async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!isAuthenticated()) {
+            navigate("/login");
+            return;
+        }
+
+        setIsFavoriteLoading(true);
+        try {
+            if (isFavorite) {
+                await removeWishlistItem(product.id);
+                setIsFavorite(false);
+            } else {
+                await addWishlistItem(product.id);
+                setIsFavorite(true);
+            }
+        } finally {
+            setIsFavoriteLoading(false);
+        }
+    };
+
     return (
         <Link to={`/products/${product.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
             <div className="product-card">
@@ -44,6 +91,15 @@ function ProductCard({ product }) {
                     )}
 
                     {/* Ảnh giày chính */}
+                    <button
+                        type="button"
+                        className={`product-favorite-btn ${isFavorite ? "active" : ""}`}
+                        onClick={handleFavoriteClick}
+                        disabled={isFavoriteLoading}
+                        aria-label={isFavorite ? "Bỏ yêu thích" : "Thêm yêu thích"}
+                    >
+                        ♥
+                    </button>
                     <img
                         src={mainImage}
                         alt={product.name}
