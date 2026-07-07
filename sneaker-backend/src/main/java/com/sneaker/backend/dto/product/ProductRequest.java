@@ -3,6 +3,7 @@ package com.sneaker.backend.dto.product;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -25,5 +26,6 @@ public class ProductRequest {
     private String description;
 
     @NotNull(message = "Danh mục không được để trống")
+    @Positive(message = "Danh mục không hợp lệ")
     private Long categoryId;
 }

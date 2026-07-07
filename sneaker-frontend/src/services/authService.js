@@ -1,4 +1,5 @@
 import apiClient from "./apiClient";
+import { getGoogleLoginUrl as buildGoogleLoginUrl } from "../config/apiConfig";
 
 export const login = (credentials) => {
     return apiClient.post("/auth/login", credentials);
@@ -25,5 +26,5 @@ export const getProfile = () => {
 };
 
 export const getGoogleLoginUrl = () => {
-    return "http://localhost:8080/oauth2/authorization/google";
+    return buildGoogleLoginUrl();
 };

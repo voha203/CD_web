@@ -4,12 +4,13 @@ import { FiCheckCircle, FiChevronLeft, FiCreditCard, FiMapPin, FiPackage, FiTruc
 import { cancelOrder, getOrderById } from '../../services/orderService';
 import { createPaymentUrl } from '../../services/paymentService';
 import { getApiErrorMessage } from '../../services/apiError';
+import { resolveAssetUrl } from '../../config/apiConfig';
 import './OrderDetail.css';
 
 const getImageUrl = (images = []) => {
     const imageUrl = images[0]?.imageUrl;
     if (!imageUrl) return 'https://via.placeholder.com/300';
-    return imageUrl.startsWith('http') ? imageUrl : `http://localhost:8080${imageUrl}`;
+    return resolveAssetUrl(imageUrl);
 };
 
 const formatDateTime = (value) => {

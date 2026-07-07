@@ -9,6 +9,7 @@ import {
     updateAdminOrderStatus,
     updateAdminPaymentStatus
 } from '../../services/adminService';
+import { resolveAssetUrl } from '../../config/apiConfig';
 import './AdminOrders.css';
 
 const orderStatuses = ['ALL', 'PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
@@ -37,7 +38,7 @@ const formatDateTime = (value) => value ? new Date(value).toLocaleString('vi-VN'
 const getImageUrl = (images = []) => {
     const imageUrl = images[0]?.imageUrl;
     if (!imageUrl) return 'https://via.placeholder.com/300';
-    return imageUrl.startsWith('http') ? imageUrl : `http://localhost:8080${imageUrl}`;
+    return resolveAssetUrl(imageUrl);
 };
 
 function AdminOrders() {

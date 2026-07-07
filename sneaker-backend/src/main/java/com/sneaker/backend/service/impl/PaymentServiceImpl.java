@@ -10,7 +10,9 @@ import com.sneaker.backend.service.EmailService;
 import com.sneaker.backend.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.Mac;
@@ -35,22 +37,22 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public String createVNPayOrder(Long orderId, String bankCode, HttpServletRequest request) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "KhÃ´ng tÃ¬m tháº¥y Ä‘Æ¡n hÃ ng"));
 
         if ("COD".equals(order.getPaymentMethod())) {
-            throw new RuntimeException("Đơn COD không cần thanh toán online");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ÄÆ¡n COD khÃ´ng cáº§n thanh toÃ¡n online");
         }
 
         if ("CANCELLED".equals(order.getStatus())) {
-            throw new RuntimeException("Đơn hàng đã bị hủy");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ÄÆ¡n hÃ ng Ä‘Ã£ bá»‹ há»§y");
         }
 
         if ("PAID".equals(order.getPaymentStatus())) {
-            throw new RuntimeException("Đơn hàng đã thanh toán");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ÄÆ¡n hÃ ng Ä‘Ã£ thanh toÃ¡n");
         }
 
         if ("REFUND_PENDING".equals(order.getPaymentStatus()) || "REFUNDED".equals(order.getPaymentStatus())) {
-            throw new RuntimeException("Đơn hàng đang trong trạng thái hoàn tiền");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ÄÆ¡n hÃ ng Ä‘ang trong tráº¡ng thÃ¡i hoÃ n tiá»n");
         }
 
         long amount = (long) getPayableAmount(order);
@@ -63,7 +65,7 @@ public class PaymentServiceImpl implements PaymentService {
         vnpParams.put("vnp_Command", "pay");
         vnpParams.put("vnp_TmnCode", VNPayConfig.vnp_TmnCode);
 
-        // XÁC ĐỊNH THẺ HAY VÍ/QR
+        // XÃC Äá»ŠNH THáºº HAY VÃ/QR
         if (bankCode != null && !bankCode.isEmpty()) {
             vnpParams.put("vnp_BankCode", bankCode);
         }
@@ -144,17 +146,48 @@ public class PaymentServiceImpl implements PaymentService {
             return hash.toString();
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Cannot create payment signature", e);
         }
     }
 
+    @Override
+    @Transactional
+    public Optional<Long> processReturn(HttpServletRequest request) {
+        String responseCode = request.getParameter("vnp_ResponseCode");
+        String txnRef = request.getParameter("vnp_TxnRef");
+
+        if (!"00".equals(responseCode) || txnRef == null || txnRef.isBlank()) {
+            return Optional.empty();
+        }
+
+        Long orderId;
+        try {
+            orderId = Long.parseLong(txnRef.split("_")[0]);
+        } catch (NumberFormatException ex) {
+            return Optional.empty();
+        }
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Khong tim thay don hang"));
+
+        boolean wasPaid = "PAID".equals(order.getPaymentStatus());
+        order.setPaymentStatus("PAID");
+        order.setStatus("PENDING");
+
+        orderRepository.save(order);
+        if (!wasPaid) {
+            emailService.sendPaymentSuccessEmail(order);
+        }
+
+        return Optional.of(orderId);
+    }
     @Override
     @Transactional
     public Map<String, String> processIpn(HttpServletRequest request) {
         Map<String, String> result = new HashMap<>();
 
         try {
-            // Lấy toàn bộ tham số VNPay gửi qua URL
+            // Láº¥y toÃ n bá»™ tham sá»‘ VNPay gá»­i qua URL
             Map<String, String> fields = new HashMap<>();
             for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements(); ) {
                 String fieldName = params.nextElement();
@@ -168,7 +201,7 @@ public class PaymentServiceImpl implements PaymentService {
             fields.remove("vnp_SecureHash");
             fields.remove("vnp_SecureHashType");
 
-            // Tạo chuỗi hashData từ các tham số (Sắp xếp theo Alphabet y như lúc tạo URL)
+            // Táº¡o chuá»—i hashData tá»« cÃ¡c tham sá»‘ (Sáº¯p xáº¿p theo Alphabet y nhÆ° lÃºc táº¡o URL)
             List<String> fieldNames = new ArrayList<>(fields.keySet());
             Collections.sort(fieldNames);
             StringBuilder hashData = new StringBuilder();
@@ -178,7 +211,7 @@ public class PaymentServiceImpl implements PaymentService {
                 String fieldName = itr.next();
                 String fieldValue = fields.get(fieldName);
                 if ((fieldValue != null) && (fieldValue.length() > 0)) {
-                    // Mã hóa URL
+                    // MÃ£ hÃ³a URL
                     hashData.append(fieldName).append("=")
                             .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
                     if (itr.hasNext()) {
@@ -187,7 +220,7 @@ public class PaymentServiceImpl implements PaymentService {
                 }
             }
 
-            // Xác thực chữ ký
+            // XÃ¡c thá»±c chá»¯ kÃ½
             String signValue = hmacSHA512(VNPayConfig.secretKey, hashData.toString());
 
             if (!signValue.equals(vnp_SecureHash)) {
@@ -196,7 +229,7 @@ public class PaymentServiceImpl implements PaymentService {
                 return result;
             }
 
-            // Kiểm tra đơn hàng có tồn tại không
+            // Kiá»ƒm tra Ä‘Æ¡n hÃ ng cÃ³ tá»“n táº¡i khÃ´ng
             String orderIdStr = request.getParameter("vnp_TxnRef").split("_")[0];
             Long orderId = Long.parseLong(orderIdStr);
             Optional<Order> orderOptional = orderRepository.findById(orderId);
@@ -209,7 +242,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             Order order = orderOptional.get();
 
-            // Kiểm tra số tiền
+            // Kiá»ƒm tra sá»‘ tiá»n
             double vnp_Amount = Double.parseDouble(request.getParameter("vnp_Amount")) / 100;
             if (Double.compare(getPayableAmount(order), vnp_Amount) != 0) {
                 result.put("RspCode", "04");
@@ -217,32 +250,32 @@ public class PaymentServiceImpl implements PaymentService {
                 return result;
             }
 
-            // Kiểm tra trạng thái đơn hàng (Chỉ xử lý nếu đơn đang là PENDING)
+            // Kiá»ƒm tra tráº¡ng thÃ¡i Ä‘Æ¡n hÃ ng (Chá»‰ xá»­ lÃ½ náº¿u Ä‘Æ¡n Ä‘ang lÃ  PENDING)
             if (!"PENDING".equals(order.getStatus())) {
                 result.put("RspCode", "02");
                 result.put("Message", "Order already confirmed");
                 return result;
             }
 
-            // Kiểm tra mã phản hồi thanh toán từ VNPay
+            // Kiá»ƒm tra mÃ£ pháº£n há»“i thanh toÃ¡n tá»« VNPay
             String responseCode = request.getParameter("vnp_ResponseCode");
             if ("00".equals(responseCode)) {
                 boolean wasPaid = "PAID".equals(order.getPaymentStatus());
-                // Thanh toán thành công
+                // Thanh toÃ¡n thÃ nh cÃ´ng
                 order.setPaymentStatus("PAID");
                 order.setStatus("PENDING");
                 if (!wasPaid) {
                     emailService.sendPaymentSuccessEmail(order);
                 }
             } else {
-                // Thanh toán thất bại
+                // Thanh toÃ¡n tháº¥t báº¡i
                 order.setPaymentStatus("FAILED");
             }
 
-            // Lưu lại trạng thái mới vào DB
+            // LÆ°u láº¡i tráº¡ng thÃ¡i má»›i vÃ o DB
             orderRepository.save(order);
 
-            // Trả về thông báo thành công cho VNPay dừng gọi ngầm
+            // Tráº£ vá» thÃ´ng bÃ¡o thÃ nh cÃ´ng cho VNPay dá»«ng gá»i ngáº§m
             result.put("RspCode", "00");
             result.put("Message", "Confirm Success");
 

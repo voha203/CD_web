@@ -8,6 +8,7 @@ import { addToCart } from "../../services/cartService";
 import { isAuthenticated } from "../../components/utils/auth";
 import { getApiErrorMessage } from "../../services/apiError";
 import { addWishlistItem, checkWishlistItem, removeWishlistItem } from "../../services/wishlistService";
+import { resolveAssetUrl } from "../../config/apiConfig";
 
 const PLACEHOLDER_IMAGE = "https://via.placeholder.com/600";
 
@@ -99,10 +100,7 @@ function ProductDetail() {
     let images = rawImages.map(img => {
         let url = img.imageUrl;
         if (!url) return PLACEHOLDER_IMAGE;
-        if (!url.startsWith("http")) {
-            return `http://localhost:8080${url}`;
-        }
-        return url;
+        return resolveAssetUrl(url, PLACEHOLDER_IMAGE);
     });
 
     // Nếu không có ảnh, chèn 1 ảnh mặc định vào mảng
@@ -324,11 +322,7 @@ function ProductDetail() {
                                 (a, b) => Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0)
                             )[0];
                             const firstImgOfVariant = firstImage?.imageUrl;
-                            const displayImg = firstImgOfVariant?.startsWith("http")
-                                ? firstImgOfVariant
-                                : firstImgOfVariant
-                                    ? `http://localhost:8080${firstImgOfVariant}`
-                                    : PLACEHOLDER_IMAGE;
+                            const displayImg = resolveAssetUrl(firstImgOfVariant, PLACEHOLDER_IMAGE);
 
                             return (
                                 <img

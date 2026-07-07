@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { FiBox, FiCheck, FiChevronRight, FiTruck } from 'react-icons/fi';
 import { getMyOrders } from '../../services/orderService';
 import { getApiErrorMessage } from '../../services/apiError';
+import { resolveAssetUrl } from '../../config/apiConfig';
 import './Orders.css';
 
 const getImageUrl = (images = []) => {
     const imageUrl = images[0]?.imageUrl;
     if (!imageUrl) return 'https://via.placeholder.com/300';
-    return imageUrl.startsWith('http') ? imageUrl : `http://localhost:8080${imageUrl}`;
+    return resolveAssetUrl(imageUrl);
 };
 
 const formatDate = (value) => {

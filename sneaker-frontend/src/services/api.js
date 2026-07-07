@@ -1,7 +1,8 @@
 import apiClient from "./apiClient";
 import { createApiError } from "./apiError";
+import { API_BASE_URL } from "../config/apiConfig";
 
-const BASE_URL = "http://localhost:8080/api";
+const BASE_URL = API_BASE_URL;
 
 const fetchJson = async (url, options, fallback) => {
   const res = await fetch(url, options);

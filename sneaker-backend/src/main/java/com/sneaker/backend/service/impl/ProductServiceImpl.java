@@ -14,12 +14,14 @@ import com.sneaker.backend.service.ProductService;
 
 import com.sneaker.backend.specification.ProductSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -177,7 +179,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse getById(Long id) {
         Product p = findProductById(id);
         if (Boolean.FALSE.equals(p.getActive())) {
-            throw new RuntimeException("Không tìm thấy sản phẩm id: " + id);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy sản phẩm id: " + id);
         }
 
         return enrichProductDTO(p);
@@ -191,15 +193,15 @@ public class ProductServiceImpl implements ProductService {
 
         //  VALIDATE
         if (request.getName() == null || request.getName().trim().isEmpty()) {
-            throw new RuntimeException("Name is required");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required");
         }
 
         if (request.getPrice() == null || request.getPrice() < 0) {
-            throw new RuntimeException("Price must be >= 0");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must be >= 0");
         }
 
         if (request.getCategoryId() == null) {
-            throw new RuntimeException("CategoryId is required");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CategoryId is required");
         }
 
         Category category = findCategoryById(request.getCategoryId());
@@ -219,15 +221,15 @@ public class ProductServiceImpl implements ProductService {
         Product p = findProductById(id);
 
         if (request.getName() == null || request.getName().trim().isEmpty()) {
-            throw new RuntimeException("Name is required");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Name is required");
         }
 
         if (request.getPrice() == null || request.getPrice() < 0) {
-            throw new RuntimeException("Price must be >= 0");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must be >= 0");
         }
 
         if (request.getCategoryId() == null) {
-            throw new RuntimeException("CategoryId is required");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "CategoryId is required");
         }
 
         Category category = findCategoryById(request.getCategoryId());
@@ -250,12 +252,12 @@ public class ProductServiceImpl implements ProductService {
     // =========================
     private Product findProductById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy sản phẩm id: " + id));
     }
 
     private Category findCategoryById(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy danh mục id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy danh mục id: " + id));
     }
 
     private ProductResponse enrichProductDTO(Product p) {

@@ -292,7 +292,7 @@ public class CouponServiceImpl implements CouponService {
         }
 
         User user = userRepository.findByUsername(auth.getName())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
 
         return user.getId();
     }

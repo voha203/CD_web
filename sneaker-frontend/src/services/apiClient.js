@@ -1,8 +1,9 @@
 import axios from "axios";
 import { getToken } from "../components/utils/auth";
+import { API_BASE_URL } from "../config/apiConfig";
 
 const apiClient = axios.create({
-    baseURL: "http://localhost:8080/api",
+    baseURL: API_BASE_URL,
     timeout: 15000
 });
 

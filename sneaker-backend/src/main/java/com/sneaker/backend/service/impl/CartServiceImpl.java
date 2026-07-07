@@ -108,7 +108,7 @@ public class CartServiceImpl implements CartService {
         Long userId = getCurrentUserId();
 
         if (!item.getCart().getUserId().equals(userId)) {
-            throw new RuntimeException("Forbidden");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden");
         }
 
         if (quantity <= 0) {
@@ -166,12 +166,12 @@ public class CartServiceImpl implements CartService {
 
     private CartItem findItemById(Long id) {
         return cartItemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("CartItem not found: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "CartItem not found: " + id));
     }
 
     private ProductVariantSize findVariantSize(Long id) {
         return variantSizeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("VariantSize not found: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "VariantSize not found: " + id));
     }
 
     private CartItem createCartItem(Cart cart, CartRequest req) {
@@ -188,11 +188,11 @@ public class CartServiceImpl implements CartService {
     private void validateAddRequest(CartRequest req) {
 
         if (req.getVariantSizeId() == null) {
-            throw new RuntimeException("variantSizeId is required");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "variantSizeId is required");
         }
 
         if (req.getQuantity() == null || req.getQuantity() <= 0) {
-            throw new RuntimeException("quantity must be > 0");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "quantity must be > 0");
         }
     }
 
@@ -210,7 +210,7 @@ public class CartServiceImpl implements CartService {
         String username = getCurrentUsername();
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
         return user.getId();
     }

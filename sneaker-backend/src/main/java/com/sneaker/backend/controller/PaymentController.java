@@ -1,8 +1,5 @@
 package com.sneaker.backend.controller;
 
-import com.sneaker.backend.entity.Order;
-import com.sneaker.backend.repository.OrderRepository;
-import com.sneaker.backend.service.EmailService;
 import com.sneaker.backend.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -18,12 +16,6 @@ public class PaymentController {
 
     @Autowired
     private PaymentService paymentService;
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private EmailService emailService;
 
     @GetMapping("/create-url")
     public ResponseEntity<?> createPaymentUrl(
@@ -37,27 +29,11 @@ public class PaymentController {
 
     @GetMapping("/vnpay-return")
     public RedirectView vnpayReturn(HttpServletRequest request) {
-        String responseCode = request.getParameter("vnp_ResponseCode");
+        Optional<Long> paidOrderId = paymentService.processReturn(request);
 
-        String vnp_TxnRef = request.getParameter("vnp_TxnRef");
-        String orderId = vnp_TxnRef.split("_")[0];
-
-        if ("00".equals(responseCode)) {
-            Order order = orderRepository.findById(Long.parseLong(orderId)).orElseThrow();
-
-            boolean wasPaid = "PAID".equals(order.getPaymentStatus());
-            order.setPaymentStatus("PAID");
-            order.setStatus("PENDING");
-
-            orderRepository.save(order);
-            if (!wasPaid) {
-                emailService.sendPaymentSuccessEmail(order);
-            }
-
-            return new RedirectView("http://localhost:5173/thank-you?orderId=" + orderId);
-        }
-
-        return new RedirectView("http://localhost:5173/payment-failed");
+        return paidOrderId
+                .map(orderId -> new RedirectView("http://localhost:5173/thank-you?orderId=" + orderId))
+                .orElseGet(() -> new RedirectView("http://localhost:5173/payment-failed"));
     }
 
     @GetMapping("/vnpay-ipn")
