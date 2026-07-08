@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { buildApiUrl } from '../../../config/apiConfig';
 import './Sidebar.css';
 
 function Sidebar({ onFilterChange }) {
@@ -19,7 +20,7 @@ function Sidebar({ onFilterChange }) {
 
     // Lấy danh mục từ Backend khi load trang
     useEffect(() => {
-        fetch("http://localhost:8080/api/categories")
+        fetch(buildApiUrl('/categories'))
             .then(res => res.json())
             .then(data => setCategories(data))
             .catch(err => console.error("Lỗi khi lấy danh mục:", err));

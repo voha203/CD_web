@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,10 +28,14 @@ public class GlobalExceptionHandler {
         Map<String, String> errors = new LinkedHashMap<>();
 
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+            errors.put(fieldError.getField(), resolveValidationMessage(fieldError));
         }
 
-        return buildResponse(HttpStatus.BAD_REQUEST, "Dữ liệu không hợp lệ", request, errors);
+        for (ObjectError objectError : ex.getBindingResult().getGlobalErrors()) {
+            errors.put(objectError.getObjectName(), resolveValidationMessage(objectError));
+        }
+
+        return buildResponse(HttpStatus.BAD_REQUEST, buildValidationSummary(errors), request, errors);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -41,7 +47,7 @@ public class GlobalExceptionHandler {
         ex.getConstraintViolations().forEach(violation ->
                 errors.put(violation.getPropertyPath().toString(), violation.getMessage()));
 
-        return buildResponse(HttpStatus.BAD_REQUEST, "Dữ liệu không hợp lệ", request, errors);
+        return buildResponse(HttpStatus.BAD_REQUEST, buildValidationSummary(errors), request, errors);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
@@ -98,11 +104,29 @@ public class GlobalExceptionHandler {
                 .timestamp(LocalDateTime.now())
                 .status(status.value())
                 .error(status.getReasonPhrase())
-                .message(message)
+                .message(resolveMessage(message, status))
                 .path(request.getRequestURI())
                 .errors(errors)
                 .build();
 
         return ResponseEntity.status(status).body(response);
+    }
+
+    private String resolveValidationMessage(ObjectError error) {
+        return StringUtils.hasText(error.getDefaultMessage())
+                ? error.getDefaultMessage()
+                : "Giá trị không hợp lệ";
+    }
+
+    private String buildValidationSummary(Map<String, String> errors) {
+        if (errors == null || errors.isEmpty()) {
+            return "Dữ liệu không hợp lệ";
+        }
+
+        return String.join("; ", errors.values());
+    }
+
+    private String resolveMessage(String message, HttpStatus status) {
+        return StringUtils.hasText(message) ? message : status.getReasonPhrase();
     }
 }

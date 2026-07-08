@@ -31,9 +31,9 @@
 
 /* Cột 1: Logo và Giới thiệu */
 .footer-brand .footer-logo {
+    color: #ffffff;
     font-size: 24px;
     font-weight: 900;
-    text-transform: uppercase;
     letter-spacing: 1px;
     margin-top: 33px;
     display: block;

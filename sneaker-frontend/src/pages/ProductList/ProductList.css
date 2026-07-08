@@ -11,6 +11,8 @@
     display: flex;
     gap: 30px;
     margin-bottom: 50px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .content-wrapper {
@@ -72,8 +74,9 @@
 .product-list-grid {
     flex: 1;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 20px;
+    min-width: 0;
 }
 
 .text-result {
@@ -98,7 +101,7 @@
 /* MÀN HÌNH TABLET VÀ LAPTOP NHỎ */
 @media (max-width: 1200px) {
     .product-list-grid {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 
@@ -118,7 +121,7 @@
     }
 
     .product-list-grid {
-        grid-template-columns: repeat(3, 1fr); 
+        grid-template-columns: repeat(3, minmax(0, 1fr)); 
     }
 
     /* Nút bật tắt bộ lọc trên mobile */
@@ -223,7 +226,7 @@
     }
 
     .product-list-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 15px;
     }
 }
@@ -231,15 +234,37 @@
 /* MÀN HÌNH MOBILE NHỎ */
 @media (max-width: 520px) {
     .product-list-container main {
-        padding: 10px;
+        padding: 12px;
     }
 
     .product-list-grid {
-        gap: 10px;
+        gap: 12px;
+    }
+
+    .product-list-top {
+        box-shadow: none;
+        padding: 12px;
+    }
+
+    .product-list-arrange {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .product-list-arrange select,
+    .btn-show-filter {
+        min-height: 42px;
+        width: 100%;
     }
 
     .text-result h2 {
         font-size: 18px;
+    }
+}
+
+@media (max-width: 380px) {
+    .product-list-grid {
+        grid-template-columns: 1fr;
     }
 }
 

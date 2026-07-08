@@ -4,6 +4,7 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -33,5 +34,6 @@ public class DiscountRequest {
     private Boolean active;
 
     @NotNull(message = "Sản phẩm áp dụng không được để trống")
+    @Positive(message = "Sản phẩm áp dụng không hợp lệ")
     private Long productId;
 }

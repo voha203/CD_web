@@ -19,6 +19,7 @@ body {
     align-items: center;
     justify-content: space-between;
     height: 60px;
+    min-width: 0;
 }
 
 .nav-item {
@@ -134,7 +135,8 @@ body {
     margin: 6px 0;
 }
 
-.logo-text {
+.header .nav-main .logo-text {
+    color: #ffffff !important;
     font-size: 24px;
     font-weight: bold;
     letter-spacing: -1px;
@@ -149,6 +151,7 @@ body {
     margin: 0 16px;
     background-color: white;
     position: relative;
+    min-width: 0;
 }
 
 .search-container:focus-within {
@@ -468,17 +471,32 @@ body {
 
 /* MÀN HÌNH ĐIỆN THOẠI NHỎ */
 @media (max-width: 520px) {
+    .nav-main {
+        align-items: center;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        padding: 8px 10px;
+    }
+
+    .nav-main > .nav-item:first-child {
+        min-width: 0;
+        padding-left: 0;
+    }
+
     .hide-on-mobile {
         display: none !important;
     }
     
-    .logo-text {
+    .header .nav-main .logo-text {
         font-size: 18px;
         letter-spacing: -0.5px;
     }
 
     .account-nav-item {
-        max-width: 112px;
+        justify-content: center;
+        max-width: 104px;
+        min-width: 0;
+        padding: 6px 4px;
     }
 
     .account-nav-item .nav-text-small,
@@ -492,8 +510,8 @@ body {
     .account-dropdown-menu {
         min-width: min(230px, calc(100vw - 24px));
         position: fixed;
-        right: 12px;
-        top: 66px;
+        right: 10px;
+        top: 60px;
     }
 
     .account-dropdown-menu::before {
@@ -517,6 +535,11 @@ body {
         height: 28px;
     }
 
+    .nav-main > .nav-item:last-child {
+        justify-content: center;
+        padding: 6px 4px;
+    }
+
     .cart-count {
         font-size: 13px;
         top: -6px;
@@ -537,9 +560,23 @@ body {
 
     .search-btn {
         padding: 0 12px;
+        flex: 0 0 46px;
     }
 
     .nav-item:hover {
         border-color: transparent;
+    }
+
+    .nav-sub {
+        padding: 4px 8px;
+    }
+
+    .mobile-menu-toggle {
+        margin-right: 0 !important;
+    }
+
+    .nav-sub-links .nav-item {
+        flex: 1 1 100%;
+        min-width: 0;
     }
 }

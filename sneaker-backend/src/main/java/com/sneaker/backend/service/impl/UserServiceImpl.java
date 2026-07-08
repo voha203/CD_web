@@ -38,11 +38,11 @@ public class UserServiceImpl implements UserService {
     public User register(User user) {
 
         if (userRepository.existsByUsername(user.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already exists");
         }
 
         if (userRepository.existsByEmail(user.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
         }
 
         if (user.getRole() == null) {
@@ -60,14 +60,14 @@ public class UserServiceImpl implements UserService {
     public User login(String username, String password) {
 
         User user = findByUsernameEmailOrPhone(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
 
         if (Boolean.FALSE.equals(user.getActive())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Tài khoản đã bị khóa");
         }
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Wrong password");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong password");
         }
 
         return user;
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
     }
 
     @Override
@@ -127,11 +127,11 @@ public class UserServiceImpl implements UserService {
         User user = findByUsername(username);
 
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
-            throw new RuntimeException("Mật khẩu cũ không đúng");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mật khẩu cũ không đúng");
         }
 
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new RuntimeException("Mật khẩu xác nhận không khớp");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mật khẩu xác nhận không khớp");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
@@ -140,7 +140,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void sendForgotPasswordOtp(ForgotPasswordRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Email không tồn tại trong hệ thống"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email không tồn tại trong hệ thống"));
 
         String otp = String.valueOf(100000 + new Random().nextInt(900000));
 
@@ -158,7 +158,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void resetPassword(ResetPasswordRequest request) {
         if (!request.getNewPassword().equals(request.getConfirmPassword())) {
-            throw new RuntimeException("Mật khẩu xác nhận không khớp");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Mật khẩu xác nhận không khớp");
         }
 
         PasswordResetOtp resetOtp = passwordResetOtpRepository
@@ -166,14 +166,14 @@ public class UserServiceImpl implements UserService {
                         request.getEmail(),
                         request.getOtp()
                 )
-                .orElseThrow(() -> new RuntimeException("OTP không đúng"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP không đúng"));
 
         if (resetOtp.getExpiredAt().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("OTP đã hết hạn");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP đã hết hạn");
         }
 
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Email không tồn tại"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email không tồn tại"));
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);

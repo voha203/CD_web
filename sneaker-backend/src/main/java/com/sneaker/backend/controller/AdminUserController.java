@@ -5,7 +5,6 @@ import com.sneaker.backend.dto.admin.UpdateUserStatusRequest;
 import com.sneaker.backend.service.AdminUserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +17,6 @@ import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/admin/users")
-@CrossOrigin("*")
 public class AdminUserController {
 
     @Autowired

@@ -19,7 +19,7 @@ function Footer() {
             <div className="footer-content">
                 {/* Thông tin thương hiệu */}
                 <div className="footer-brand">
-                    <span className="footer-logo">mysneaker</span>
+                    <span className="footer-logo">Mysneaker</span>
                     <p>
                         Tự hào là đơn vị cung cấp Sneaker chính hãng hàng đầu.
                         Chúng tôi mang đến những đôi giày chất lượng nhất để bạn
@@ -63,7 +63,7 @@ function Footer() {
 
             {/* Phần bản quyền dưới cùng */}
             <div className="footer-bottom">
-                <p>© 2026 mysneaker. All Rights Reserved.</p>
+                <p>© 2026 Mysneaker. All Rights Reserved.</p>
             </div>
         </footer>
     );

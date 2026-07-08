@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/variant-sizes")
-@CrossOrigin("*")
 public class ProductVariantSizeController {
 
     @Autowired

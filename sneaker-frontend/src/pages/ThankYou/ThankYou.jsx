@@ -12,6 +12,7 @@ import {
 import ProductCard from '../../components/layout/productCard/ProductCard';
 import { getOrderById } from '../../services/orderService';
 import { getApiErrorMessage } from '../../services/apiError';
+import { buildApiUrl } from '../../config/apiConfig';
 import './ThankYou.css';
 
 function ThankYou() {
@@ -46,7 +47,7 @@ function ThankYou() {
                 setIsLoading(false);
             });
 
-        fetch(`http://localhost:8080/api/products/recommendations?orderId=${orderId}`)
+        fetch(buildApiUrl(`/products/recommendations?orderId=${orderId}`))
             .then((response) => {
                 if (!response.ok) throw new Error('Could not load recommendations');
                 return response.json();

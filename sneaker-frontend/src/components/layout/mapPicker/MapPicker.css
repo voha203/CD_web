@@ -1,9 +1,16 @@
 .map-container-wrapper {
     height: 350px;
-    width: 813px;
+    max-width: 813px;
+    width: 100%;
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid #ccc;
     margin-top: 18px;
     position: relative;
+}
+
+@media (max-width: 576px) {
+    .map-container-wrapper {
+        height: 280px;
+    }
 }

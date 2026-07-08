@@ -298,4 +298,16 @@
     .discount-list-panel {
         padding: 18px;
     }
+
+    .discount-form-actions {
+        flex-direction: column;
+    }
+
+    .discount-form-actions button {
+        width: 100%;
+    }
+
+    .discount-table-wrapper {
+        margin-inline: -4px;
+    }
 }

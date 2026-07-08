@@ -73,13 +73,13 @@ public class OrderServiceImpl implements OrderService {
         Long currentUserId = getCurrentUserId();
 
         User user = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Người dùng không tồn tại"));
 
         Cart cart = cartRepository.findByUserId(currentUserId)
-                .orElseThrow(() -> new RuntimeException("Giỏ hàng không tồn tại"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giỏ hàng không tồn tại"));
 
         if (cart.getItems().isEmpty()) {
-            throw new RuntimeException("Giỏ hàng đang trống!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Giỏ hàng đang trống!");
         }
 
         Order order = new Order();
@@ -98,7 +98,7 @@ public class OrderServiceImpl implements OrderService {
             ProductVariantSize variantSize = cartItem.getVariantSize();
 
             if (variantSize.getQuantity() < cartItem.getQuantity()) {
-                throw new RuntimeException("Sản phẩm " + variantSize.getVariant().getProduct().getName()
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sản phẩm " + variantSize.getVariant().getProduct().getName()
                         + " hiện không đủ số lượng trong kho.");
             }
 
@@ -142,7 +142,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponse getOrderById(Long id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn hàng với mã số này."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Không tìm thấy đơn hàng với mã số này."));
 
         Long currentUserId = getCurrentUserId();
 
@@ -221,7 +221,7 @@ public class OrderServiceImpl implements OrderService {
         String username = getCurrentUsername();
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
 
         return user.getId();
     }

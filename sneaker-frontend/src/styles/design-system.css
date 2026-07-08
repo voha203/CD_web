@@ -178,8 +178,11 @@ textarea:focus-visible {
 .admin-orders-table-wrap,
 .admin-users-table-wrap,
 .admin-categories-table-wrap,
+.category-table-wrap,
 .coupon-table-wrap,
+.coupon-table-wrapper,
 .discount-table-wrap,
+.discount-table-wrapper,
 .orders-table-wrap {
     max-width: 100%;
     overflow-x: auto;
@@ -191,8 +194,11 @@ textarea:focus-visible {
 .admin-orders-table-wrap table,
 .admin-users-table-wrap table,
 .admin-categories-table-wrap table,
+.category-table-wrap table,
 .coupon-table-wrap table,
+.coupon-table-wrapper table,
 .discount-table-wrap table,
+.discount-table-wrapper table,
 .orders-table-wrap table {
     border-collapse: separate;
     border-spacing: 0;
@@ -205,7 +211,9 @@ textarea:focus-visible {
 .admin-orders-table-wrap thead th,
 .admin-users-table-wrap thead th,
 .admin-categories-table-wrap thead th,
+.category-table-wrap thead th,
 .coupon-table-wrap thead th,
+.coupon-table-wrapper thead th,
 .discount-table-wrap thead th {
     position: sticky;
     top: 0;
@@ -217,7 +225,9 @@ textarea:focus-visible {
 .admin-orders-table-wrap tbody tr,
 .admin-users-table-wrap tbody tr,
 .admin-categories-table-wrap tbody tr,
+.category-table-wrap tbody tr,
 .coupon-table-wrap tbody tr,
+.coupon-table-wrapper tbody tr,
 .discount-table-wrap tbody tr {
     transition: background-color 0.16s ease;
 }
@@ -227,9 +237,27 @@ textarea:focus-visible {
 .admin-orders-table-wrap tbody tr:hover,
 .admin-users-table-wrap tbody tr:hover,
 .admin-categories-table-wrap tbody tr:hover,
+.category-table-wrap tbody tr:hover,
 .coupon-table-wrap tbody tr:hover,
+.coupon-table-wrapper tbody tr:hover,
 .discount-table-wrap tbody tr:hover {
     background: #f9fafb;
+}
+
+.table-actions,
+.coupon-actions,
+.discount-actions {
+    align-items: center;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    white-space: nowrap;
+}
+
+.table-actions button,
+.coupon-actions button,
+.discount-actions button {
+    margin-left: 0 !important;
 }
 
 .coupon-form,
@@ -318,6 +346,25 @@ textarea:focus-visible {
     .profile-card,
     .checkout-section {
         border-radius: 7px;
+    }
+
+    .admin-table-wrap,
+    .admin-products-table-wrap,
+    .admin-orders-table-wrap,
+    .admin-users-table-wrap,
+    .admin-categories-table-wrap,
+    .category-table-wrap,
+    .coupon-table-wrapper,
+    .discount-table-wrapper {
+        border-radius: 8px;
+        margin-inline: -4px;
+        padding-bottom: 2px;
+    }
+
+    .table-actions,
+    .coupon-actions,
+    .discount-actions {
+        justify-content: flex-start;
     }
 }
 
